@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2026 京阪六天五夜</title>
-    <!-- 啟用全螢幕 App 模式 (隱藏 Safari 網址列與底部工具列) -->
+    <!-- 啟用全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="京阪旅遊">
@@ -30,16 +30,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
 
-        /* Splash Screen 啟動畫面 */
+        /* Splash Screen 啟動畫面 (防破圖保護) */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #fff; z-index: 9999;
+            background: #f4f7f6; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.5s ease;
         }
         #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.8; }
-        #splash-screen .splash-text { position: relative; z-index: 10; background: rgba(255,255,255,0.9); padding: 15px 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
-        #splash-screen h2 { color: var(--primary-color); font-size: 24px; margin-bottom: 5px;}
+        #splash-screen .splash-text { position: relative; z-index: 10; background: rgba(255,255,255,0.9); padding: 20px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
+        #splash-screen h2 { color: var(--primary-color); font-size: 26px; margin-bottom: 8px;}
         #splash-screen p { color: #555; font-size: 14px; font-weight: bold; }
 
         /* Header Hero */
@@ -51,8 +51,8 @@
 
         /* Global Controls */
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; margin-bottom: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
-        .manual-save-btn:active { transform: scale(0.95); background: #3a5885; }
+        .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
+        .manual-save-btn:active { transform: scale(0.95); }
 
         /* Container & Cards */
         .container { padding: 0 15px; }
@@ -90,19 +90,20 @@
         .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 5px; margin-bottom: 10px;}
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
-        /* Currency & Budget (極致 RWD 優化) */
-        #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-all; }
+        /* Currency & Budget (完美防破版 RWD) */
+        #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; }
         #budget-table th { background: #eef2f5; padding: 6px 2px; font-size: 12px; color: #555; text-align: center; }
         #budget-table td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 13px; text-align: center; vertical-align: middle; }
-        /* 嚴格控制各欄比例，保證不超出螢幕 */
-        #budget-table th:nth-child(1) { width: 26%; }
+        
+        /* 嚴格限制欄位寬度，保證不超出螢幕 */
+        #budget-table th:nth-child(1) { width: 28%; }
         #budget-table th:nth-child(2) { width: 22%; }
         #budget-table th:nth-child(3) { width: 18%; }
-        #budget-table th:nth-child(4) { width: 24%; }
-        #budget-table th:nth-child(5) { width: 10%; } /* 發票與刪除合併欄 */
+        #budget-table th:nth-child(4) { width: 20%; }
+        #budget-table th:nth-child(5) { width: 12%; }
         
         .amount-input { width: 100%; box-sizing: border-box; font-size: 13px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; }
-        .curr-select, .payer-select { font-size: 12px; padding: 2px; width: 100%; box-sizing: border-box; }
+        .curr-select, .payer-select { font-size: 11px; padding: 2px; width: 100%; box-sizing: border-box; }
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-right: 5px; margin-bottom: 5px; }
 
         /* Receipt Box */
@@ -138,9 +139,9 @@
 </head>
 <body>
 
-    <!-- 💯 百發百中 Splash Screen 啟動畫面 -->
+    <!-- 💯 Splash Screen 啟動畫面 (加入 onerror 防破圖保護) -->
     <div id="splash-screen">
-        <img src="splash.jpg" alt="Splash Background">
+        <img src="splash.jpg" alt="" onerror="this.style.display='none'">
         <div class="splash-text">
             <h2>2026 京阪之旅</h2>
             <p>行程載入中...</p>
@@ -155,15 +156,20 @@
     <!-- 全域控制列 -->
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:6px;">
-            <button class="manual-save-btn" onclick="forceManualSave()">
-                <span class="material-icons-round" style="font-size:16px;">save</span> 雲端儲存
-            </button>
+            <div style="display:flex; gap:8px;">
+                <button class="manual-save-btn" onclick="forceManualSave()">
+                    <span class="material-icons-round" style="font-size:14px;">save</span> 雲端儲存
+                </button>
+                <button class="manual-save-btn" onclick="location.reload()" style="background:#6c757d;">
+                    <span class="material-icons-round" style="font-size:14px;">refresh</span> 重新載入
+                </button>
+            </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <div style="font-size: 14px; font-weight: bold; color: var(--primary-color);">
-            全域顯示：TWD (台幣)
+        <div style="font-size: 14px; font-weight: bold; color: var(--primary-color); text-align: right;">
+            全域顯示<br>TWD (台幣)
         </div>
     </div>
 
@@ -203,6 +209,27 @@
                     </div>
                     <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
                 </div>
+                <!-- Day 2 to 6 -->
+                <div class="glass-card day-card">
+                    <div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">⛩️ Day 2 - 09/26 京都精華巡禮</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div>
+                    <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
+                </div>
+                <div class="glass-card day-card">
+                    <div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">🌳 Day 3 - 09/27 稻荷與嵐山</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div>
+                    <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
+                </div>
+                <div class="glass-card day-card">
+                    <div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">🚆 Day 4 - 09/28 前進大阪</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div>
+                    <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
+                </div>
+                <div class="glass-card day-card">
+                    <div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">🏯 Day 5 - 09/29 大阪名勝與購物</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div>
+                    <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
+                </div>
+                <div class="glass-card day-card">
+                    <div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">🛫 Day 6 - 09/30 滿載歸國</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div>
+                    <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
+                </div>
             </div>
             <button class="add-btn" onclick="addNewDayCard()" style="background: var(--primary-color); color: white;">+ 新增天數區塊</button>
         </div>
@@ -213,6 +240,7 @@
                 <h2 class="section-title"><span class="material-icons-round">directions_transit</span> 交通票券與指南</h2>
                 <div id="transport-text-list" style="margin-top: 15px;">
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">機場至京都：JR 特急 Haruka</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">市區交通：Apple Pay ICOCA</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                 </div>
                 <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 5px;">+ 新增交通指南</button>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
@@ -259,12 +287,12 @@
             </div>
         </div>
 
-        <!-- ================= 預算 Tab ================= -->
+        <!-- ================= 預算 Tab (RWD 優化版) ================= -->
         <div id="tab-budget" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
                 <div style="margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                    <div style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">付款人清單：</div>
+                    <div style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">建立與管理付款人清單：</div>
                     <div id="payer-tags-container"></div>
                     <button onclick="addPayer()" class="btn-nav" style="background: #eef2f5; color: var(--primary-color); box-shadow: none;">+ 新增付款人</button>
                 </div>
@@ -302,16 +330,65 @@
                 
                 <div id="person-todo-container">
                     <div class="person-todo-list" data-person="預設範本" style="display: block;">
+                        <!-- 類別：行李重量 -->
                         <div class="todo-category-header flex-between">
-                            <span class="editable" contenteditable="true">📦 行李重量</span>
+                            <span class="editable" contenteditable="true">📦 確認行李重量</span>
                             <div style="display:flex; gap:8px;">
                                 <span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span>
                                 <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
                             </div>
                         </div>
-                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">托運 20 公斤</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">隨身行李 XX 公斤</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        
+                        <!-- 類別：托運行李 -->
+                        <div class="todo-category-header flex-between">
+                            <span class="editable" contenteditable="true">🧳 托運行李 (液體允許>100ml)</span>
+                            <div style="display:flex; gap:8px;">
+                                <span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span>
+                                <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
+                            </div>
+                        </div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                            <div class="content-box"><div class="item-title editable" contenteditable="true">換洗衣褲件數確認</div>
+                            <table style="width: 100%; font-size: 12px; text-align: center; margin-top:5px; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" contenteditable="true">
+                                <tr style="background: #eef2f5;"><th>種類</th><th>短袖</th><th>短褲</th><th>長袖</th><th>長褲</th><th>外套</th><th>內褲</th><th>襪子</th><th>帽子</th></tr>
+                                <tr><td>主要</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
+                                <tr style="border-top: 1px solid #eee;"><td>睡衣</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
+                                <tr style="border-top: 1px solid #eee;"><td>總共</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
+                            </table></div>
+                        </div>
+                        
+                        <!-- 類別：藥品類 -->
+                        <div class="todo-category-header flex-between">
+                            <span class="editable" contenteditable="true">💊 藥品類 (放密封袋)</span>
+                            <div style="display:flex; gap:8px;">
+                                <span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span>
+                                <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
+                            </div>
+                        </div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">胃藥</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">感冒藥</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">防曬乳 (<100ml可隨身)</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">皮膚藥</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">OK繃</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+
+                        <!-- 類別：日用品類 -->
+                        <div class="todo-category-header flex-between">
+                            <span class="editable" contenteditable="true">🧴 日用品類</span>
+                            <div style="display:flex; gap:8px;">
+                                <span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span>
+                                <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
+                            </div>
+                        </div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">口罩</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">洗臉巾</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">備用塑膠袋 / 分層袋</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">折疊衣架</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+
                         <div class="flex-between" style="gap:10px; margin-top:15px;">
                             <button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button>
+                            <button class="add-btn" onclick="addTodoItemToPerson(this)">+ 新增未分類物品</button>
                         </div>
                     </div>
                 </div>
@@ -343,7 +420,7 @@
         // ==========================================
         // 🔴 雲端 API 設定區 (請在此貼上您的網址)
         // ==========================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbzGWuiGzdMYOB9Z9Fkhw63FCbNyGuWCDfnz1QkfBuW3BOz9WZtSBQSwRFpjGRr4sVMOTw/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         
         let payers = ['本人', '家人']; 
         let currentReceiptBox = null;
@@ -539,6 +616,15 @@
             saveData();
         }
 
+        function addTodoItemToPerson(btnElement) {
+            const newItem = document.createElement('div');
+            newItem.className = 'timeline-item';
+            newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            btnElement.parentNode.parentNode.insertBefore(newItem, btnElement.parentNode);
+            saveData();
+        }
+
         // --- 6. 記帳與分帳系統 ---
         function renderPayerTags() {
             let html = '';
@@ -662,20 +748,25 @@
         }
 
         // --- 8. 圖片極致壓縮與上傳 (解決 Google 同步失敗問題) ---
+        let currentUploadTarget = '';
+        function triggerUpload(targetId) { currentUploadTarget = targetId; document.getElementById('global-file-input').click(); }
+        function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; document.getElementById('receipt-file-input').click(); }
+
+        // 圖片壓縮引擎 (更激進的壓縮，確保能成功存入試算表)
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400; // 強制縮小尺寸，確保能成功存入試算表
+                    const MAX_WIDTH = 250; 
                     let scaleSize = 1;
                     if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
                     canvas.width = img.width * scaleSize;
                     canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.4); // 降低畫質至 40%
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.2); 
                     callback(dataUrl);
                 }
                 img.src = e.target.result;
@@ -747,6 +838,7 @@
             saveData(true);
         }
 
+        // 修復：確保所有 select 的變更都會被記錄下來
         document.addEventListener('change', function(e) {
             if (e.target.tagName === 'SELECT') {
                 Array.from(e.target.options).forEach(opt => {
@@ -771,12 +863,12 @@
             };
             const payload = JSON.stringify(state);
 
-            localStorage.setItem('travelAppSave_Keihan_vCloud3', payload);
-            localStorage.setItem('travelAppPayers_vCloud3', JSON.stringify(payers));
+            localStorage.setItem('travelAppSave_Keihan_vCloud4', payload);
+            localStorage.setItem('travelAppPayers_vCloud4', JSON.stringify(payers));
             
             if(!API_URL.startsWith("https://script.google.com")) {
                 setStatus('cloud_off', '本機模式(未綁雲端)', true);
-                if(isManual) alert("❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)");
+                if(isManual) alert("❌ 尚未綁定 Google API 網址！\n請先至程式碼最下方替換 API_URL");
                 return;
             }
 
@@ -794,7 +886,7 @@
                     }
                 }).catch(e => {
                     setStatus('cloud_off', '連線失敗(已存本機)', true);
-                    if(isManual) alert("❌ 同步失敗！\n可能是圖片檔案過大超出了 Google 接收極限，請嘗試刪除幾張發票照片。");
+                    if(isManual) alert("❌ 同步失敗！\n可能是圖片過多超出了 Google 接收極限，請嘗試刪除幾張照片。");
                 });
             }, isManual ? 0 : 1500); 
         }
@@ -803,7 +895,7 @@
             const template = document.getElementById('default-template');
             if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
 
-            const savedPayers = localStorage.getItem('travelAppPayers_vCloud3');
+            const savedPayers = localStorage.getItem('travelAppPayers_vCloud4');
             if (savedPayers) payers = JSON.parse(savedPayers);
             renderPayerTags();
 
@@ -836,7 +928,7 @@
         }
 
         function loadFromLocal() {
-            const saved = localStorage.getItem('travelAppSave_Keihan_vCloud3');
+            const saved = localStorage.getItem('travelAppSave_Keihan_vCloud4');
             if (saved) {
                 const state = JSON.parse(saved);
                 if(state.html) document.getElementById('main-container').innerHTML = state.html;
@@ -852,18 +944,23 @@
 
         function finalizeLoad() {
             calcBudget();
-            // 💯 確保啟動時，切換至「行程頁」
-            const firstNav = document.querySelector('.nav-item');
-            if(firstNav) { switchTab('tab-itinerary', firstNav); }
+            
+            // 💯 確保啟動時，強制歸位並切換至「行程頁」
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            const itTab = document.getElementById('tab-itinerary');
+            const firstNav = document.querySelectorAll('.nav-item')[0];
+            if(itTab) itTab.classList.add('active');
+            if(firstNav) firstNav.classList.add('active');
 
-            // 💯 關閉 Splash 啟動畫面，確保一定會顯示再優雅淡出
+            // 💯 關閉 Splash 啟動畫面，確保看得到且平滑淡出
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash) {
                     splash.style.opacity = '0';
                     setTimeout(() => splash.style.display = 'none', 500); 
                 }
-            }, 1500);
+            }, 2000); // 延長至 2 秒，保證看得見
         }
 
         function rebindEvents() {
@@ -875,7 +972,9 @@
             });
             document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
                 const img = wrap.querySelector('img');
+                const delBtn = wrap.querySelector('.receipt-del-btn');
                 if(img) img.onclick = function(e) { openImageModal(this.src, e); };
+                if(delBtn) delBtn.onclick = function(e) { deleteReceipt(this, e); };
             });
         }
         
