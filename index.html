@@ -37,14 +37,17 @@
             transition: opacity 0.3s ease;
         }
         #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.85; }
-        #splash-screen .splash-text { position: relative; z-index: 10; background: rgba(255,255,255,0.9); padding: 20px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
+        
+        /* 🛠️ 修改 1：改變 Splash 標籤位置，對齊下方木桌 (約底部 12%) */
+        #splash-screen .splash-text { position: absolute; bottom: 12%; z-index: 10; background: rgba(255,255,255,0.9); padding: 15px 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
         #splash-screen h2 { color: var(--primary-color); font-size: 26px; margin-bottom: 8px;}
         #splash-screen p { color: #555; font-size: 14px; font-weight: bold; }
 
         /* Header Hero */
-        .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 200px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); }
-        .hero h1 { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-        .hero p { font-size: 14px; opacity: 0.9; }
+        /* 🛠️ 修改 2：高度從 200px 縮成 130px，並微調字體空間 */
+        .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 130px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 15px 20px; padding-top: max(20px, env(safe-area-inset-top)); }
+        .hero h1 { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+        .hero p { font-size: 13px; opacity: 0.9; }
         .hero .editable { padding: 2px 6px; margin-left: -6px; border-radius: 6px; transition: background 0.2s; width: fit-content; max-width: 100%; }
         .hero .editable:focus { background: rgba(255, 255, 255, 0.2); outline: none; }
 
@@ -87,13 +90,14 @@
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         .luggage-select:focus { box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.3); }
 
-        /* 🆕 橫向滑動天數分頁樣式 */
-        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 10px; padding: 5px 2px 15px 2px; margin-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        /* 橫向滑動天數分頁樣式 */
+        /* 🛠️ 修改 3：縮小寬度(52px)、圓角、內距與字體大小 */
+        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 5px 2px 10px 2px; margin-bottom: 5px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
-        .day-tab { flex: 0 0 auto; width: 65px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3); }
-        .day-tab .day-num { font-size: 18px; font-weight: 700; line-height: 1.1; }
-        .day-tab .day-date { font-size: 11px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
+        .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; }
+        .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
 
         /* Buttons */
         .btn-nav { display: inline-flex; align-items: center; gap: 4px; background: var(--primary-color); color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; text-decoration: none; cursor: pointer; border: none; }
@@ -451,7 +455,7 @@
         // ================= 橫向滑動天數分頁邏輯 =================
         function updateDayTabs() {
             let container = document.getElementById('day-tabs-container');
-            if (!container) return; // 避免舊資料尚未產生容器時報錯
+            if (!container) return; 
             
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
             let html = '';
@@ -521,7 +525,6 @@
                 saveData(); 
             }
         }
-        // =======================================================
 
         function addItineraryItem(btnElement) {
             const newItem = document.createElement('div');
@@ -872,7 +875,6 @@
             if (e.target.tagName === 'INPUT' && e.target.type === 'text') { e.target.setAttribute('value', e.target.value); }
             if (e.target.classList.contains('luggage-item-title')) { predictLuggageType(e.target); }
             
-            // 即時更新天數分頁的日期
             if (e.target.classList.contains('section-title') && e.target.closest('.day-card')) { updateDayTabs(); }
             
             saveData(); 
@@ -975,7 +977,6 @@
             if(itTab) itTab.classList.add('active');
             if(firstNav) firstNav.classList.add('active');
 
-            // 🌟 【關鍵修正】檢查舊存檔是否缺少分頁容器，沒有的話就動態補上
             if (itTab && !document.getElementById('day-tabs-container')) {
                 let tabsContainer = document.createElement('div');
                 tabsContainer.id = 'day-tabs-container';
@@ -986,7 +987,6 @@
                 }
             }
 
-            // 初始化時，讀取並建立橫向分頁，同時將不屬於第一天的卡片隱藏
             updateDayTabs();
 
             setTimeout(() => {
