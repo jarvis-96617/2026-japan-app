@@ -50,7 +50,8 @@
 
         /* Global Controls */
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; margin-bottom: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
+        /* 🛠️ 修改：按鈕瘦身 (縮小 padding、字體與圖示距離，強制不換行) */
+        .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 5px 6px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; }
         .manual-save-btn:active { transform: scale(0.95); }
 
         /* Container & Cards */
@@ -63,7 +64,7 @@
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* Lists & Items (大幅縮小特定分頁的間距) */
+        /* Lists & Items */
         .timeline-item { display: flex; gap: 12px; margin-bottom: 8px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; align-items: center; }
         .timeline-item.completed { opacity: 0.35; }
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { margin-bottom: 2px; padding: 2px 4px; }
@@ -164,28 +165,29 @@
 
     <!-- 全域控制列 -->
     <div class="global-controls">
-        <div style="display:flex; flex-direction:column; gap:6px;">
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:6px; flex-grow:1; min-width:0; overflow:hidden;">
+            <!-- 🛠️ 修改：按鈕群組設定為不換行(nowrap)，小螢幕可自動微調 -->
+            <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto;">
                 <button class="manual-save-btn" onclick="forceManualSave()">
-                    <span class="material-icons-round" style="font-size:14px;">save</span> 雲端儲存
+                    <span class="material-icons-round" style="font-size:13px;">save</span> 雲端儲存
                 </button>
                 <button class="manual-save-btn" onclick="undoAction()" style="background:#f0ad4e;">
-                    <span class="material-icons-round" style="font-size:14px;">undo</span> 復原
+                    <span class="material-icons-round" style="font-size:13px;">undo</span> 復原
                 </button>
-                <!-- 🆕 新增：重做按鈕 -->
                 <button class="manual-save-btn" onclick="redoAction()" style="background:#5bc0de;">
-                    <span class="material-icons-round" style="font-size:14px;">redo</span> 重做
+                    <span class="material-icons-round" style="font-size:13px;">redo</span> 重做
                 </button>
                 <button class="manual-save-btn" onclick="location.reload()" style="background:#6c757d;">
-                    <span class="material-icons-round" style="font-size:14px;">refresh</span> 重新載入
+                    <span class="material-icons-round" style="font-size:13px;">refresh</span> 重新載入
                 </button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <div style="font-size: 13px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 6px 10px; border-radius: 8px;">
-            全域顯示<br>TWD (臺幣)
+        <!-- 🛠️ 修改：右側字眼精簡為 TWD (臺幣)，加入 flex-shrink: 0 確保空間 -->
+        <div style="font-size: 13px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 6px 10px; border-radius: 8px; flex-shrink:0; margin-left: 8px;">
+            TWD (臺幣)
         </div>
     </div>
 
@@ -393,7 +395,6 @@
         let currentReceiptBox = null;
         let syncTimeout = null;
         
-        // ================= 🆕 復原/重做系統 (Undo/Redo) =================
         let undoStack = [];
         let redoStack = [];
         let currentStateSnapshot = null;
@@ -417,8 +418,8 @@
             let newState = captureState();
             if (newState.html !== currentStateSnapshot.html || newState.heroHtml !== currentStateSnapshot.heroHtml) {
                 undoStack.push(currentStateSnapshot);
-                if (undoStack.length > 20) undoStack.shift(); // 保留最近 20 步
-                redoStack = []; // 只要有新動作，就清空重做堆疊
+                if (undoStack.length > 20) undoStack.shift(); 
+                redoStack = []; 
                 currentStateSnapshot = newState;
             }
         }
@@ -428,10 +429,7 @@
                 alert('已經退到最一開始，沒有可以復原的操作囉！');
                 return;
             }
-            // 存入重做堆疊
             redoStack.push(currentStateSnapshot);
-            
-            // 取出上一步並套用
             let prevState = undoStack.pop();
             applyState(prevState);
         }
@@ -441,10 +439,7 @@
                 alert('已經是最新的狀態囉！');
                 return;
             }
-            // 存入復原堆疊
             undoStack.push(currentStateSnapshot);
-            
-            // 取出下一步並套用
             let nextState = redoStack.pop();
             applyState(nextState);
         }
@@ -454,16 +449,14 @@
             document.getElementById('hero-container').innerHTML = state.heroHtml;
             payers = state.payersData;
             
-            currentStateSnapshot = captureState(); // 更新當前快照
+            currentStateSnapshot = captureState(); 
             
             renderPayerTags();
             rebindEvents();
             updateDayTabs();
             
-            // 無痕儲存 (不寫入新的歷史)
             saveData(false, true); 
         }
-        // ================================================================
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
