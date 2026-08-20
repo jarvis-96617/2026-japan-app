@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-title" content="京阪旅遊">
     
     <link rel="apple-touch-icon" href="icon.png">
-    <!-- 已移除原生的 apple-touch-startup-image 避免尺寸不符導致黑屏 -->
     
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -30,7 +29,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
 
-        /* Splash Screen 啟動畫面 (加入防破圖保護與高質感背景) */
+        /* Splash Screen 啟動畫面 */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #eef2f5 0%, #d4e0eb 100%); z-index: 9999;
@@ -65,7 +64,7 @@
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
         /* Lists & Items */
-        .timeline-item { display: flex; gap: 12px; margin-bottom: 16px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; }
+        .timeline-item { display: flex; gap: 12px; margin-bottom: 16px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; align-items: center; }
         .timeline-item.completed { opacity: 0.35; }
         #tab-todo .timeline-item { margin-bottom: 4px; }
         .checkbox-wrapper { flex-shrink: 0; padding-top: 2px; }
@@ -84,23 +83,25 @@
         .item-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
         .item-note { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 6px; font-size: 12px; margin-bottom: 4px; color: #555; width: 100%;}
         
+        /* 行李下拉選單樣式 */
+        .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
+        .luggage-select:focus { box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.3); }
+
         /* Buttons */
         .btn-nav { display: inline-flex; align-items: center; gap: 4px; background: var(--primary-color); color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; text-decoration: none; cursor: pointer; border: none; }
         .delete-btn { color: var(--danger-color); cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 4px; }
         .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 5px; margin-bottom: 10px;}
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
-        /* Currency & Budget (完美防破版 RWD 瘦身) */
+        /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; }
         #budget-table th { background: #eef2f5; padding: 6px 2px; font-size: 12px; color: #555; text-align: center; }
         #budget-table td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 13px; text-align: center; vertical-align: middle; }
-        
-        /* 嚴格限制欄位寬度，保證絕對不超出螢幕 */
         #budget-table th:nth-child(1) { width: 30%; }
         #budget-table th:nth-child(2) { width: 20%; }
         #budget-table th:nth-child(3) { width: 15%; }
         #budget-table th:nth-child(4) { width: 20%; }
-        #budget-table th:nth-child(5) { width: 15%; } /* 發票與刪除合併欄 */
+        #budget-table th:nth-child(5) { width: 15%; }
         
         .amount-input { width: 100%; box-sizing: border-box; font-size: 13px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; }
         .curr-select, .payer-select { font-size: 11px; padding: 2px; width: 100%; box-sizing: border-box; }
@@ -139,7 +140,7 @@
 </head>
 <body>
 
-    <!-- 💯 百發百中 Splash Screen 啟動畫面 (加入 onerror 防破圖保護) -->
+    <!-- Splash Screen -->
     <div id="splash-screen">
         <img src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
         <div class="splash-text">
@@ -177,12 +178,11 @@
         <!-- 內容將由載入時替換 -->
     </div>
 
-    <!-- 預設初始版型 (隱藏備用) -->
+    <!-- 預設初始版型 -->
     <template id="default-template">
         <!-- ================= 行程 Tab ================= -->
         <div id="tab-itinerary" class="tab-content active">
             <div id="itinerary-days-container">
-                <!-- Day 1 -->
                 <div class="glass-card day-card">
                     <div class="flex-between" style="margin-bottom: 12px;">
                         <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">🛬 Day 1 - 09/25 抵達京都</h2>
@@ -267,7 +267,7 @@
             </div>
         </div>
 
-        <!-- ================= 預算 Tab (極致 RWD 版) ================= -->
+        <!-- ================= 預算 Tab ================= -->
         <div id="tab-budget" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
@@ -310,16 +310,27 @@
                 
                 <div id="person-todo-container">
                     <div class="person-todo-list" data-person="預設範本" style="display: block;">
-                        <!-- 類別：行李重量 -->
                         <div class="todo-category-header flex-between">
-                            <span class="editable" contenteditable="true">📦 確認行李重量</span>
+                            <span class="editable" contenteditable="true"> 確認行李重量</span>
                             <div style="display:flex; gap:8px;">
                                 <span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span>
                                 <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
                             </div>
                         </div>
-                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
-                        <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">隨身行李 XX 公斤</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                        
+                        <!-- 預設項目 (已加入行李選擇器與 luggage-item-title 類別) -->
+                        <div class="timeline-item" onclick="toggleComplete(this, event)">
+                            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                            <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
+                            <select class="luggage-select"><option value="未定">-</option><option value="手提">手提</option><option value="託運" selected>託運</option></select>
+                            <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                        </div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)">
+                            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                            <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
+                            <select class="luggage-select"><option value="未定">-</option><option value="手提" selected>手提</option><option value="託運">託運</option></select>
+                            <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                        </div>
                         
                         <div class="flex-between" style="gap:10px; margin-top:15px;">
                             <button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button>
@@ -330,7 +341,6 @@
         </div>
     </template>
 
-    <!-- 隱藏的檔案上傳器 (已經包含 multiple 屬性) -->
     <input type="file" id="global-file-input" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
     <input type="file" id="receipt-file-input" accept="image/*" style="display: none;" onchange="handleReceiptUpload(event)">
 
@@ -344,23 +354,18 @@
         <div class="nav-item" onclick="switchTab('tab-todo', this)"><span class="material-icons-round">checklist</span>待辦</div>
     </nav>
 
-    <!-- 圖片放大 Modal -->
     <div class="modal" id="imageModal" onclick="this.style.display='none'">
         <span class="modal-close">&times;</span>
         <img id="modalImg" src="">
     </div>
 
     <script>
-        // ==========================================
-        // 🔴 雲端 API 設定區 (請在此貼上您的網址)
-        // ==========================================
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         
         let payers = ['本人', '家人']; 
         let currentReceiptBox = null;
         let syncTimeout = null;
 
-        // --- 1. 頁籤切換 ---
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
@@ -370,9 +375,9 @@
             if(tabId === 'tab-budget') calcBudget();
         }
 
-        // --- 2. 項目操作與導航 ---
+        // ⚠️ 修正：加入 event.target.closest('select') 確保點擊下拉選單時不會錯誤觸發完成勾選
         function toggleComplete(element, event) {
-            if (event.target.closest('.editable') || event.target.closest('button') || event.target.closest('a') || event.target.closest('.delete-btn') || event.target.closest('table') || event.target.closest('.cat-action-icon') || event.target.closest('.receipt-box') || event.target.closest('.receipt-thumb-wrap')) return;
+            if (event.target.closest('.editable') || event.target.closest('button') || event.target.closest('a') || event.target.closest('.delete-btn') || event.target.closest('table') || event.target.closest('.cat-action-icon') || event.target.closest('.receipt-box') || event.target.closest('.receipt-thumb-wrap') || event.target.closest('select')) return;
             element.classList.toggle('completed');
             saveData();
         }
@@ -396,7 +401,6 @@
             }
         }
 
-        // --- 3. 時間自動推算邏輯 ---
         function updateEndTime(el) {
             const item = el.closest('.timeline-item');
             if (!item) return;
@@ -439,7 +443,7 @@
             let dayCount = container.querySelectorAll('.day-card').length + 1;
             let div = document.createElement('div');
             div.className = 'glass-card day-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">📝 Day ${dayCount} - 點此編輯標題</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯標題</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
             container.appendChild(div);
             saveData();
         }
@@ -477,7 +481,6 @@
             sortItinerary(newItem.querySelector('.start-time'));
         }
 
-        // --- 4. 其他新增項目邏輯 ---
         function addTransportText(btn) {
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
@@ -522,20 +525,48 @@
             }
         }
 
-        // --- 5. 待辦事項 ---
+        // ================= 智慧判定行李類別邏輯 =================
+        function predictLuggageType(titleElement) {
+            const text = titleElement.innerText;
+            const timelineItem = titleElement.closest('.timeline-item');
+            const select = timelineItem.querySelector('.luggage-select');
+            
+            if (!select) return;
+
+            // ⚠️ 只有在「未定」狀態才幫忙預測，避免覆蓋使用者的手動決定
+            if (select.value === '未定') {
+                const carryOnKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '護照', '錢包', '貴重', '隨身', '打火機', '雨傘'];
+                const checkedKeywords = ['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'];
+                
+                let predicted = null;
+                if (carryOnKeywords.some(kw => text.includes(kw))) predicted = '手提';
+                else if (checkedKeywords.some(kw => text.includes(kw))) predicted = '託運';
+
+                if (predicted) {
+                    select.value = predicted;
+                    // 同步觸發 HTML 屬性更新，以利存進 Google 雲端
+                    Array.from(select.options).forEach(opt => {
+                        if(opt.value === predicted) opt.setAttribute('selected', 'selected');
+                        else opt.removeAttribute('selected');
+                    });
+                }
+            }
+        }
+
         function addTodoCategory(btnElement) {
             const newCat = document.createElement('div');
             newCat.className = 'todo-category-header flex-between';
-            newCat.innerHTML = `<span class="editable" contenteditable="true">📁 新增分類名稱</span><div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span><span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span></div>`;
+            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span><span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span></div>`;
             btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode);
             saveData();
         }
 
+        // ⚠️ 修正：在此處動態生成的項目加入了「行李下拉選單」與「智慧判定 Class」
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="未定" selected>-</option><option value="手提">手提</option><option value="託運">託運</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             const header = btnElement.closest('.todo-category-header');
             header.parentNode.insertBefore(newItem, header.nextSibling);
             saveData();
@@ -550,16 +581,6 @@
             saveData();
         }
 
-        function addTodoItemToPerson(btnElement) {
-            const newItem = document.createElement('div');
-            newItem.className = 'timeline-item';
-            newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
-            btnElement.parentNode.parentNode.insertBefore(newItem, btnElement.parentNode);
-            saveData();
-        }
-
-        // --- 6. 記帳與分帳系統 ---
         function renderPayerTags() {
             let html = '';
             payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; });
@@ -590,13 +611,19 @@
             }
         }
 
+        function triggerReceiptUpload(boxElement) {
+            currentReceiptBox = boxElement;
+            const input = document.getElementById('receipt-file-input');
+            input.value = '';
+            input.click();
+        }
+
         function addBudgetRow(item = '新項目', payerName = payers[0], currency = 'JPY', amount = '0') {
             const tbody = document.getElementById('budget-tbody');
             const tr = document.createElement('tr');
             tr.className = 'budget-row';
             let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
             
-            // 將發票與刪除合併在一個虛線框內 (完美對齊)
             tr.innerHTML = `
                 <td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td>
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td>
@@ -636,14 +663,13 @@
                 grandTotal += amtInTWD;
             });
 
-            let resHTML = '<div style="font-weight:bold; margin-bottom:8px; color:#555;">💳 個人付款小計 (折合台幣)：</div>';
-            for(let p in totals) { resHTML += `<div class="flex-between" style="font-size:14px; margin-bottom:6px;"><span>👤 ${p}</span><span>NT$${totals[p].toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`; }
+            let resHTML = '<div style="font-weight:bold; margin-bottom:8px; color:#555;"> 個人付款小計 (折合台幣)：</div>';
+            for(let p in totals) { resHTML += `<div class="flex-between" style="font-size:14px; margin-bottom:6px;"><span> ${p}</span><span>NT$${totals[p].toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`; }
             resHTML += `<hr style="margin:10px 0; border:0; border-top:1px solid #ccc;">`;
-            resHTML += `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px;"><span>👑 旅程總花費：</span><span>NT$${grandTotal.toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`;
+            resHTML += `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px;"><span> 旅程總花費：</span><span>NT$${grandTotal.toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`;
             document.getElementById('budget-result').innerHTML = resHTML;
         }
 
-        // --- 7. 多重待辦清單 (拷貝最新進度) ---
         function switchTodoPerson(personName) {
             document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none');
             let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`);
@@ -678,24 +704,15 @@
             switchTodoPerson(name);
         }
 
-        // --- 8. 圖片極致壓縮與上傳 (解決 Google 同步失敗問題) ---
         let currentUploadTarget = '';
         
-        // 修正點：觸發前先清空 input
         function triggerUpload(targetId) { 
             currentUploadTarget = targetId; 
             const input = document.getElementById('global-file-input');
             input.value = ''; 
             input.click(); 
         }
-        function triggerReceiptUpload(boxElement) { 
-            currentReceiptBox = boxElement; 
-            const input = document.getElementById('receipt-file-input');
-            input.value = '';
-            input.click(); 
-        }
 
-        // 圖片壓縮引擎
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -717,13 +734,11 @@
             reader.readAsDataURL(file);
         }
 
-        // 修正點：移除上傳後的 input.value = '';
         function handleImageUpload(event) {
             const input = event.target;
-            const files = input.files; // 取得所有選取的檔案
+            const files = input.files; 
             
             if (files && files.length > 0 && currentUploadTarget) {
-                // 將 FileList 轉為陣列，並對每一張圖片執行壓縮與顯示
                 Array.from(files).forEach(file => {
                     compressImage(file, function(compressedDataUrl) {
                         addImageToGallery(compressedDataUrl, currentUploadTarget);
@@ -764,7 +779,6 @@
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        // --- 9. 雲端同步系統 (防斷線與手動儲存功能) ---
         function setStatus(icon, text, isError = false) {
             const statusEl = document.getElementById('sync-status');
             if(statusEl) {
@@ -777,7 +791,7 @@
             saveData(true);
         }
 
-        // 監聽所有的 Select 變更，確保幣別選擇被正確存入 HTML
+        // 監聽所有 Select 變更 (包含新加入的行李選單)，確保狀態正確存入 HTML
         document.addEventListener('change', function(e) {
             if (e.target.tagName === 'SELECT') {
                 Array.from(e.target.options).forEach(opt => {
@@ -788,9 +802,11 @@
             }
         });
         
+        // ⚠️ 修正：在全域 input 事件中，觸發行李智慧預測
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('start-time') || e.target.classList.contains('duration')) { updateEndTime(e.target); }
             if (e.target.tagName === 'INPUT' && e.target.type === 'text') { e.target.setAttribute('value', e.target.value); }
+            if (e.target.classList.contains('luggage-item-title')) { predictLuggageType(e.target); }
             saveData(); 
         });
 
@@ -884,7 +900,6 @@
         function finalizeLoad() {
             calcBudget();
             
-            // 💯 確保啟動時，強制歸位並切換至「行程頁」
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             const itTab = document.getElementById('tab-itinerary');
@@ -892,7 +907,6 @@
             if(itTab) itTab.classList.add('active');
             if(firstNav) firstNav.classList.add('active');
 
-            // 💯 Splash 啟動畫面平滑處理 (1秒)
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash) {
