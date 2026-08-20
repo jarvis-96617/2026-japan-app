@@ -191,7 +191,7 @@
         <!-- ================= 行程 Tab ================= -->
         <div id="tab-itinerary" class="tab-content active">
             
-            <!-- 🆕 新增：橫向滑動天數分頁容器 -->
+            <!-- 橫向滑動天數分頁容器 -->
             <div id="day-tabs-container" class="day-tabs-wrapper"></div>
             
             <div id="itinerary-days-container">
@@ -386,7 +386,6 @@
             if(tabId === 'tab-budget') calcBudget();
         }
 
-        // ⚠️ 修正：加入 event.target.closest('select') 確保點擊下拉選單時不會錯誤觸發完成勾選
         function toggleComplete(element, event) {
             if (event.target.closest('.editable') || event.target.closest('button') || event.target.closest('a') || event.target.closest('.delete-btn') || event.target.closest('table') || event.target.closest('.cat-action-icon') || event.target.closest('.receipt-box') || event.target.closest('.receipt-thumb-wrap') || event.target.closest('select')) return;
             element.classList.toggle('completed');
@@ -397,8 +396,6 @@
             event.stopPropagation();
             if(confirm("確定要刪除這個項目嗎？")) {
                 btnElement.closest('.timeline-item, .link-item, .todo-category-header').remove();
-                
-                // 針對刪除行程內的項目，若影響了排序可再補上邏輯。此處以預設 saveData 為主
                 saveData();
             }
         }
@@ -451,15 +448,14 @@
             saveData();
         }
 
-        // ================= 🆕 橫向滑動天數分頁邏輯 =================
+        // ================= 橫向滑動天數分頁邏輯 =================
         function updateDayTabs() {
             let container = document.getElementById('day-tabs-container');
-            if (!container) return;
+            if (!container) return; // 避免舊資料尚未產生容器時報錯
             
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
             let html = '';
             
-            // 找出目前顯示中的那一天 (找不到預設為 0)
             let activeIndex = 0;
             cards.forEach((card, idx) => {
                 if (card.style.display !== 'none') activeIndex = idx;
@@ -468,7 +464,6 @@
             cards.forEach((card, index) => {
                 let titleEl = card.querySelector('.section-title');
                 let title = titleEl ? titleEl.innerText : '';
-                // 自動從標題擷取日期 (例如 09/25 或 9/25)
                 let dateMatch = title.match(/\d{1,2}\/\d{1,2}/);
                 let dateStr = dateMatch ? dateMatch[0] : '日期';
                 
@@ -482,8 +477,8 @@
             
             container.innerHTML = html;
             
-            // 確保一定有一張卡片是被顯示的
-            if (cards.length > 0 && activeIndex < cards.length) {
+            if (cards.length > 0) {
+                if (activeIndex >= cards.length) activeIndex = 0;
                 switchDayCard(activeIndex);
             }
         }
@@ -496,14 +491,13 @@
                 if (idx === targetIndex) {
                     card.style.display = 'block';
                     if(tabs[idx]) tabs[idx].classList.add('active');
-                    // 讓選中的 Tab 自動置中滾動
                     if(tabs[idx]) tabs[idx].scrollIntoView({ behavior: 'smooth', inline: 'center' });
                 } else {
                     card.style.display = 'none';
                     if(tabs[idx]) tabs[idx].classList.remove('active');
                 }
             });
-            saveData(); // 儲存目前的顯示狀態
+            saveData(); 
         }
 
         function addNewDayCard() {
@@ -511,19 +505,19 @@
             let dayCount = container.querySelectorAll('.day-card').length + 1;
             let div = document.createElement('div');
             div.className = 'glass-card day-card';
-            div.style.display = 'none'; // 預設先隱藏，讓系統自動切換
+            div.style.display = 'none'; 
             div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
             container.appendChild(div);
             
-            updateDayTabs(); // 更新上方分頁
-            switchDayCard(dayCount - 1); // 自動切換到剛新增的這一天
+            updateDayTabs(); 
+            switchDayCard(dayCount - 1); 
         }
 
         function deleteDayCard(btn, event) {
             event.stopPropagation();
             if(confirm("確定刪除這天所有行程嗎？")) { 
                 btn.closest('.day-card').remove(); 
-                updateDayTabs(); // 重建分頁並自動跳轉
+                updateDayTabs(); 
                 saveData(); 
             }
         }
@@ -601,7 +595,6 @@
             }
         }
 
-        // ================= 智慧判定行李類別邏輯 =================
         function predictLuggageType(titleElement) {
             const text = titleElement.innerText;
             const timelineItem = titleElement.closest('.timeline-item');
@@ -860,7 +853,7 @@
         }
 
         function forceManualSave() {
-            setStatus('sync', '手Upload上傳中...');
+            setStatus('sync', '手動上傳中...');
             saveData(true);
         }
 
@@ -879,7 +872,7 @@
             if (e.target.tagName === 'INPUT' && e.target.type === 'text') { e.target.setAttribute('value', e.target.value); }
             if (e.target.classList.contains('luggage-item-title')) { predictLuggageType(e.target); }
             
-            // 🆕 即時更新天數分頁的日期
+            // 即時更新天數分頁的日期
             if (e.target.classList.contains('section-title') && e.target.closest('.day-card')) { updateDayTabs(); }
             
             saveData(); 
@@ -982,7 +975,18 @@
             if(itTab) itTab.classList.add('active');
             if(firstNav) firstNav.classList.add('active');
 
-            // 🆕 初始化時，讀取並建立橫向分頁
+            // 🌟 【關鍵修正】檢查舊存檔是否缺少分頁容器，沒有的話就動態補上
+            if (itTab && !document.getElementById('day-tabs-container')) {
+                let tabsContainer = document.createElement('div');
+                tabsContainer.id = 'day-tabs-container';
+                tabsContainer.className = 'day-tabs-wrapper';
+                let daysContainer = document.getElementById('itinerary-days-container');
+                if (daysContainer) {
+                    itTab.insertBefore(tabsContainer, daysContainer);
+                }
+            }
+
+            // 初始化時，讀取並建立橫向分頁，同時將不屬於第一天的卡片隱藏
             updateDayTabs();
 
             setTimeout(() => {
