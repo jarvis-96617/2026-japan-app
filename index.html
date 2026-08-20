@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="京阪旅遊">
     
     <link rel="apple-touch-icon" href="icon.png">
+    <!-- 已移除原生的 apple-touch-startup-image 避免尺寸不符導致黑屏 -->
     
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -29,10 +30,22 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
 
-        /* Header Hero (高度縮減版本) */
-        .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 120px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 15px 20px; padding-top: max(15px, env(safe-area-inset-top)); }
-        .hero h1 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-        .hero p { font-size: 13px; opacity: 0.9; }
+        /* Splash Screen 啟動畫面 (加入防破圖保護與高質感背景) */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #eef2f5 0%, #d4e0eb 100%); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.85; }
+        #splash-screen .splash-text { position: relative; z-index: 10; background: rgba(255,255,255,0.9); padding: 20px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
+        #splash-screen h2 { color: var(--primary-color); font-size: 26px; margin-bottom: 8px;}
+        #splash-screen p { color: #555; font-size: 14px; font-weight: bold; }
+
+        /* Header Hero */
+        .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 200px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); }
+        .hero h1 { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+        .hero p { font-size: 14px; opacity: 0.9; }
         .hero .editable { padding: 2px 6px; margin-left: -6px; border-radius: 6px; transition: background 0.2s; width: fit-content; max-width: 100%; }
         .hero .editable:focus { background: rgba(255, 255, 255, 0.2); outline: none; }
 
@@ -77,16 +90,17 @@
         .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 5px; margin-bottom: 10px;}
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
-        /* Currency & Budget */
+        /* Currency & Budget (完美防破版 RWD 瘦身) */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; }
         #budget-table th { background: #eef2f5; padding: 6px 2px; font-size: 12px; color: #555; text-align: center; }
         #budget-table td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 13px; text-align: center; vertical-align: middle; }
         
+        /* 嚴格限制欄位寬度，保證絕對不超出螢幕 */
         #budget-table th:nth-child(1) { width: 30%; }
-        #budget-table th:nth-child(2) { width: 22%; }
-        #budget-table th:nth-child(3) { width: 16%; }
+        #budget-table th:nth-child(2) { width: 20%; }
+        #budget-table th:nth-child(3) { width: 15%; }
         #budget-table th:nth-child(4) { width: 20%; }
-        #budget-table th:nth-child(5) { width: 12%; }
+        #budget-table th:nth-child(5) { width: 15%; } /* 發票與刪除合併欄 */
         
         .amount-input { width: 100%; box-sizing: border-box; font-size: 13px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; }
         .curr-select, .payer-select { font-size: 11px; padding: 2px; width: 100%; box-sizing: border-box; }
@@ -124,6 +138,15 @@
     </style>
 </head>
 <body>
+
+    <!-- 💯 百發百中 Splash Screen 啟動畫面 (加入 onerror 防破圖保護) -->
+    <div id="splash-screen">
+        <img src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
+        <div class="splash-text">
+            <h2>2026 京阪之旅</h2>
+            <p>行程載入中...</p>
+        </div>
+    </div>
 
     <div class="hero" id="hero-container">
         <h1 class="editable" contenteditable="true">2026 京阪六天五夜</h1>
@@ -244,7 +267,7 @@
             </div>
         </div>
 
-        <!-- ================= 預算 Tab ================= -->
+        <!-- ================= 預算 Tab (極致 RWD 版) ================= -->
         <div id="tab-budget" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
@@ -307,8 +330,8 @@
         </div>
     </template>
 
-    <!-- 隱藏的檔案上傳器 -->
-    <input type="file" id="global-file-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+    <!-- 隱藏的檔案上傳器 (已經包含 multiple 屬性) -->
+    <input type="file" id="global-file-input" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
     <input type="file" id="receipt-file-input" accept="image/*" style="display: none;" onchange="handleReceiptUpload(event)">
 
     <!-- 底部導航 -->
@@ -567,17 +590,13 @@
             }
         }
 
-        function triggerReceiptUpload(boxElement) {
-            currentReceiptBox = boxElement;
-            document.getElementById('receipt-file-input').click();
-        }
-
         function addBudgetRow(item = '新項目', payerName = payers[0], currency = 'JPY', amount = '0') {
             const tbody = document.getElementById('budget-tbody');
             const tr = document.createElement('tr');
             tr.className = 'budget-row';
             let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
             
+            // 將發票與刪除合併在一個虛線框內 (完美對齊)
             tr.innerHTML = `
                 <td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td>
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td>
@@ -589,11 +608,11 @@
                 </td>
                 <td><input type="text" class="amount-input" value="${amount}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value || 0).toLocaleString('en-US'); calcBudget(); saveData();"></td>
                 <td style="text-align:center;">
-                    <div style="display:inline-flex; flex-direction:column; align-items:center; gap:6px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa;">
-                        <div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>
-                        <span class="material-icons-round" style="color:var(--danger-color); font-size:16px; cursor:pointer;" onclick="this.closest('tr').remove(); calcBudget(); saveData();">delete</span>
-                    </div>
-                </td>
+    <div style="display:inline-flex; flex-direction:row; align-items:center; gap:8px; padding:4px 8px; border:1px dashed #ccc; border-radius:6px; background:#fafafa;">
+        <div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>
+        <span class="material-icons-round" style="color:var(--danger-color); font-size:16px; cursor:pointer;" onclick="this.closest('tr').remove(); calcBudget(); saveData();">delete</span>
+    </div>
+</td>
             `;
             tbody.appendChild(tr);
             calcBudget(); saveData();
@@ -659,11 +678,24 @@
             switchTodoPerson(name);
         }
 
-        // --- 8. 圖片極致壓縮與上傳 ---
+        // --- 8. 圖片極致壓縮與上傳 (解決 Google 同步失敗問題) ---
         let currentUploadTarget = '';
-        function triggerUpload(targetId) { currentUploadTarget = targetId; document.getElementById('global-file-input').click(); }
-        function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; document.getElementById('receipt-file-input').click(); }
+        
+        // 修正點：觸發前先清空 input
+        function triggerUpload(targetId) { 
+            currentUploadTarget = targetId; 
+            const input = document.getElementById('global-file-input');
+            input.value = ''; 
+            input.click(); 
+        }
+        function triggerReceiptUpload(boxElement) { 
+            currentReceiptBox = boxElement; 
+            const input = document.getElementById('receipt-file-input');
+            input.value = '';
+            input.click(); 
+        }
 
+        // 圖片壓縮引擎
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -685,17 +717,19 @@
             reader.readAsDataURL(file);
         }
 
+        // 修正點：移除上傳後的 input.value = '';
         function handleImageUpload(event) {
             const input = event.target;
-            const file = input.files[0];
-            if (file && currentUploadTarget) {
-                compressImage(file, function(compressedDataUrl) {
-                    addImageToGallery(compressedDataUrl, currentUploadTarget);
-                    saveData();
-                    input.value = ''; 
+            const files = input.files; // 取得所有選取的檔案
+            
+            if (files && files.length > 0 && currentUploadTarget) {
+                // 將 FileList 轉為陣列，並對每一張圖片執行壓縮與顯示
+                Array.from(files).forEach(file => {
+                    compressImage(file, function(compressedDataUrl) {
+                        addImageToGallery(compressedDataUrl, currentUploadTarget);
+                        saveData();
+                    });
                 });
-            } else {
-                input.value = '';
             }
         }
 
@@ -706,10 +740,7 @@
                 compressImage(file, function(compressedDataUrl) {
                     currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${compressedDataUrl}" onclick="openImageModal(this.src, event)"></div>`;
                     saveData();
-                    input.value = ''; 
                 });
-            } else {
-                input.value = '';
             }
         }
 
@@ -733,7 +764,7 @@
             document.getElementById('imageModal').style.display = 'flex';
         }
 
-        // --- 9. 雲端同步系統 ---
+        // --- 9. 雲端同步系統 (防斷線與手動儲存功能) ---
         function setStatus(icon, text, isError = false) {
             const statusEl = document.getElementById('sync-status');
             if(statusEl) {
@@ -746,6 +777,7 @@
             saveData(true);
         }
 
+        // 監聽所有的 Select 變更，確保幣別選擇被正確存入 HTML
         document.addEventListener('change', function(e) {
             if (e.target.tagName === 'SELECT') {
                 Array.from(e.target.options).forEach(opt => {
@@ -852,13 +884,22 @@
         function finalizeLoad() {
             calcBudget();
             
-            // 強制歸位並切換至「行程頁」
+            // 💯 確保啟動時，強制歸位並切換至「行程頁」
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             const itTab = document.getElementById('tab-itinerary');
             const firstNav = document.querySelectorAll('.nav-item')[0];
             if(itTab) itTab.classList.add('active');
             if(firstNav) firstNav.classList.add('active');
+
+            // 💯 Splash 啟動畫面平滑處理 (1秒)
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if(splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 500); 
+                }
+            }, 1000); 
         }
 
         function rebindEvents() {
