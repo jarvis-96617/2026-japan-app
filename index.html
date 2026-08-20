@@ -13,6 +13,10 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- 🆕 載入觸控拖曳排序套件 SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
     <style>
         :root {
             --bg-color: #f4f7f6;
@@ -50,7 +54,6 @@
 
         /* Global Controls */
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: white; margin-bottom: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        /* 🛠️ 修改：按鈕瘦身 (縮小 padding、字體與圖示距離，強制不換行) */
         .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 5px 6px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; }
         .manual-save-btn:active { transform: scale(0.95); }
 
@@ -73,6 +76,32 @@
         .completed .custom-checkbox { background: var(--primary-color); }
         .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 14px; }
         
+        /* 🆕 拖曳視覺效果 */
+        .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; }
+        .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; }
+        
+        /* 🆕 注入拖曳把手圖示 (使用純 CSS 確保不破壞舊結構) */
+        #transport-text-list .timeline-item, 
+        #shopping-list .timeline-item, 
+        #booking-list .timeline-item, 
+        .person-todo-list .timeline-item {
+            padding-left: 24px; /* 留出左側把手空間 */
+        }
+        #transport-text-list .timeline-item::before, 
+        #shopping-list .timeline-item::before, 
+        #booking-list .timeline-item::before, 
+        .person-todo-list .timeline-item::before {
+            content: '⋮⋮'; 
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #cfcfcf;
+            font-size: 15px;
+            letter-spacing: -1.5px;
+            pointer-events: none; /* 防止點擊干擾 */
+        }
+
         /* Time Column */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 60px; margin-right: 2px; flex-shrink: 0; padding-top: 2px; }
         .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); cursor: text; margin-bottom: 4px; line-height: 1; }
@@ -166,7 +195,6 @@
     <!-- 全域控制列 -->
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:6px; flex-grow:1; min-width:0; overflow:hidden;">
-            <!-- 🛠️ 修改：按鈕群組設定為不換行(nowrap)，小螢幕可自動微調 -->
             <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto;">
                 <button class="manual-save-btn" onclick="forceManualSave()">
                     <span class="material-icons-round" style="font-size:13px;">save</span> 雲端儲存
@@ -185,7 +213,6 @@
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <!-- 🛠️ 修改：右側字眼精簡為 TWD (臺幣)，加入 flex-shrink: 0 確保空間 -->
         <div style="font-size: 13px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 6px 10px; border-radius: 8px; flex-shrink:0; margin-left: 8px;">
             TWD (臺幣)
         </div>
@@ -238,10 +265,13 @@
         <div id="tab-transport" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">directions_transit</span> 交通票券與指南</h2>
+                
+                <!-- 🆕 加入 id 以利拖曳引擎定位 -->
                 <div id="transport-text-list" style="margin-top: 15px;">
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">機場至京都：JR 特急 Haruka</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">市區交通：Apple Pay ICOCA</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                 </div>
+                
                 <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 5px;">+ 新增交通指南</button>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
                 <div id="transport-links"></div>
@@ -279,7 +309,12 @@
         <div id="tab-shopping" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">shopping_bag</span> 採買清單</h2>
-                <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">免稅藥妝</div><div class="item-note editable" contenteditable="true">備註：感冒藥、維他命</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                
+                <!-- 🆕 加入 shopping-list 容器以利排序 -->
+                <div id="shopping-list">
+                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">免稅藥妝</div><div class="item-note editable" contenteditable="true">備註：感冒藥、維他命</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                </div>
+                
                 <button class="add-btn" onclick="addGeneralItemWithNote(this)">+ 新增清單項目</button>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
                 <div class="upload-area" onclick="triggerUpload('gallery-shopping')"><span class="material-icons-round" style="font-size: 28px; color: var(--primary-color);">add_photo_alternate</span><p style="font-size: 13px; color: #666;">點擊上傳代購商品圖</p></div>
@@ -313,6 +348,7 @@
         <div id="tab-todo" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">book_online</span> 預訂類</h2>
+                <!-- 已具備 booking-list -->
                 <div id="booking-list">
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">日本網路 eSIM (機場開通)</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                 </div>
@@ -342,10 +378,10 @@
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
                             <select class="luggage-select">
-                                <option value="背包">背包</option>
-                                <option value="小包包">小包包</option>
-                                <option value="手提">手提</option>
-                                <option value="託運" selected>託運</option>
+                                <option value="背包">背包 🎒</option>
+                                <option value="小包包">小包包 👛</option>
+                                <option value="手提">手提 👜</option>
+                                <option value="託運" selected>託運 🧳</option>
                             </select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
@@ -353,10 +389,10 @@
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
                             <select class="luggage-select">
-                                <option value="背包">背包</option>
-                                <option value="小包包">小包包</option>
-                                <option value="手提" selected>手提</option>
-                                <option value="託運">託運</option>
+                                <option value="背包">背包 🎒</option>
+                                <option value="小包包">小包包 👛</option>
+                                <option value="手提" selected>手提 👜</option>
+                                <option value="託運">託運 🧳</option>
                             </select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
@@ -454,9 +490,55 @@
             renderPayerTags();
             rebindEvents();
             updateDayTabs();
+            initSortable(); // 🆕 狀態復原後必須重新綁定拖曳功能
             
             saveData(false, true); 
         }
+
+        // ================= 🆕 拖曳排序初始化 =================
+        function initSortable() {
+            if (typeof Sortable === 'undefined') return;
+
+            const sortableOptions = {
+                animation: 150,
+                delay: 250, // 長按 0.25 秒拖動 (防誤觸)
+                delayOnTouchOnly: true,
+                draggable: '.timeline-item',
+                filter: '.editable, button, select, input', // 編輯區或按鈕不觸發拖曳
+                preventOnFilter: false,
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                onEnd: function () {
+                    saveData(); // 拖曳結束自動存檔並寫入歷史
+                }
+            };
+
+            // 1. 交通
+            const transportList = document.getElementById('transport-text-list');
+            if (transportList && !transportList.sortable) {
+                transportList.sortable = Sortable.create(transportList, sortableOptions);
+            }
+
+            // 2. 購物
+            const shoppingList = document.getElementById('shopping-list');
+            if (shoppingList && !shoppingList.sortable) {
+                shoppingList.sortable = Sortable.create(shoppingList, sortableOptions);
+            }
+
+            // 3. 待辦 - 預訂
+            const bookingList = document.getElementById('booking-list');
+            if (bookingList && !bookingList.sortable) {
+                bookingList.sortable = Sortable.create(bookingList, sortableOptions);
+            }
+
+            // 4. 待辦 - 事前準備
+            document.querySelectorAll('.person-todo-list').forEach(list => {
+                if (!list.sortable) {
+                    list.sortable = Sortable.create(list, sortableOptions);
+                }
+            });
+        }
+        // =========================================================
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -653,12 +735,18 @@
             saveData();
         }
 
+        // 🆕 修正：自動判斷推入 shopping-list 容器
         function addGeneralItemWithNote(btnElement) {
+            let wrapper = document.getElementById('shopping-list');
+            let target = wrapper ? wrapper : btnElement.parentNode;
+
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
-            btnElement.parentNode.insertBefore(newItem, btnElement);
+            
+            if (wrapper) wrapper.appendChild(newItem);
+            else target.insertBefore(newItem, btnElement);
             saveData();
         }
 
@@ -713,7 +801,7 @@
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="手提">手提</option><option value="託運">託運</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包 🎒</option><option value="小包包">小包包 👛</option><option value="手提">手提 👜</option><option value="託運">託運 🧳</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             const header = btnElement.closest('.todo-category-header');
             header.parentNode.insertBefore(newItem, header.nextSibling);
             saveData();
@@ -849,6 +937,8 @@
             select.appendChild(opt);
             select.value = name;
             switchTodoPerson(name);
+            
+            initSortable(); // 🆕 新增人員後必須重新綁定拖曳功能
         }
 
         let currentUploadTarget = '';
@@ -1068,10 +1158,25 @@
                     itTab.insertBefore(tabsContainer, daysContainer);
                 }
             }
+            
+            // 🌟 【自動升級】為舊存檔加上購物清單容器 (以利拖曳排序)
+            let shoppingCard = document.querySelector('#tab-shopping .glass-card');
+            if (shoppingCard && !document.getElementById('shopping-list')) {
+                let wrapper = document.createElement('div');
+                wrapper.id = 'shopping-list';
+                let items = shoppingCard.querySelectorAll('.timeline-item');
+                if(items.length > 0) {
+                    shoppingCard.insertBefore(wrapper, items[0]);
+                    items.forEach(item => wrapper.appendChild(item));
+                } else {
+                    let btn = shoppingCard.querySelector('.add-btn');
+                    if(btn) shoppingCard.insertBefore(wrapper, btn);
+                }
+            }
 
             updateDayTabs();
-            
             initHistory();
+            initSortable(); // 🆕 啟動拖曳排序系統
 
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
