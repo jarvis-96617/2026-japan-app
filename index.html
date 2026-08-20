@@ -37,14 +37,11 @@
             transition: opacity 0.3s ease;
         }
         #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.85; }
-        
-        /* 🛠️ 修改 1：改變 Splash 標籤位置，對齊下方木桌 (約底部 12%) */
         #splash-screen .splash-text { position: absolute; bottom: 12%; z-index: 10; background: rgba(255,255,255,0.9); padding: 15px 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
         #splash-screen h2 { color: var(--primary-color); font-size: 26px; margin-bottom: 8px;}
         #splash-screen p { color: #555; font-size: 14px; font-weight: bold; }
 
         /* Header Hero */
-        /* 🛠️ 修改 2：高度從 200px 縮成 130px，並微調字體空間 */
         .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 130px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 15px 20px; padding-top: max(20px, env(safe-area-inset-top)); }
         .hero h1 { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
         .hero p { font-size: 13px; opacity: 0.9; }
@@ -66,10 +63,10 @@
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* Lists & Items */
-        .timeline-item { display: flex; gap: 12px; margin-bottom: 16px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; align-items: center; }
+        /* Lists & Items (大幅縮小特定分頁的間距) */
+        .timeline-item { display: flex; gap: 12px; margin-bottom: 8px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; align-items: center; }
         .timeline-item.completed { opacity: 0.35; }
-        #tab-todo .timeline-item { margin-bottom: 4px; }
+        #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { margin-bottom: 2px; padding: 2px 4px; }
         .checkbox-wrapper { flex-shrink: 0; padding-top: 2px; }
         .custom-checkbox { width: 22px; height: 22px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
         .completed .custom-checkbox { background: var(--primary-color); }
@@ -91,7 +88,6 @@
         .luggage-select:focus { box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.3); }
 
         /* 橫向滑動天數分頁樣式 */
-        /* 🛠️ 修改 3：縮小寬度(52px)、圓角、內距與字體大小 */
         .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 5px 2px 10px 2px; margin-bottom: 5px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -169,9 +165,13 @@
     <!-- 全域控制列 -->
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:6px;">
-            <div style="display:flex; gap:8px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button class="manual-save-btn" onclick="forceManualSave()">
                     <span class="material-icons-round" style="font-size:14px;">save</span> 雲端儲存
+                </button>
+                <!-- 🆕 新增：復原按鈕 -->
+                <button class="manual-save-btn" onclick="undoAction()" style="background:#f0ad4e;">
+                    <span class="material-icons-round" style="font-size:14px;">undo</span> 復原
                 </button>
                 <button class="manual-save-btn" onclick="location.reload()" style="background:#6c757d;">
                     <span class="material-icons-round" style="font-size:14px;">refresh</span> 重新載入
@@ -182,7 +182,7 @@
             </div>
         </div>
         <div style="font-size: 13px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 6px 10px; border-radius: 8px;">
-            全域顯示<br>TWD (台幣)
+            全域顯示<br>TWD (臺幣)
         </div>
     </div>
 
@@ -195,7 +195,6 @@
         <!-- ================= 行程 Tab ================= -->
         <div id="tab-itinerary" class="tab-content active">
             
-            <!-- 橫向滑動天數分頁容器 -->
             <div id="day-tabs-container" class="day-tabs-wrapper"></div>
             
             <div id="itinerary-days-container">
@@ -334,16 +333,17 @@
                             </div>
                         </div>
                         
+                        <!-- 🆕 修改為「背包」作為預設預先選項 -->
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="未定">-</option><option value="手提">手提 </option><option value="託運" selected>託運 </option></select>
+                            <select class="luggage-select"><option value="背包">背包 🎒</option><option value="手提">手提 👜</option><option value="託運" selected>託運 🧳</option></select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="未定">-</option><option value="手提" selected>手提 </option><option value="託運">託運 </option></select>
+                            <select class="luggage-select"><option value="背包">背包 🎒</option><option value="手提" selected>手提 👜</option><option value="託運">託運 🧳</option></select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
                         
@@ -380,6 +380,55 @@
         let payers = ['本人', '家人']; 
         let currentReceiptBox = null;
         let syncTimeout = null;
+        
+        // ================= 🆕 復原系統 (Undo) =================
+        let historyStack = [];
+        let currentStateSnapshot = null;
+
+        function captureState() {
+            return {
+                html: document.getElementById('main-container').innerHTML,
+                heroHtml: document.getElementById('hero-container').innerHTML,
+                payersData: JSON.parse(JSON.stringify(payers))
+            };
+        }
+
+        function initHistory() {
+            currentStateSnapshot = captureState();
+        }
+
+        function recordHistory() {
+            if (!currentStateSnapshot) return;
+            let newState = captureState();
+            if (newState.html !== currentStateSnapshot.html || newState.heroHtml !== currentStateSnapshot.heroHtml) {
+                historyStack.push(currentStateSnapshot);
+                if (historyStack.length > 20) historyStack.shift(); // 保留最近 20 步
+                currentStateSnapshot = newState;
+            }
+        }
+
+        function undoAction() {
+            if (historyStack.length === 0) {
+                alert('已經退到最一開始，沒有可以復原的操作囉！');
+                return;
+            }
+            let prevState = historyStack.pop();
+            
+            // 復原畫面與資料
+            document.getElementById('main-container').innerHTML = prevState.html;
+            document.getElementById('hero-container').innerHTML = prevState.heroHtml;
+            payers = prevState.payersData;
+            
+            // 更新目前快照與綁定
+            currentStateSnapshot = captureState();
+            renderPayerTags();
+            rebindEvents();
+            updateDayTabs();
+            
+            // 無痕儲存 (不寫入新的歷史)
+            saveData(false, true); 
+        }
+        // ======================================================
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -452,7 +501,6 @@
             saveData();
         }
 
-        // ================= 橫向滑動天數分頁邏輯 =================
         function updateDayTabs() {
             let container = document.getElementById('day-tabs-container');
             if (!container) return; 
@@ -605,8 +653,9 @@
             
             if (!select) return;
 
-            if (select.value === '未定') {
-                const carryOnKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '護照', '錢包', '貴重', '隨身', '打火機', '雨傘'];
+            // ⚠️ 只要目前是「背包」預設值，就允許智慧覆蓋
+            if (select.value === '背包') {
+                const carryOnKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '護照', '錢包', '貴重', '隨身', '打火機', '雨傘', '手提'];
                 const checkedKeywords = ['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'];
                 
                 let predicted = null;
@@ -635,7 +684,7 @@
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="未定" selected>-</option><option value="手提">手提 </option><option value="託運">託運 </option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包 🎒</option><option value="手提">手提 👜</option><option value="託運">託運 🧳</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             const header = btnElement.closest('.todo-category-header');
             header.parentNode.insertBefore(newItem, header.nextSibling);
             saveData();
@@ -732,7 +781,7 @@
                 grandTotal += amtInTWD;
             });
 
-            let resHTML = '<div style="font-weight:bold; margin-bottom:8px; color:#555;"> 個人付款小計 (折合台幣)：</div>';
+            let resHTML = '<div style="font-weight:bold; margin-bottom:8px; color:#555;"> 個人付款小計 (折合臺幣)：</div>';
             for(let p in totals) { resHTML += `<div class="flex-between" style="font-size:14px; margin-bottom:6px;"><span> ${p}</span><span>NT$${totals[p].toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`; }
             resHTML += `<hr style="margin:10px 0; border:0; border-top:1px solid #ccc;">`;
             resHTML += `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px;"><span> 旅程總花費：</span><span>NT$${grandTotal.toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`;
@@ -880,7 +929,12 @@
             saveData(); 
         });
 
-        function saveData(isManual = false) {
+        // 加入 skipHistory 參數，避免撤銷動作自己又被記錄下來
+        function saveData(isManual = false, skipHistory = false) {
+            if (!skipHistory) {
+                recordHistory();
+            }
+            
             const state = { 
                 html: document.getElementById('main-container').innerHTML,
                 heroHtml: document.getElementById('hero-container').innerHTML,
@@ -988,6 +1042,9 @@
             }
 
             updateDayTabs();
+            
+            // 🆕 讀取完畢後，初始化復原紀錄系統
+            initHistory();
 
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
