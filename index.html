@@ -311,7 +311,7 @@
                 <div id="person-todo-container">
                     <div class="person-todo-list" data-person="預設範本" style="display: block;">
                         <div class="todo-category-header flex-between">
-                            <span class="editable" contenteditable="true"> 確認行李重量</span>
+                            <span class="editable" contenteditable="true">📦 確認行李重量</span>
                             <div style="display:flex; gap:8px;">
                                 <span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span>
                                 <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
@@ -322,13 +322,13 @@
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="未定">-</option><option value="手提">手提</option><option value="託運" selected>託運</option></select>
+                            <select class="luggage-select"><option value="未定">-</option><option value="手提">手提 🎒</option><option value="託運" selected>託運 🧳</option></select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="未定">-</option><option value="手提" selected>手提</option><option value="託運">託運</option></select>
+                            <select class="luggage-select"><option value="未定">-</option><option value="手提" selected>手提 🎒</option><option value="託運">託運 🧳</option></select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
                         
@@ -443,7 +443,7 @@
             let dayCount = container.querySelectorAll('.day-card').length + 1;
             let div = document.createElement('div');
             div.className = 'glass-card day-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯標題</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;">📝 Day ${dayCount} - 點此編輯標題</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
             container.appendChild(div);
             saveData();
         }
@@ -556,7 +556,7 @@
         function addTodoCategory(btnElement) {
             const newCat = document.createElement('div');
             newCat.className = 'todo-category-header flex-between';
-            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span><span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span></div>`;
+            newCat.innerHTML = `<span class="editable" contenteditable="true">📁 新增分類名稱</span><div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span><span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span></div>`;
             btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode);
             saveData();
         }
@@ -566,7 +566,7 @@
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="未定" selected>-</option><option value="手提">手提</option><option value="託運">託運</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="未定" selected>-</option><option value="手提">手提 🎒</option><option value="託運">託運 🧳</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             const header = btnElement.closest('.todo-category-header');
             header.parentNode.insertBefore(newItem, header.nextSibling);
             saveData();
@@ -663,10 +663,10 @@
                 grandTotal += amtInTWD;
             });
 
-            let resHTML = '<div style="font-weight:bold; margin-bottom:8px; color:#555;"> 個人付款小計 (折合台幣)：</div>';
-            for(let p in totals) { resHTML += `<div class="flex-between" style="font-size:14px; margin-bottom:6px;"><span> ${p}</span><span>NT$${totals[p].toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`; }
+            let resHTML = '<div style="font-weight:bold; margin-bottom:8px; color:#555;">💳 個人付款小計 (折合台幣)：</div>';
+            for(let p in totals) { resHTML += `<div class="flex-between" style="font-size:14px; margin-bottom:6px;"><span>👤 ${p}</span><span>NT$${totals[p].toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`; }
             resHTML += `<hr style="margin:10px 0; border:0; border-top:1px solid #ccc;">`;
-            resHTML += `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px;"><span> 旅程總花費：</span><span>NT$${grandTotal.toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`;
+            resHTML += `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px;"><span>👑 旅程總花費：</span><span>NT$${grandTotal.toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`;
             document.getElementById('budget-result').innerHTML = resHTML;
         }
 
