@@ -169,7 +169,6 @@
                 <button class="manual-save-btn" onclick="forceManualSave()">
                     <span class="material-icons-round" style="font-size:14px;">save</span> 雲端儲存
                 </button>
-                <!-- 🆕 新增：復原按鈕 -->
                 <button class="manual-save-btn" onclick="undoAction()" style="background:#f0ad4e;">
                     <span class="material-icons-round" style="font-size:14px;">undo</span> 復原
                 </button>
@@ -333,17 +332,27 @@
                             </div>
                         </div>
                         
-                        <!-- 🆕 修改為「背包」作為預設預先選項 -->
+                        <!-- 🆕 修改選項列表：背包、小包包、手提、託運 -->
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="背包">背包 🎒</option><option value="手提">手提 👜</option><option value="託運" selected>託運 🧳</option></select>
+                            <select class="luggage-select">
+                                <option value="背包">背包 🎒</option>
+                                <option value="小包包">小包包 👛</option>
+                                <option value="手提">手提 👜</option>
+                                <option value="託運" selected>託運 🧳</option>
+                            </select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="背包">背包 🎒</option><option value="手提" selected>手提 👜</option><option value="託運">託運 🧳</option></select>
+                            <select class="luggage-select">
+                                <option value="背包">背包 🎒</option>
+                                <option value="小包包">小包包 👛</option>
+                                <option value="手提" selected>手提 👜</option>
+                                <option value="託運">託運 🧳</option>
+                            </select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
                         
@@ -381,7 +390,6 @@
         let currentReceiptBox = null;
         let syncTimeout = null;
         
-        // ================= 🆕 復原系統 (Undo) =================
         let historyStack = [];
         let currentStateSnapshot = null;
 
@@ -402,7 +410,7 @@
             let newState = captureState();
             if (newState.html !== currentStateSnapshot.html || newState.heroHtml !== currentStateSnapshot.heroHtml) {
                 historyStack.push(currentStateSnapshot);
-                if (historyStack.length > 20) historyStack.shift(); // 保留最近 20 步
+                if (historyStack.length > 20) historyStack.shift(); 
                 currentStateSnapshot = newState;
             }
         }
@@ -414,21 +422,17 @@
             }
             let prevState = historyStack.pop();
             
-            // 復原畫面與資料
             document.getElementById('main-container').innerHTML = prevState.html;
             document.getElementById('hero-container').innerHTML = prevState.heroHtml;
             payers = prevState.payersData;
             
-            // 更新目前快照與綁定
             currentStateSnapshot = captureState();
             renderPayerTags();
             rebindEvents();
             updateDayTabs();
             
-            // 無痕儲存 (不寫入新的歷史)
             saveData(false, true); 
         }
-        // ======================================================
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -653,13 +657,14 @@
             
             if (!select) return;
 
-            // ⚠️ 只要目前是「背包」預設值，就允許智慧覆蓋
             if (select.value === '背包') {
-                const carryOnKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '護照', '錢包', '貴重', '隨身', '打火機', '雨傘', '手提'];
+                const smallBagKeywords = ['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'];
+                const carryOnKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '打火機', '雨傘', '手提'];
                 const checkedKeywords = ['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'];
                 
                 let predicted = null;
-                if (carryOnKeywords.some(kw => text.includes(kw))) predicted = '手提';
+                if (smallBagKeywords.some(kw => text.includes(kw))) predicted = '小包包';
+                else if (carryOnKeywords.some(kw => text.includes(kw))) predicted = '手提';
                 else if (checkedKeywords.some(kw => text.includes(kw))) predicted = '託運';
 
                 if (predicted) {
@@ -680,11 +685,12 @@
             saveData();
         }
 
+        // 🆕 修正：加入新選項配置
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包 🎒</option><option value="手提">手提 👜</option><option value="託運">託運 🧳</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包 🎒</option><option value="小包包">小包包 👛</option><option value="手提">手提 👜</option><option value="託運">託運 🧳</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             const header = btnElement.closest('.todo-category-header');
             header.parentNode.insertBefore(newItem, header.nextSibling);
             saveData();
@@ -929,7 +935,6 @@
             saveData(); 
         });
 
-        // 加入 skipHistory 參數，避免撤銷動作自己又被記錄下來
         function saveData(isManual = false, skipHistory = false) {
             if (!skipHistory) {
                 recordHistory();
@@ -1043,7 +1048,6 @@
 
             updateDayTabs();
             
-            // 🆕 讀取完畢後，初始化復原紀錄系統
             initHistory();
 
             setTimeout(() => {
