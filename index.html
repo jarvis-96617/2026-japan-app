@@ -172,6 +172,10 @@
                 <button class="manual-save-btn" onclick="undoAction()" style="background:#f0ad4e;">
                     <span class="material-icons-round" style="font-size:14px;">undo</span> 復原
                 </button>
+                <!-- 🆕 新增：重做按鈕 -->
+                <button class="manual-save-btn" onclick="redoAction()" style="background:#5bc0de;">
+                    <span class="material-icons-round" style="font-size:14px;">redo</span> 重做
+                </button>
                 <button class="manual-save-btn" onclick="location.reload()" style="background:#6c757d;">
                     <span class="material-icons-round" style="font-size:14px;">refresh</span> 重新載入
                 </button>
@@ -332,7 +336,6 @@
                             </div>
                         </div>
                         
-                        <!-- 🆕 修改選項列表：背包、小包包、手提、託運 -->
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
@@ -390,7 +393,9 @@
         let currentReceiptBox = null;
         let syncTimeout = null;
         
-        let historyStack = [];
+        // ================= 🆕 復原/重做系統 (Undo/Redo) =================
+        let undoStack = [];
+        let redoStack = [];
         let currentStateSnapshot = null;
 
         function captureState() {
@@ -402,6 +407,8 @@
         }
 
         function initHistory() {
+            undoStack = [];
+            redoStack = [];
             currentStateSnapshot = captureState();
         }
 
@@ -409,30 +416,54 @@
             if (!currentStateSnapshot) return;
             let newState = captureState();
             if (newState.html !== currentStateSnapshot.html || newState.heroHtml !== currentStateSnapshot.heroHtml) {
-                historyStack.push(currentStateSnapshot);
-                if (historyStack.length > 20) historyStack.shift(); 
+                undoStack.push(currentStateSnapshot);
+                if (undoStack.length > 20) undoStack.shift(); // 保留最近 20 步
+                redoStack = []; // 只要有新動作，就清空重做堆疊
                 currentStateSnapshot = newState;
             }
         }
 
         function undoAction() {
-            if (historyStack.length === 0) {
+            if (undoStack.length === 0) {
                 alert('已經退到最一開始，沒有可以復原的操作囉！');
                 return;
             }
-            let prevState = historyStack.pop();
+            // 存入重做堆疊
+            redoStack.push(currentStateSnapshot);
             
-            document.getElementById('main-container').innerHTML = prevState.html;
-            document.getElementById('hero-container').innerHTML = prevState.heroHtml;
-            payers = prevState.payersData;
+            // 取出上一步並套用
+            let prevState = undoStack.pop();
+            applyState(prevState);
+        }
+
+        function redoAction() {
+            if (redoStack.length === 0) {
+                alert('已經是最新的狀態囉！');
+                return;
+            }
+            // 存入復原堆疊
+            undoStack.push(currentStateSnapshot);
             
-            currentStateSnapshot = captureState();
+            // 取出下一步並套用
+            let nextState = redoStack.pop();
+            applyState(nextState);
+        }
+
+        function applyState(state) {
+            document.getElementById('main-container').innerHTML = state.html;
+            document.getElementById('hero-container').innerHTML = state.heroHtml;
+            payers = state.payersData;
+            
+            currentStateSnapshot = captureState(); // 更新當前快照
+            
             renderPayerTags();
             rebindEvents();
             updateDayTabs();
             
+            // 無痕儲存 (不寫入新的歷史)
             saveData(false, true); 
         }
+        // ================================================================
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -685,7 +716,6 @@
             saveData();
         }
 
-        // 🆕 修正：加入新選項配置
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
