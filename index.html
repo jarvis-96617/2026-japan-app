@@ -67,7 +67,7 @@
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* Lists & Items */
+        /* Lists & Items (縮小特定分頁的間距) */
         .timeline-item { display: flex; gap: 12px; margin-bottom: 8px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; align-items: center; }
         .timeline-item.completed { opacity: 0.35; }
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { margin-bottom: 2px; padding: 2px 4px; }
@@ -111,7 +111,7 @@
 
         .content-box { flex-grow: 1; min-width: 0; align-self: center; }
         .item-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
-        .item-note { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 6px; font-size: 12px; margin-bottom: 4px; color: #555; width: 100%;}
+        .item-note { display: inline-block; background: #eee; padding: 3px 8px; border-radius: 6px; font-size: 12px; margin-bottom: 4px; color: #555; width: 100%; word-break: break-all;}
         
         /* 行李下拉選單樣式 */
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
@@ -347,7 +347,17 @@
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">book_online</span> 預訂類</h2>
                 <div id="booking-list">
-                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">日本網路 eSIM (機場開通)</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                    <div class="timeline-item" onclick="toggleComplete(this, event)">
+                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                        <div class="content-box">
+                            <div class="item-title editable" contenteditable="true">日本網路 eSIM (機場開通)</div>
+                            <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
+                            <div class="action-row" style="margin-top:6px;">
+                                <button class="btn-nav" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button>
+                            </div>
+                        </div>
+                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                    </div>
                 </div>
                 <button class="add-btn" onclick="addTodoItemToContainer('booking-list')">+ 新增預訂項目</button>
             </div>
@@ -371,7 +381,6 @@
                             </div>
                         </div>
                         
-                        <!-- 🆕 選項只保留：背包、小包包、託運 -->
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
@@ -520,6 +529,29 @@
             document.querySelectorAll('.person-todo-list').forEach(list => {
                 if (!list.sortable) { list.sortable = Sortable.create(list, sortableOptions); }
             });
+        }
+
+        // 🔗 智能開啟連結按鈕
+        function openLinkFromText(btn, event) {
+            event.preventDefault();
+            event.stopPropagation();
+            let parentBox = btn.closest('.content-box');
+            let text = parentBox.innerText; 
+            
+            let urlMatch = text.match(/https?:\/\/[^\s\)]+/);
+            if (urlMatch) {
+                window.open(urlMatch[0], '_blank');
+            } else {
+                let manualUrl = prompt('未偵測到網址，請直接貼上連結 (需包含 http)：', 'https://');
+                if (manualUrl && manualUrl.startsWith('http')) {
+                    let noteEl = parentBox.querySelector('.item-note');
+                    if(noteEl && noteEl.innerText.trim() === '備註/貼上連結：') {
+                        noteEl.innerText = manualUrl;
+                        saveData();
+                    }
+                    window.open(manualUrl, '_blank');
+                }
+            }
         }
 
         function switchTab(tabId, element) {
@@ -750,7 +782,6 @@
             
             if (!select) return;
 
-            // 🆕 當前只要是背包，就支援關鍵字覆蓋判斷
             if (select.value === '背包') {
                 const smallBagKeywords = ['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'];
                 const backpackKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '打火機', '雨傘', '手提', '背包'];
@@ -793,7 +824,14 @@
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            
+            // 預訂類也有自己的專屬新增樣式 (包含備註與按鈕)
+            if (containerId === 'booking-list') {
+                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row" style="margin-top:6px;"><button class="btn-nav" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            } else {
+                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            }
+            
             document.getElementById(containerId).appendChild(newItem);
             saveData();
         }
@@ -1141,7 +1179,7 @@
                 }
             }
             
-            // 🌟 【自動升級】清除舊的「手提」選項，並將已選「手提」的項目替換為「背包」
+            // 🌟 自動清除舊的「手提」選項，並將已選「手提」替換為「背包」
             document.querySelectorAll('.luggage-select').forEach(sel => {
                 let currentVal = sel.value || '背包';
                 if (currentVal === '手提') currentVal = '背包'; 
@@ -1172,6 +1210,39 @@
                     if(btn) shoppingCard.insertBefore(wrapper, btn);
                 }
             }
+
+            // 🌟 【自動升級】為預訂類項目加入備註與連結按鈕
+            let bookingItems = document.querySelectorAll('#booking-list .timeline-item');
+            bookingItems.forEach(item => {
+                let contentBox = item.querySelector('.content-box');
+                if (contentBox && !contentBox.querySelector('.btn-nav')) {
+                    let titleEl = contentBox.querySelector('.item-title');
+                    let text = titleEl ? titleEl.innerText : '';
+                    let urlMatch = text.match(/https?:\/\/[^\s\)]+/);
+                    
+                    let noteDiv = contentBox.querySelector('.item-note');
+                    if(!noteDiv) {
+                        noteDiv = document.createElement('div');
+                        noteDiv.className = 'item-note editable';
+                        noteDiv.setAttribute('contenteditable', 'true');
+                        
+                        if(urlMatch) {
+                            noteDiv.innerText = urlMatch[0];
+                            // 清除標題裡的網址和空括號
+                            titleEl.innerText = text.replace(urlMatch[0], '').replace(/\(\s*\)/g, '').replace(/（\s*）/g, '').trim(); 
+                        } else {
+                            noteDiv.innerText = '備註/貼上連結：';
+                        }
+                        contentBox.appendChild(noteDiv);
+                    }
+
+                    let actionRow = document.createElement('div');
+                    actionRow.className = 'action-row';
+                    actionRow.style = 'margin-top:6px;';
+                    actionRow.innerHTML = `<button class="btn-nav" style="background:#4a6fa5;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button>`;
+                    contentBox.appendChild(actionRow);
+                }
+            });
 
             updateDayTabs();
             initHistory();
