@@ -67,7 +67,7 @@
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* Lists & Items (縮小特定分頁的間距) */
+        /* Lists & Items */
         .timeline-item { display: flex; gap: 12px; margin-bottom: 8px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; align-items: center; }
         .timeline-item.completed { opacity: 0.35; }
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { margin-bottom: 2px; padding: 2px 4px; }
@@ -80,7 +80,7 @@
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; }
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; }
         
-        /* 🛠️ 修正：加入 !important 強制拉開左側空間，避免與上方縮小行距的設定衝突 */
+        /* 拖曳把手圖示 */
         #transport-text-list .timeline-item, 
         #shopping-list .timeline-item, 
         #booking-list .timeline-item, 
@@ -265,10 +265,12 @@
         <div id="tab-transport" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">directions_transit</span> 交通票券與指南</h2>
+                
                 <div id="transport-text-list" style="margin-top: 15px;">
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">機場至京都：JR 特急 Haruka</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">市區交通：Apple Pay ICOCA</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                 </div>
+                
                 <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 5px;">+ 新增交通指南</button>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
                 <div id="transport-links"></div>
@@ -369,13 +371,13 @@
                             </div>
                         </div>
                         
+                        <!-- 🆕 選項只保留：背包、小包包、託運 -->
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
                             <select class="luggage-select">
                                 <option value="背包">背包</option>
                                 <option value="小包包">小包包</option>
-                                <option value="手提">手提</option>
                                 <option value="託運" selected>託運</option>
                             </select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
@@ -384,9 +386,8 @@
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
                             <select class="luggage-select">
-                                <option value="背包">背包</option>
+                                <option value="背包" selected>背包</option>
                                 <option value="小包包">小包包</option>
-                                <option value="手提" selected>手提</option>
                                 <option value="託運">託運</option>
                             </select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
@@ -749,14 +750,15 @@
             
             if (!select) return;
 
+            // 🆕 當前只要是背包，就支援關鍵字覆蓋判斷
             if (select.value === '背包') {
                 const smallBagKeywords = ['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'];
-                const carryOnKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '打火機', '雨傘', '手提'];
+                const backpackKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '打火機', '雨傘', '手提', '背包'];
                 const checkedKeywords = ['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'];
                 
                 let predicted = null;
                 if (smallBagKeywords.some(kw => text.includes(kw))) predicted = '小包包';
-                else if (carryOnKeywords.some(kw => text.includes(kw))) predicted = '手提';
+                else if (backpackKeywords.some(kw => text.includes(kw))) predicted = '背包';
                 else if (checkedKeywords.some(kw => text.includes(kw))) predicted = '託運';
 
                 if (predicted) {
@@ -781,7 +783,7 @@
             const newItem = document.createElement('div');
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="手提">手提</option><option value="託運">託運</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             const header = btnElement.closest('.todo-category-header');
             header.parentNode.insertBefore(newItem, header.nextSibling);
             saveData();
@@ -1138,6 +1140,24 @@
                     itTab.insertBefore(tabsContainer, daysContainer);
                 }
             }
+            
+            // 🌟 【自動升級】清除舊的「手提」選項，並將已選「手提」的項目替換為「背包」
+            document.querySelectorAll('.luggage-select').forEach(sel => {
+                let currentVal = sel.value || '背包';
+                if (currentVal === '手提') currentVal = '背包'; 
+                
+                sel.innerHTML = `
+                    <option value="背包">背包</option>
+                    <option value="小包包">小包包</option>
+                    <option value="託運">託運</option>
+                `;
+                
+                sel.value = currentVal;
+                Array.from(sel.options).forEach(opt => {
+                    if (opt.value === currentVal) opt.setAttribute('selected', 'selected');
+                    else opt.removeAttribute('selected');
+                });
+            });
             
             let shoppingCard = document.querySelector('#tab-shopping .glass-card');
             if (shoppingCard && !document.getElementById('shopping-list')) {
