@@ -353,7 +353,7 @@
                             <div class="item-title editable" contenteditable="true">日本網路 eSIM (機場開通)</div>
                             <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
                             <div class="action-row" style="margin-top:6px;">
-                                <button class="btn-nav" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button>
+                                <button class="btn-nav" style="background:#4a6fa5;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button>
                             </div>
                         </div>
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
@@ -365,9 +365,13 @@
             <div class="glass-card">
                 <div class="flex-between" style="margin-bottom: 15px;">
                     <h2 class="section-title" style="margin-bottom: 0;"><span class="material-icons-round">luggage</span> 事前準備類</h2>
-                    <select id="todo-person-select" onchange="switchTodoPerson(this.value)" style="border:2px solid var(--primary-color); color:var(--primary-color); font-weight:bold; border-radius:6px; padding:2px;">
-                        <option value="預設範本" selected>預設範本</option>
-                    </select>
+                    <!-- 🆕 新增：在下拉選單外面包一層 div 放置刪除按鈕 -->
+                    <div class="person-select-wrapper" style="display:flex; align-items:center; gap:5px;">
+                        <select id="todo-person-select" onchange="switchTodoPerson(this.value)" style="border:2px solid var(--primary-color); color:var(--primary-color); font-weight:bold; border-radius:6px; padding:2px;">
+                            <option value="預設範本" selected>預設範本</option>
+                        </select>
+                        <span class="material-icons-round delete-btn" style="padding:0; font-size: 20px; cursor: pointer;" onclick="deleteTodoPerson()">delete_outline</span>
+                    </div>
                 </div>
                 <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷貝建立新人員清單</button>
                 
@@ -381,6 +385,7 @@
                             </div>
                         </div>
                         
+                        <!-- 🆕 修改選項列表，移除手提 -->
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
@@ -531,7 +536,6 @@
             });
         }
 
-        // 🔗 智能開啟連結按鈕
         function openLinkFromText(btn, event) {
             event.preventDefault();
             event.stopPropagation();
@@ -784,12 +788,10 @@
 
             if (select.value === '背包') {
                 const smallBagKeywords = ['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'];
-                const backpackKeywords = ['行動電源', '電池', '筆電', '平板', '相機', '打火機', '雨傘', '手提', '背包'];
                 const checkedKeywords = ['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'];
                 
                 let predicted = null;
                 if (smallBagKeywords.some(kw => text.includes(kw))) predicted = '小包包';
-                else if (backpackKeywords.some(kw => text.includes(kw))) predicted = '背包';
                 else if (checkedKeywords.some(kw => text.includes(kw))) predicted = '託運';
 
                 if (predicted) {
@@ -825,15 +827,40 @@
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             
-            // 預訂類也有自己的專屬新增樣式 (包含備註與按鈕)
             if (containerId === 'booking-list') {
-                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row" style="margin-top:6px;"><button class="btn-nav" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row" style="margin-top:6px;"><button class="btn-nav" style="background:#4a6fa5;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             } else {
                 newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             }
             
             document.getElementById(containerId).appendChild(newItem);
             saveData();
+        }
+
+        // 🆕 新增：刪除人員的腳本
+        function deleteTodoPerson() {
+            let select = document.getElementById('todo-person-select');
+            let personName = select.value;
+            
+            if (personName === '預設範本') {
+                alert('「預設範本」為系統基礎清單，無法被刪除喔！');
+                return;
+            }
+
+            if (confirm(`確定要刪除人員「${personName}」的所有待辦清單嗎？\n(此操作會一併移除該人員的所有項目)`)) {
+                // 從下拉選單中移除
+                Array.from(select.options).forEach(opt => {
+                    if (opt.value === personName) opt.remove();
+                });
+
+                // 移除對應的清單區塊
+                let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`);
+                if (targetList) targetList.remove();
+
+                // 自動切回預設範本
+                select.value = '預設範本';
+                switchTodoPerson('預設範本');
+            }
         }
 
         function renderPayerTags() {
@@ -1179,7 +1206,7 @@
                 }
             }
             
-            // 🌟 自動清除舊的「手提」選項，並將已選「手提」替換為「背包」
+            // 🌟 自動升級：清除舊的「手提」選項並替換，也為下拉選單加上刪除按鈕
             document.querySelectorAll('.luggage-select').forEach(sel => {
                 let currentVal = sel.value || '背包';
                 if (currentVal === '手提') currentVal = '背包'; 
@@ -1196,6 +1223,26 @@
                     else opt.removeAttribute('selected');
                 });
             });
+
+            // 🌟 自動升級：為事前準備類的下拉選單旁加入「刪除人員」按鈕
+            let personSelect = document.getElementById('todo-person-select');
+            if (personSelect && !personSelect.closest('.person-select-wrapper')) {
+                let flexParent = personSelect.closest('.flex-between');
+                if(flexParent) {
+                    let wrapper = document.createElement('div');
+                    wrapper.className = 'person-select-wrapper';
+                    wrapper.style.cssText = 'display:flex; align-items:center; gap:5px;';
+                    flexParent.insertBefore(wrapper, personSelect);
+                    wrapper.appendChild(personSelect);
+                    
+                    let delBtn = document.createElement('span');
+                    delBtn.className = 'material-icons-round delete-btn';
+                    delBtn.style.cssText = 'padding:0; font-size: 20px; cursor: pointer;';
+                    delBtn.innerText = 'delete_outline';
+                    delBtn.setAttribute('onclick', 'deleteTodoPerson()');
+                    wrapper.appendChild(delBtn);
+                }
+            }
             
             let shoppingCard = document.querySelector('#tab-shopping .glass-card');
             if (shoppingCard && !document.getElementById('shopping-list')) {
@@ -1211,7 +1258,6 @@
                 }
             }
 
-            // 🌟 【自動升級】為預訂類項目加入備註與連結按鈕
             let bookingItems = document.querySelectorAll('#booking-list .timeline-item');
             bookingItems.forEach(item => {
                 let contentBox = item.querySelector('.content-box');
@@ -1228,7 +1274,6 @@
                         
                         if(urlMatch) {
                             noteDiv.innerText = urlMatch[0];
-                            // 清除標題裡的網址和空括號
                             titleEl.innerText = text.replace(urlMatch[0], '').replace(/\(\s*\)/g, '').replace(/（\s*）/g, '').trim(); 
                         } else {
                             noteDiv.innerText = '備註/貼上連結：';
