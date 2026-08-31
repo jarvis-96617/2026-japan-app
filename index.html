@@ -63,12 +63,25 @@
         
         /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
-        .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; }
+        
+        /* 🌟 修正1：處理可編輯區塊與拖曳的交互作用 */
+        .editable { 
+            padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; 
+            -webkit-user-select: text !important; /* 確保文字可以被選取與編輯 */
+            user-select: text !important;
+            -webkit-touch-callout: default !important;
+        }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* Lists & Items */
-        .timeline-item { display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
+        /* 🌟 修正1：禁止在整個行程區塊長按選字 (解決藍色反白問題) */
+        .timeline-item { 
+            display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease; 
+            padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; 
+            -webkit-user-select: none; /* 禁止選字反藍 */
+            user-select: none;
+            -webkit-touch-callout: none; /* 禁止長按跳出選單 */
+        }
         .timeline-item:last-child { border-bottom: none; }
         .timeline-item.completed { opacity: 0.35; }
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { padding: 6px 4px; }
@@ -82,7 +95,7 @@
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; }
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; }
         
-        /* 🌟 新增行程表把手，以及拖曳把手圖示 */
+        /* 拖曳把手圖示 */
         #itinerary-days-container .timeline-item, 
         #transport-text-list .timeline-item, 
         #shopping-list .timeline-item, 
@@ -125,10 +138,35 @@
         .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; }
         .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
 
-        /* Buttons & Labels */
-        .action-row { display: flex; align-items: center; gap: 6px; margin-top: 0; flex-wrap: wrap; }
-        .btn-nav { display: inline-flex; align-items: center; gap: 3px; background: var(--primary-color); color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; }
-        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:4px 6px; border-radius:6px; display:inline-flex; align-items:center; gap:2px; border: 1px solid #e0e0e0;}
+        /* 🌟 修正2：Action Row 強制不換行 (解決紅框跑版) */
+        .action-row { 
+            display: flex; align-items: center; gap: 4px; margin-top: 0; 
+            flex-wrap: nowrap; /* 核心修正：強制同一行 */
+            overflow-x: auto; /* 若真的塞不下允許左右小幅滑動 */
+            scrollbar-width: none;
+        }
+        .action-row::-webkit-scrollbar { display: none; }
+        
+        .btn-nav { display: inline-flex; align-items: center; gap: 2px; background: var(--primary-color); color: white; padding: 4px 6px; border-radius: 6px; font-size: 11px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; white-space: nowrap; flex-shrink: 0;}
+        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 4px 3px 2px; border-radius:6px; display:inline-flex; align-items:center; gap:2px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0;}
+        
+        /* 🌟 修正3：獨立的切換交通工具按鈕樣式 (讓橘框看起來像按鈕) */
+        .transport-icon {
+            font-size: 13px !important;
+            background: #ffffff;
+            color: var(--primary-color);
+            border: 1px solid #4a6fa5;
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .transport-icon:active { background: #eef2f5; transform: scale(0.9); }
+
         .delete-btn { color: var(--danger-color); cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 4px; margin-top: -2px;}
         .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px;}
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -254,8 +292,8 @@
                                 <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
                                 <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
                                 <div class="travel-time-wrap">
-                                    <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_transit</span>
-                                    <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">56</span> 分鐘
+                                    <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span>
+                                    <span style="color:#777; margin:0 1px;">至下站:</span> <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">56</span> 分鐘
                                 </div>
                             </div>
                         </div>
@@ -284,8 +322,8 @@
                                 <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
                                 <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
                                 <div class="travel-time-wrap">
-                                    <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_walk</span>
-                                    <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">6</span> 分鐘
+                                    <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span>
+                                    <span style="color:#777; margin:0 1px;">至下站:</span> <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">6</span> 分鐘
                                 </div>
                             </div>
                         </div>
@@ -830,8 +868,8 @@
                         <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
                         <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
                         <div class="travel-time-wrap">
-                            <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_transit</span>
-                            <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘
+                            <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span>
+                            <span style="color:#777; margin:0 1px;">至下站:</span> <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘
                         </div>
                     </div>
                 </div>
@@ -1399,43 +1437,24 @@
                 });
             });
 
-            // 🌟 自動幫舊行程無痛升級「縮圖上傳區」與「新按鈕排版」
+            // 🌟 自動幫舊版按鈕結構套用「強制不換行」與按鈕化設定
             document.querySelectorAll('#itinerary-days-container .content-box').forEach(box => {
-                if(!box.querySelector('.item-thumb-box')) {
-                    let topDiv = document.createElement('div');
-                    topDiv.style.cssText = 'display: flex; gap: 8px; align-items: flex-start;';
-
-                    let leftDiv = document.createElement('div');
-                    leftDiv.style.cssText = 'flex-grow: 1; min-width: 0;';
-
-                    let titleEl = box.querySelector('.item-title');
-                    let noteEl = box.querySelector('.item-note');
-                    if(titleEl) leftDiv.appendChild(titleEl);
-                    if(noteEl) leftDiv.appendChild(noteEl);
-
-                    let thumbBox = document.createElement('div');
-                    thumbBox.className = 'item-thumb-box';
-                    thumbBox.setAttribute('onclick', 'triggerItemUpload(this)');
-                    thumbBox.style.cssText = 'width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;';
-                    thumbBox.innerHTML = '<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>';
-
-                    topDiv.appendChild(leftDiv);
-                    topDiv.appendChild(thumbBox);
-                    box.insertBefore(topDiv, box.firstChild);
-
-                    let actionRow = box.querySelector('.action-row');
-                    if(actionRow) {
-                        let travelWrap = actionRow.querySelector('.travel-time-wrap');
-                        if(travelWrap) travelWrap.innerHTML = travelWrap.innerHTML.replace('至下站:', '');
+                let actionRow = box.querySelector('.action-row');
+                if(actionRow) {
+                    let travelWrap = actionRow.querySelector('.travel-time-wrap');
+                    if(travelWrap) {
+                        travelWrap.innerHTML = travelWrap.innerHTML.replace('至下站:', '');
                         
-                        if(!actionRow.innerHTML.includes('addLinkToNote')) {
-                            let linkBtn = document.createElement('button');
-                            linkBtn.className = 'btn-nav';
-                            linkBtn.style.background = '#66bb6a';
-                            linkBtn.setAttribute('onclick', 'addLinkToNote(this, event)');
-                            linkBtn.innerHTML = `<span class="material-icons-round" style="font-size:13px;">add_link</span> 連結`;
-                            if(travelWrap) actionRow.insertBefore(linkBtn, travelWrap);
-                            else actionRow.appendChild(linkBtn);
+                        let icon = travelWrap.querySelector('.transport-icon');
+                        if(icon) {
+                            icon.className = 'material-icons-round transport-icon';
+                        } else {
+                            let timeMatch = travelWrap.innerText.match(/\d+/);
+                            let mins = timeMatch ? timeMatch[0] : '15';
+                            travelWrap.innerHTML = `
+                                <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span>
+                                <span style="color:#777; margin:0 1px;">至下站:</span> <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">${mins}</span> 分鐘
+                            `;
                         }
                     }
                 }
