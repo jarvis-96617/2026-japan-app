@@ -567,11 +567,13 @@
             if(tabId === 'tab-budget') calcBudget();
         }
 
-        function toggleComplete(element, event) {
-            if (event.target.closest('.editable') || event.target.closest('button') || event.target.closest('a') || event.target.closest('.delete-btn') || event.target.closest('table') || event.target.closest('.cat-action-icon') || event.target.closest('.receipt-box') || event.target.closest('.receipt-thumb-wrap') || event.target.closest('select')) return;
-            element.classList.toggle('completed');
-            saveData();
-        }
+       function toggleComplete(element, event) {
+    // 檢查點擊的目標是否為核取圓圈，如果不是就直接結束函式
+    if (!event.target.closest('.custom-checkbox')) return;
+    
+    element.classList.toggle('completed');
+    saveData();
+}
 
         function deleteItem(btnElement, event) {
             event.stopPropagation();
