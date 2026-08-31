@@ -63,12 +63,22 @@
         
         /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
-        .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; -webkit-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important; }
+        
+        /* 🌟 Editable 修正：確保文字區塊可以選取編輯，不受外層防反白影響 */
+        .editable { 
+            padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; 
+            -webkit-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important;
+        }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🌟 Lists & Items (極致緊湊 + 禁止長按反藍) */
-        .timeline-item { display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        /* 🌟 Lists & Items (加入防反白與允許換行 Flex-wrap) */
+        .timeline-item { 
+            display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease; 
+            padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; 
+            flex-wrap: wrap; /* 核心：允許按鈕列掉到第二行 */
+            -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; /* 解決長按反藍問題 */
+        }
         .timeline-item:last-child { border-bottom: none; }
         .timeline-item.completed { opacity: 0.35; }
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { padding: 6px 4px; }
@@ -83,13 +93,22 @@
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; }
         
         /* 拖曳把手圖示 */
-        #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 24px !important; }
-        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before {
+        #itinerary-days-container .timeline-item, 
+        #transport-text-list .timeline-item, 
+        #shopping-list .timeline-item, 
+        #booking-list .timeline-item, 
+        .person-todo-list .timeline-item { padding-left: 24px !important; }
+        
+        #itinerary-days-container .timeline-item::before, 
+        #transport-text-list .timeline-item::before, 
+        #shopping-list .timeline-item::before, 
+        #booking-list .timeline-item::before, 
+        .person-todo-list .timeline-item::before {
             content: '⋮⋮'; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; 
         }
 
         /* Time Column */
-        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; padding-top: 0; }
+        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
         .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); cursor: text; margin-bottom: 3px; line-height: 1; }
         .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; }
         .duration { font-weight: bold; color: var(--primary-color); min-width: 14px; display: inline-block; text-align: center; }
@@ -97,6 +116,8 @@
 
         .content-box { flex-grow: 1; min-width: 0; }
         .item-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
+        
+        /* 備註樣式 */
         .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid #ccc; font-size: 12px; margin-bottom: 6px; color: #666; width: 100%; word-break: break-word; line-height: 1.4;}
         
         /* 專屬備註連結樣式 */
@@ -106,7 +127,7 @@
         /* 行李下拉選單樣式 */
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
-        /* 橫向滑動天數分頁 */
+        /* 橫向滑動天數分頁樣式 */
         .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 5px 2px 10px 2px; margin-bottom: 5px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -114,33 +135,35 @@
         .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; }
         .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
 
-        /* 🌟 Buttons & Labels (強制換行防跑版 + 尺寸緊湊) */
-        .action-row { display: flex; align-items: center; gap: 6px; row-gap: 4px; margin-top: 2px; flex-wrap: wrap; }
-        .btn-nav { display: inline-flex; align-items: center; gap: 2px; background: var(--primary-color); color: white; padding: 4px 6px; border-radius: 6px; font-size: 11px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; }
-        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 6px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; flex-shrink: 0;}
+        /* 🌟 Buttons & Labels：移至左側並佔滿版面 */
+        .action-row { 
+            display: flex; align-items: center; gap: 4px; margin-top: 0; 
+            flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+            width: calc(100% - 32px); /* 扣除左邊核取圓圈的寬度 */
+            margin-left: 32px; /* 對齊在時間欄位正下方 */
+            order: 10; /* 強制這排按鈕換行掉到最下面 */
+        }
+        .action-row::-webkit-scrollbar { display: none; }
         
-        /* 🌟 修正3：專屬交通工具圖示按鈕 (具備按鈕回饋感) */
+        .btn-nav { display: inline-flex; align-items: center; gap: 2px; background: var(--primary-color); color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; white-space: nowrap; flex-shrink: 0;}
+        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 6px 3px 3px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0;}
+        
+        /* 🌟 交通圖示按鈕化 */
         .transport-icon {
-            font-size: 14px !important; background: #ffffff; color: var(--primary-color);
-            border: 1px solid #4a6fa5; border-radius: 4px; padding: 2px 4px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; transition: 0.15s;
-            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 14px !important;
+            background: #ffffff;
+            color: var(--primary-color);
+            border: 1px solid #4a6fa5;
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .transport-icon:active { background: #eef2f5; transform: scale(0.9); }
-
-        /* 🌟 修正2：堅固的專屬縮圖區塊 CSS */
-        .item-thumb-box {
-            width: 40px; height: 40px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px;
-            display: flex; justify-content: center; align-items: center; background: #fafafa;
-            cursor: pointer; position: relative;
-        }
-        .item-thumb-box.has-image { border: none; background: transparent; }
-        .item-thumb-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .del-thumb-btn {
-            position: absolute; top: -6px; right: -6px; background: var(--danger-color); color: white;
-            width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); z-index: 2;
-        }
 
         .delete-btn { color: var(--danger-color); cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 4px; margin-top: -2px;}
         .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px;}
@@ -150,6 +173,7 @@
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; }
         #budget-table th { background: #eef2f5; padding: 6px 2px; font-size: 12px; color: #555; text-align: center; }
         #budget-table td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 13px; text-align: center; vertical-align: middle; }
+        
         .amount-input { width: 100%; box-sizing: border-box; font-size: 13px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; }
         .curr-select, .payer-select { font-size: 11px; padding: 2px; width: 100%; box-sizing: border-box; }
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-right: 5px; margin-bottom: 5px; }
@@ -244,6 +268,7 @@
                         <span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span>
                     </div>
                     
+                    <!-- 第 1 站 -->
                     <div class="timeline-item" onclick="toggleComplete(this, event)">
                         <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                         <div class="time-column">
@@ -257,20 +282,50 @@
                                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">TPE 到 KIX</span></div>
                                     <div class="item-note editable" contenteditable="true">備註：抵達機場、開通 eSIM</div>
                                 </div>
-                                <div class="item-thumb-box" onclick="triggerItemUpload(this)">
+                                <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;">
                                     <span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>
-                                </div>
-                            </div>
-                            <div class="action-row">
-                                <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
-                                <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
-                                <div class="travel-time-wrap">
-                                    <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span>
-                                    <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">56</span> 分鐘
                                 </div>
                             </div>
                         </div>
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                        <div class="action-row">
+                            <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                            <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
+                            <div class="travel-time-wrap">
+                                <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span>
+                                <span style="color:#777; margin:0 1px;">至下站:</span> <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">56</span> 分鐘
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第 2 站 -->
+                    <div class="timeline-item" onclick="toggleComplete(this, event)">
+                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                        <div class="time-column">
+                            <div class="start-time editable" contenteditable="true">20:16</div>
+                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">76</span> 分</div>
+                            <div class="end-time">21:32</div>
+                        </div>
+                        <div class="content-box">
+                            <div style="display: flex; gap: 8px; align-items: flex-start;">
+                                <div style="flex-grow: 1; min-width: 0;">
+                                    <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">KIX 到 京都車站</span></div>
+                                    <div class="item-note editable" contenteditable="true">備註：HARUKA</div>
+                                </div>
+                                <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;">
+                                    <span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                        <div class="action-row">
+                            <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                            <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
+                            <div class="travel-time-wrap">
+                                <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span>
+                                <span style="color:#777; margin:0 1px;">至下站:</span> <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">6</span> 分鐘
+                            </div>
+                        </div>
                     </div>
 
                     <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
@@ -283,9 +338,12 @@
         <div id="tab-transport" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">directions_transit</span> 交通票券與指南</h2>
+                
                 <div id="transport-text-list" style="margin-top: 15px;">
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">機場至京都：JR 特急 Haruka</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">市區交通：Apple Pay ICOCA</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                 </div>
+                
                 <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 5px;">+ 新增交通指南</button>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
                 <div id="transport-links"></div>
@@ -323,9 +381,11 @@
         <div id="tab-shopping" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">shopping_bag</span> 採買清單</h2>
+                
                 <div id="shopping-list">
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">免稅藥妝</div><div class="item-note editable" contenteditable="true">備註：感冒藥、維他命</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                 </div>
+                
                 <button class="add-btn" onclick="addGeneralItemWithNote(this)">+ 新增清單項目</button>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
                 <div class="upload-area" onclick="triggerUpload('gallery-shopping')"><span class="material-icons-round" style="font-size: 28px; color: var(--primary-color);">add_photo_alternate</span><p style="font-size: 13px; color: #666;">點擊上傳代購商品圖</p></div>
@@ -344,9 +404,12 @@
                 </div>
                 
                 <table id="budget-table">
-                    <tr><th>項目</th><th>付款人</th><th>幣別</th><th>金額</th><th>操作</th></tr>
+                    <tr>
+                        <th>項目</th><th>付款人</th><th>幣別</th><th>金額</th><th>操作</th>
+                    </tr>
                     <tbody id="budget-tbody"></tbody>
                 </table>
+                
                 <button class="add-btn" onclick="addBudgetRow()">+ 新增記帳項目</button>
                 <div id="budget-result" style="margin-top:20px; padding-top:15px; border-top:1px dashed #ccc; line-height: 1.8;"></div>
             </div>
@@ -362,11 +425,11 @@
                         <div class="content-box">
                             <div class="item-title editable" contenteditable="true">日本網路 eSIM (機場開通)</div>
                             <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
-                            <div class="action-row">
-                                <button class="btn-nav" style="background:#4a6fa5;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button>
-                            </div>
                         </div>
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                        <div class="action-row">
+                            <button class="btn-nav" style="background:#4a6fa5;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button>
+                        </div>
                     </div>
                 </div>
                 <button class="add-btn" onclick="addTodoItemToContainer('booking-list')">+ 新增預訂項目</button>
@@ -383,6 +446,7 @@
                     </div>
                 </div>
                 <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷貝建立新人員清單</button>
+                
                 <div id="person-todo-container">
                     <div class="person-todo-list" data-person="預設範本" style="display: block;">
                         <div class="todo-category-header flex-between">
@@ -392,12 +456,28 @@
                                 <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
                             </div>
                         </div>
+                        
                         <div class="timeline-item" onclick="toggleComplete(this, event)">
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="背包">背包</option><option value="小包包">小包包</option><option value="託運" selected>託運</option></select>
+                            <select class="luggage-select">
+                                <option value="背包">背包</option>
+                                <option value="小包包">小包包</option>
+                                <option value="託運" selected>託運</option>
+                            </select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)">
+                            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                            <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
+                            <select class="luggage-select">
+                                <option value="背包" selected>背包</option>
+                                <option value="小包包">小包包</option>
+                                <option value="託運">託運</option>
+                            </select>
+                            <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                        </div>
+                        
                         <div class="flex-between" style="gap:10px; margin-top:15px;">
                             <button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button>
                         </div>
@@ -522,15 +602,15 @@
                 let text = prompt('請輸入連結顯示名稱：', '參考連結');
                 if (!text) text = '參考連結';
                 
-                let noteEl = btn.closest('.content-box').querySelector('.item-note');
+                let noteEl = btn.closest('.timeline-item').querySelector('.item-note');
                 
-                if(noteEl.innerText.trim() === '備註：') {
+                if(noteEl && noteEl.innerText.trim() === '備註：') {
                     noteEl.innerHTML = '';
                 }
                 
                 let linkHtml = ` <a contenteditable="false" href="${url}" target="_blank" class="note-link" onclick="window.open(this.href, '_blank'); return false;"><span class="material-icons-round" style="font-size:12px;">link</span>${text}</a> &nbsp;`;
                 
-                noteEl.innerHTML += linkHtml;
+                if(noteEl) noteEl.innerHTML += linkHtml;
                 saveData();
             }
         }
@@ -584,7 +664,7 @@
                 delay: 250, 
                 delayOnTouchOnly: true,
                 draggable: '.timeline-item',
-                filter: '.editable, button, select, input, .transport-icon, .note-link, img, .del-thumb-btn', 
+                filter: '.editable, button, select, input, .transport-icon, .note-link, img', 
                 preventOnFilter: false,
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
@@ -595,7 +675,6 @@
                 }
             };
 
-            // 讓行程表可以拖曳排序
             document.querySelectorAll('.day-card').forEach(card => {
                 if (!card.sortable) { card.sortable = Sortable.create(card, sortableOptions); }
             });
@@ -639,7 +718,7 @@
             }
         }
 
-        // 終極智能導航：支援「A 到 B」解析與交通工具連動
+        // 終極智能導航
         function autoNavigate(btn, event) {
             event.preventDefault();
             let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card');
@@ -778,20 +857,20 @@
                             <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                             <div class="item-note editable" contenteditable="true">備註：</div>
                         </div>
-                        <div class="item-thumb-box" onclick="triggerItemUpload(this)">
+                        <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;">
                             <span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>
-                        </div>
-                    </div>
-                    <div class="action-row">
-                        <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
-                        <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
-                        <div class="travel-time-wrap">
-                            <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span>
-                            <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘
                         </div>
                     </div>
                 </div>
                 <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                <div class="action-row">
+                    <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                    <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
+                    <div class="travel-time-wrap">
+                        <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span>
+                        <span style="color:#777; margin:0 1px;">至下站:</span> <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘
+                    </div>
+                </div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement);
             
@@ -899,7 +978,17 @@
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             
             if (containerId === 'booking-list') {
-                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註：</div><div class="action-row" style="margin-top:6px;"><button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+                newItem.innerHTML = `
+                    <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                    <div class="content-box">
+                        <div class="item-title editable" contenteditable="true">輸入預訂項目</div>
+                        <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
+                    </div>
+                    <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                    <div class="action-row">
+                        <button class="btn-nav" style="background:#4a6fa5;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button>
+                    </div>
+                `;
             } else {
                 newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             }
@@ -1155,10 +1244,10 @@
             if (file && currentItemThumbBox) {
                 compressImage(file, function(compressedDataUrl) {
                     uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
-                        currentItemThumbBox.classList.add('has-image');
+                        currentItemThumbBox.style.border = 'none';
                         currentItemThumbBox.innerHTML = `
-                            <img src="${driveUrl}" onclick="openImageModal(this.src, event)">
-                            <div class="del-thumb-btn" onclick="deleteItemThumb(this, event)">&times;</div>
+                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openImageModal(this.src, event)">
+                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2;">&times;</div>
                         `;
                         saveData();
                     });
@@ -1171,7 +1260,7 @@
             event.stopPropagation();
             if(confirm('確定移除此圖片？')) {
                 let box = delBtn.closest('.item-thumb-box');
-                box.classList.remove('has-image');
+                box.style.border = '1px dashed #ccc';
                 box.innerHTML = `<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>`;
                 saveData();
             }
@@ -1224,7 +1313,7 @@
             if (e.target.classList.contains('luggage-item-title')) { predictLuggageType(e.target); }
             if (e.target.classList.contains('section-title') && e.target.closest('.day-card')) { updateDayTabs(); }
             
-            // 自動時間連動邏輯
+            // 🌟 自動時間連動邏輯
             let card = e.target.closest('.day-card');
             if (card && (e.target.classList.contains('start-time') || e.target.classList.contains('duration') || e.target.classList.contains('travel-time'))) {
                 recalculateDayTime(card);
@@ -1355,66 +1444,11 @@
                 });
             });
 
-            // 🌟 最終極致除蟲：拔除舊有「至下站:」標籤，避免版面無限拉長破版
-            document.querySelectorAll('#itinerary-days-container .content-box').forEach(box => {
-                let actionRow = box.querySelector('.action-row');
-                if(actionRow) {
-                    let travelWrap = actionRow.querySelector('.travel-time-wrap') || actionRow.querySelector('div:not(.btn-nav)');
-                    if(travelWrap) {
-                        travelWrap.className = 'travel-time-wrap';
-                        travelWrap.style.cssText = ''; // 清除舊內嵌樣式
-                        
-                        // 強制清除「至下站:」，保留最純淨的圖示與時間
-                        if(travelWrap.innerText.includes('至下站')) {
-                            let timeMatch = travelWrap.innerText.match(/\d+/);
-                            let mins = timeMatch ? timeMatch[0] : '15';
-                            let iconEl = travelWrap.querySelector('.transport-icon');
-                            let mode = iconEl ? iconEl.innerText : 'directions_transit';
-                            travelWrap.innerHTML = `
-                                <span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">${mode}</span>
-                                <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">${mins}</span> 分鐘
-                            `;
-                        }
-                    }
-                }
-            });
-
-            // 自動幫舊版行程補上縮圖與連結按鈕
-            document.querySelectorAll('#itinerary-days-container .content-box').forEach(box => {
-                if(!box.querySelector('.item-thumb-box')) {
-                    let topDiv = document.createElement('div');
-                    topDiv.style.cssText = 'display: flex; gap: 8px; align-items: flex-start;';
-
-                    let leftDiv = document.createElement('div');
-                    leftDiv.style.cssText = 'flex-grow: 1; min-width: 0;';
-
-                    let titleEl = box.querySelector('.item-title');
-                    let noteEl = box.querySelector('.item-note');
-                    if(titleEl) leftDiv.appendChild(titleEl);
-                    if(noteEl) leftDiv.appendChild(noteEl);
-
-                    let thumbBox = document.createElement('div');
-                    thumbBox.className = 'item-thumb-box';
-                    thumbBox.setAttribute('onclick', 'triggerItemUpload(this)');
-                    thumbBox.innerHTML = '<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>';
-
-                    topDiv.appendChild(leftDiv);
-                    topDiv.appendChild(thumbBox);
-                    box.insertBefore(topDiv, box.firstChild);
-
-                    let actionRow = box.querySelector('.action-row');
-                    if(actionRow) {
-                        if(!actionRow.innerHTML.includes('addLinkToNote')) {
-                            let linkBtn = document.createElement('button');
-                            linkBtn.className = 'btn-nav';
-                            linkBtn.style.background = '#66bb6a';
-                            linkBtn.setAttribute('onclick', 'addLinkToNote(this, event)');
-                            linkBtn.innerHTML = `<span class="material-icons-round" style="font-size:13px;">add_link</span> 連結`;
-                            let travelWrap = actionRow.querySelector('.travel-time-wrap');
-                            if(travelWrap) actionRow.insertBefore(linkBtn, travelWrap);
-                            else actionRow.appendChild(linkBtn);
-                        }
-                    }
+            // 🌟 將 action-row 獨立抽出，強迫換行到左下方，解決破圖
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                let actionRow = item.querySelector('.action-row');
+                if (actionRow && actionRow.parentNode.classList.contains('content-box')) {
+                    item.appendChild(actionRow);
                 }
             });
 
