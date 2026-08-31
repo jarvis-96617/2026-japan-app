@@ -999,20 +999,20 @@
             input.click(); 
         }
 
-        function compressImage(file, callback) {
+function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 300; 
+                    const MAX_WIDTH = 1200; // 🌟 已經放大解析度到 1200px，保證清晰！
                     let scaleSize = 1;
                     if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
                     canvas.width = img.width * scaleSize;
                     canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.4); 
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // 🌟 提高品質
                     callback(dataUrl);
                 }
                 img.src = e.target.result;
@@ -1020,6 +1020,33 @@
             reader.readAsDataURL(file);
         }
 
+        // 🌟 新增：將圖片傳送到 Google Drive 並取得短網址
+        function uploadImageToDrive(base64Str, filename, callback) {
+            setStatus('sync', '圖片上傳雲端中...');
+            const payload = JSON.stringify({
+                action: 'uploadImage',
+                base64: base64Str,
+                fileName: filename
+            });
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: payload
+            }).then(res => res.json()).then(data => {
+                if(data.status === "success") {
+                    setStatus('cloud_done', '上傳成功');
+                    callback(data.url);
+                } else {
+                    setStatus('cloud_off', '上傳失敗', true);
+                    alert("圖片上傳失敗，請檢查 API 設定！");
+                }
+            }).catch(e => {
+                setStatus('cloud_off', '上傳失敗', true);
+                alert("網路錯誤，圖片無法上傳！");
+            });
+        }
+
+        // 🌟 更新：一般圖片上傳邏輯
         function handleImageUpload(event) {
             const input = event.target;
             const files = input.files; 
@@ -1027,20 +1054,25 @@
             if (files && files.length > 0 && currentUploadTarget) {
                 Array.from(files).forEach(file => {
                     compressImage(file, function(compressedDataUrl) {
-                        addImageToGallery(compressedDataUrl, currentUploadTarget);
-                        saveData();
+                        uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
+                            addImageToGallery(driveUrl, currentUploadTarget);
+                            saveData();
+                        });
                     });
                 });
             }
         }
 
+        // 🌟 更新：記帳發票上傳邏輯
         function handleReceiptUpload(event) {
             const input = event.target;
             const file = input.files[0];
             if (file && currentReceiptBox) {
                 compressImage(file, function(compressedDataUrl) {
-                    currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${compressedDataUrl}" onclick="openImageModal(this.src, event)"></div>`;
-                    saveData();
+                    uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
+                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this.src, event)"></div>`;
+                        saveData();
+                    });
                 });
             }
         }
