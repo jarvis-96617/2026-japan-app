@@ -1038,7 +1038,7 @@ function compressImage(file, callback) {
                     callback(data.url);
                 } else {
                     setStatus('cloud_off', '上傳失敗', true);
-                    alert("圖片上傳失敗，請檢查 API 設定！");
+                    alert("圖片上傳失敗：" + (data.message || "未知錯誤"));
                 }
             }).catch(e => {
                 setStatus('cloud_off', '上傳失敗', true);
