@@ -59,22 +59,24 @@
 
         /* Container & Cards */
         .container { padding: 0 15px; }
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); }
         
         /* Typography */
-        .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; }
-        .editable { padding: 4px; border-radius: 6px; transition: background 0.2s; min-height: 1.5em; }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
+        .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* Lists & Items (壓縮間距版) */
-        .timeline-item { display: flex; gap: 8px; margin-bottom: 4px; position: relative; transition: opacity 0.3s ease; padding: 4px; border-radius: 8px; align-items: center; }
+        /* 🌟 Lists & Items (極致壓縮緊湊版) */
+        .timeline-item { display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
+        .timeline-item:last-child { border-bottom: none; }
         .timeline-item.completed { opacity: 0.35; }
-        #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { margin-bottom: 2px; padding: 2px 4px; }
-        .checkbox-wrapper { flex-shrink: 0; padding-top: 0; }
-        .custom-checkbox { width: 22px; height: 22px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
+        #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { padding: 6px 4px; }
+        
+        .checkbox-wrapper { flex-shrink: 0; padding-top: 2px; }
+        .custom-checkbox { width: 20px; height: 20px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
         .completed .custom-checkbox { background: var(--primary-color); }
-        .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 14px; }
+        .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 13px; }
         
         /* 拖曳視覺效果 */
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; }
@@ -84,39 +86,34 @@
         #transport-text-list .timeline-item, 
         #shopping-list .timeline-item, 
         #booking-list .timeline-item, 
-        .person-todo-list .timeline-item {
-            padding-left: 28px !important; 
-        }
+        .person-todo-list .timeline-item { padding-left: 24px !important; }
         #transport-text-list .timeline-item::before, 
         #shopping-list .timeline-item::before, 
         #booking-list .timeline-item::before, 
         .person-todo-list .timeline-item::before {
-            content: '⋮⋮'; 
-            position: absolute;
-            left: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #cfcfcf;
-            font-size: 15px;
-            letter-spacing: -1.5px;
-            pointer-events: none; 
+            content: '⋮⋮'; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; 
         }
 
-        /* Time Column (壓縮版) */
-        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 50px; margin-right: 0; flex-shrink: 0; padding-top: 0; }
-        .start-time { font-weight: 700; font-size: 14px; color: var(--primary-color); cursor: text; margin-bottom: 2px; line-height: 1; }
-        .duration-wrap { font-size: 10px; color: #777; background: #eef2f5; padding: 1px 3px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; border: 1px solid #e0e0e0; }
+        /* 🌟 Time Column (極致壓縮版) */
+        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
+        .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); cursor: text; margin-bottom: 3px; line-height: 1; }
+        .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; }
         .duration { font-weight: bold; color: var(--primary-color); min-width: 14px; display: inline-block; text-align: center; }
-        .end-time { font-size: 10px; color: #aaa; font-weight: 500; line-height: 1; }
+        .end-time { font-size: 11px; color: #aaa; font-weight: 500; line-height: 1; }
 
-        .content-box { flex-grow: 1; min-width: 0; align-self: center; }
-        .item-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
-        .item-note { display: inline-block; background: #eee; padding: 2px 6px; border-radius: 6px; font-size: 11px; margin-bottom: 2px; color: #555; width: 100%; word-break: break-all;}
+        .content-box { flex-grow: 1; min-width: 0; }
+        .item-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
         
+        /* 🌟 備註樣式 (改為左側邊線，清爽省空間) */
+        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid #ccc; font-size: 12px; margin-bottom: 6px; color: #666; width: 100%; word-break: break-word; line-height: 1.4;}
+        
+        /* 🌟 專屬備註連結樣式 */
+        .note-link { display: inline-flex; align-items: center; gap: 2px; background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 12px; text-decoration: none; font-size: 11px; margin-top: 4px; margin-right: 4px; font-weight: bold; border: 1px solid #bbdefb;}
+        .note-link:active { background: #bbdefb; }
+
         /* 行李下拉選單樣式 */
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
-        .luggage-select:focus { box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.3); }
-
+        
         /* 橫向滑動天數分頁樣式 */
         .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 5px 2px 10px 2px; margin-bottom: 5px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
@@ -125,23 +122,18 @@
         .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; }
         .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
 
-        /* Buttons & Labels (壓縮版) */
-        .action-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
-        .btn-nav { display: inline-flex; align-items: center; gap: 4px; background: var(--primary-color); color: white; padding: 3px 8px; border-radius: 20px; font-size: 11px; text-decoration: none; cursor: pointer; border: none; }
-        .travel-time-wrap { font-size:10px; color:#666; background:#f0f0f0; padding:3px 6px; border-radius:10px; display:inline-flex; align-items:center; gap:2px; }
-        .delete-btn { color: var(--danger-color); cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 4px; }
-        .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 5px; margin-bottom: 10px;}
+        /* 🌟 Buttons & Labels (極致壓縮版) */
+        .action-row { display: flex; align-items: center; gap: 6px; margin-top: 0; flex-wrap: wrap; }
+        .btn-nav { display: inline-flex; align-items: center; gap: 3px; background: var(--primary-color); color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; }
+        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:4px 6px; border-radius:6px; display:inline-flex; align-items:center; gap:2px; border: 1px solid #e0e0e0;}
+        .delete-btn { color: var(--danger-color); cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 4px; margin-top: -2px;}
+        .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px;}
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
         /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; }
         #budget-table th { background: #eef2f5; padding: 6px 2px; font-size: 12px; color: #555; text-align: center; }
         #budget-table td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 13px; text-align: center; vertical-align: middle; }
-        #budget-table th:nth-child(1) { width: 30%; }
-        #budget-table th:nth-child(2) { width: 20%; }
-        #budget-table th:nth-child(3) { width: 15%; }
-        #budget-table th:nth-child(4) { width: 20%; }
-        #budget-table th:nth-child(5) { width: 15%; }
         
         .amount-input { width: 100%; box-sizing: border-box; font-size: 13px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; }
         .curr-select, .payer-select { font-size: 11px; padding: 2px; width: 100%; box-sizing: border-box; }
@@ -149,7 +141,6 @@
 
         /* Receipt Box */
         .receipt-box { width: 22px; height: 22px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; }
-        .receipt-box:active { background: #eee; }
         .receipt-thumb-wrap { position: relative; width: 24px; height: 24px; margin: 0 auto; }
         .receipt-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
@@ -233,31 +224,126 @@
             
             <div id="itinerary-days-container">
                 <div class="glass-card day-card">
-                    <div class="flex-between" style="margin-bottom: 12px;">
+                    <div class="flex-between" style="margin-bottom: 8px;">
                         <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day 1 - 09/25 抵達京都</h2>
                         <span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span>
                     </div>
-                    <!-- 行程項目 -->
+                    
+                    <!-- 🌟 第 1 站 -->
                     <div class="timeline-item" onclick="toggleComplete(this, event)">
                         <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                         <div class="time-column">
                             <div class="start-time editable" contenteditable="true">15:40</div>
-                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div>
-                            <div class="end-time">16:40</div>
+                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">220</span> 分</div>
+                            <div class="end-time">19:20</div>
                         </div>
                         <div class="content-box">
-                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">關西國際機場</span></div>
+                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">TPE 到 KIX</span></div>
                             <div class="item-note editable" contenteditable="true">備註：抵達機場、開通 eSIM</div>
                             <div class="action-row">
-                                <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:14px;">place</span> 導航</button>
+                                <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                                <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
                                 <div class="travel-time-wrap">
-                                    <span class="material-icons-round" style="font-size:12px;">directions_transit</span>
-                                    至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">80</span> 分鐘
+                                    <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_transit</span>
+                                    至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">56</span> 分鐘
                                 </div>
                             </div>
                         </div>
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                     </div>
+                    
+                    <!-- 🌟 第 2 站 -->
+                    <div class="timeline-item" onclick="toggleComplete(this, event)">
+                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                        <div class="time-column">
+                            <div class="start-time editable" contenteditable="true">20:16</div>
+                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">76</span> 分</div>
+                            <div class="end-time">21:32</div>
+                        </div>
+                        <div class="content-box">
+                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">KIX 到 京都車站</span></div>
+                            <div class="item-note editable" contenteditable="true">備註：HARUKA</div>
+                            <div class="action-row">
+                                <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                                <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
+                                <div class="travel-time-wrap">
+                                    <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_walk</span>
+                                    至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">6</span> 分鐘
+                                </div>
+                            </div>
+                        </div>
+                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                    </div>
+
+                    <!-- 🌟 第 3 站 -->
+                    <div class="timeline-item" onclick="toggleComplete(this, event)">
+                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                        <div class="time-column">
+                            <div class="start-time editable" contenteditable="true">21:38</div>
+                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">18</span> 分</div>
+                            <div class="end-time">21:56</div>
+                        </div>
+                        <div class="content-box">
+                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">京都車站 到 四条河原町温泉 空庭テラス京都</span></div>
+                            <div class="item-note editable" contenteditable="true">備註：轉乘烏丸線</div>
+                            <div class="action-row">
+                                <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                                <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
+                                <div class="travel-time-wrap">
+                                    <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_walk</span>
+                                    至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">4</span> 分鐘
+                                </div>
+                            </div>
+                        </div>
+                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                    </div>
+
+                    <!-- 🌟 第 4 站 -->
+                    <div class="timeline-item" onclick="toggleComplete(this, event)">
+                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                        <div class="time-column">
+                            <div class="start-time editable" contenteditable="true">22:00</div>
+                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">15</span> 分</div>
+                            <div class="end-time">22:15</div>
+                        </div>
+                        <div class="content-box">
+                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">Check in</span></div>
+                            <div class="item-note editable" contenteditable="true">備註：確認護照與訂房代號</div>
+                            <div class="action-row">
+                                <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                                <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
+                                <div class="travel-time-wrap">
+                                    <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_walk</span>
+                                    至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘
+                                </div>
+                            </div>
+                        </div>
+                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                    </div>
+
+                    <!-- 🌟 第 5 站 -->
+                    <div class="timeline-item" onclick="toggleComplete(this, event)">
+                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                        <div class="time-column">
+                            <div class="start-time editable" contenteditable="true">22:30</div>
+                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div>
+                            <div class="end-time">23:30</div>
+                        </div>
+                        <div class="content-box">
+                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">晚餐@板前燒肉一笑 四条木屋町店</span></div>
+                            <div class="item-note editable" contenteditable="true">備註：和牛吃起來！</div>
+                            <div class="action-row">
+                                <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                                <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
+                                <div class="travel-time-wrap">
+                                    <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_walk</span>
+                                    至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">10</span> 分鐘
+                                </div>
+                            </div>
+                        </div>
+                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                    </div>
+                    
                     <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
                 </div>
             </div>
@@ -506,6 +592,43 @@
             saveData(false, true); 
         }
 
+        // 🌟 點擊切換交通工具圖示
+        function toggleTransportMode(iconEl, event) {
+            event.stopPropagation();
+            let modes = ['directions_transit', 'directions_walk', 'directions_car'];
+            let current = iconEl.innerText.trim();
+            let nextIndex = (modes.indexOf(current) + 1) % modes.length;
+            iconEl.innerText = modes[nextIndex];
+            
+            let card = iconEl.closest('.day-card');
+            if(card) recalculateDayTime(card); 
+            saveData();
+        }
+
+        // 🌟 自動新增參考連結功能
+        function addLinkToNote(btn, event) {
+            event.preventDefault();
+            event.stopPropagation();
+            let url = prompt('請輸入參考網址 (需包含 http/https)：', 'https://');
+            if (url && url.startsWith('http')) {
+                let text = prompt('請輸入連結顯示名稱：', '參考連結');
+                if (!text) text = '參考連結';
+                
+                let noteEl = btn.closest('.content-box').querySelector('.item-note');
+                
+                // 如果是預設文字就清空，不然就空一格再貼連結
+                if(noteEl.innerText.trim() === '備註：') {
+                    noteEl.innerHTML = '';
+                }
+                
+                // 產生一個防修改的專屬連結標籤
+                let linkHtml = ` <a contenteditable="false" href="${url}" target="_blank" class="note-link" onclick="window.open(this.href, '_blank'); return false;"><span class="material-icons-round" style="font-size:12px;">link</span>${text}</a> &nbsp;`;
+                
+                noteEl.innerHTML += linkHtml;
+                saveData();
+            }
+        }
+
         // 🌟 自動重新計算整天時間的魔法函式
         function recalculateDayTime(dayCardElement) {
             let items = dayCardElement.querySelectorAll('.timeline-item');
@@ -560,12 +683,11 @@
                 delay: 250, 
                 delayOnTouchOnly: true,
                 draggable: '.timeline-item',
-                filter: '.editable, button, select, input', 
+                filter: '.editable, button, select, input, .transport-icon, .note-link', 
                 preventOnFilter: false,
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
                 onEnd: function (evt) {
-                    // 🌟 拖曳結束後，如果是行程頁面，觸發時間重算
                     let card = evt.item.closest('.day-card');
                     if (card) recalculateDayTime(card);
                     saveData(); 
@@ -628,41 +750,56 @@
             if(confirm("確定要刪除這個項目嗎？")) {
                 let card = btnElement.closest('.day-card');
                 btnElement.closest('.timeline-item, .link-item, .todo-category-header').remove();
-                if(card) recalculateDayTime(card); // 🌟 刪除後重算時間
+                if(card) recalculateDayTime(card); 
                 saveData();
             }
         }
 
-        // 🌟 更新版：智能導航邏輯 (自動帶入起終點與大眾運輸模式)
+        // 🌟 終極智能導航：支援「A 到 B」解析與交通工具連動
         function autoNavigate(btn, event) {
             event.preventDefault();
-            
             let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card');
             if (!currentItem) return;
 
-            // 抓取目的地
-            let destEl = currentItem.querySelector('.item-name-target');
-            let dest = destEl ? destEl.innerText.trim() : '';
+            let titleEl = currentItem.querySelector('.item-name-target');
+            let title = titleEl ? titleEl.innerText.trim() : '';
+            if (!title) { alert('請先輸入地點名稱！'); return; }
 
-            // 嘗試抓取上一個行程當作起點
-            let prevItem = currentItem.previousElementSibling;
             let origin = '';
-            while(prevItem && !prevItem.classList.contains('timeline-item')) {
-                prevItem = prevItem.previousElementSibling;
-            }
-            if (prevItem) {
-                let originEl = prevItem.querySelector('.item-name-target');
-                if(originEl) origin = originEl.innerText.trim();
+            let dest = title;
+
+            // 解析：判斷是否有寫「A 到 B」、「A -> B」或「A to B」
+            let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+            if (match) {
+                origin = match[1].trim();
+                dest = match[2].trim();
+            } else {
+                // 如果沒寫，往上找一個行程當作起點
+                let prevItem = currentItem.previousElementSibling;
+                while(prevItem && !prevItem.classList.contains('timeline-item')) {
+                    prevItem = prevItem.previousElementSibling;
+                }
+                if (prevItem) {
+                    let originEl = prevItem.querySelector('.item-name-target');
+                    if(originEl) {
+                        let prevTitle = originEl.innerText.trim();
+                        let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+                        origin = prevMatch ? prevMatch[2].trim() : prevTitle;
+                    }
+                }
             }
 
-            if (!dest) {
-                alert('請先輸入目的地名稱！');
-                return;
+            // 讀取交通工具圖示
+            let mode = 'transit'; // 預設大眾運輸
+            let iconEl = currentItem.querySelector('.transport-icon');
+            if (iconEl) {
+                let iconText = iconEl.innerText.trim();
+                if (iconText === 'directions_walk') mode = 'walking';
+                if (iconText === 'directions_car') mode = 'driving';
             }
 
-            // 組裝 Google Maps 網址 (travelmode=transit 為大眾運輸預設)
-            let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=transit`;
-            
+            // 組裝 Google Maps 網址
+            let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
             if (origin && origin !== '輸入行程名稱') {
                 mapUrl += `&origin=${encodeURIComponent(origin)}`;
             }
@@ -727,7 +864,7 @@
             let div = document.createElement('div');
             div.className = 'glass-card day-card';
             div.style.display = 'none'; 
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
             container.appendChild(div);
             
             updateDayTabs(); 
@@ -758,9 +895,10 @@
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
                     <div class="action-row">
-                        <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:14px;">place</span> 導航</button>
+                        <button class="btn-nav" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:13px;">place</span> 導航</button>
+                        <button class="btn-nav" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:13px;">add_link</span> 連結</button>
                         <div class="travel-time-wrap">
-                            <span class="material-icons-round" style="font-size:12px;">directions_transit</span>
+                            <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_transit</span>
                             至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘
                         </div>
                     </div>
@@ -770,7 +908,7 @@
             btnElement.parentNode.insertBefore(newItem, btnElement);
             
             let card = btnElement.closest('.day-card');
-            if (card) recalculateDayTime(card); // 🌟 新增行程後重算時間
+            if (card) recalculateDayTime(card);
 
             saveData();
         }
@@ -1044,14 +1182,14 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200; // 🌟 已經放大解析度到 1200px，保證清晰！
+                    const MAX_WIDTH = 1200; 
                     let scaleSize = 1;
                     if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
                     canvas.width = img.width * scaleSize;
                     canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // 🌟 提高品質
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8); 
                     callback(dataUrl);
                 }
                 img.src = e.target.result;
@@ -1360,11 +1498,32 @@
                 }
             });
 
-            // 🌟 自動為舊版行程加上 .travel-time-wrap
-            document.querySelectorAll('#itinerary-days-container .action-row > div:not(.travel-time-wrap)').forEach(el => {
-                if(el.innerText.includes('至下站')) {
+            // 🌟 自動為舊版行程加上 .travel-time-wrap 與點擊圖示、連結按鈕
+            document.querySelectorAll('#itinerary-days-container .action-row').forEach(row => {
+                // 加連結按鈕
+                if(!row.innerHTML.includes('addLinkToNote')) {
+                    let linkBtn = document.createElement('button');
+                    linkBtn.className = 'btn-nav';
+                    linkBtn.style.background = '#66bb6a';
+                    linkBtn.setAttribute('onclick', 'addLinkToNote(this, event)');
+                    linkBtn.innerHTML = `<span class="material-icons-round" style="font-size:13px;">add_link</span> 連結`;
+                    
+                    let travelWrap = row.querySelector('.travel-time-wrap') || row.querySelector('div');
+                    if(travelWrap) row.insertBefore(linkBtn, travelWrap);
+                    else row.appendChild(linkBtn);
+                }
+                
+                // 升級至下站區塊
+                let el = row.querySelector('div:not(.travel-time-wrap)');
+                if(el && el.innerText.includes('至下站')) {
                     el.className = 'travel-time-wrap';
                     el.style.cssText = '';
+                    let timeMatch = el.innerText.match(/\d+/);
+                    let mins = timeMatch ? timeMatch[0] : '15';
+                    el.innerHTML = `
+                        <span class="material-icons-round transport-icon" style="font-size:14px; cursor:pointer;" onclick="toggleTransportMode(this, event)">directions_transit</span>
+                        至下站: <span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">${mins}</span> 分鐘
+                    `;
                 }
             });
 
@@ -1372,7 +1531,7 @@
             initHistory();
             initSortable(); 
 
-            // 🌟 首次載入時重算一次時間確保正確
+            // 首次載入時重算一次時間確保正確
             document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
 
             setTimeout(() => {
