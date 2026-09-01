@@ -92,7 +92,7 @@
         #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 24px !important; }
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
 
-        /* Time Column */
+        /* Time Column (自動計算與相隔時間) */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
         .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); cursor: text; margin-bottom: 3px; line-height: 1; }
         .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; }
@@ -122,11 +122,11 @@
         .action-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;}
         .action-row::-webkit-scrollbar { display: none; }
         
-        /* 一般按鈕 */
+        /* 一般按鈕：膠囊狀、可放文字 (適用住宿、記帳、待辦) */
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap; }
         .btn-nav:active { transform: scale(0.95); }
         
-        /* 行程專用按鈕 */
+        /* 行程專用按鈕：純圖示、正圓形 */
         .btn-circle { width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0; }
         
         .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 8px 3px 4px; border-radius:15px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0; height: 30px; box-sizing: border-box;}
@@ -244,7 +244,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">76</span> 分鐘</div>
                             </div>
                         </div>
@@ -268,7 +268,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                             </div>
                         </div>
@@ -513,12 +513,17 @@
             shareParam = shareParam.replace(/，/g, ',').replace(/、/g, ',');
             let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
             
+            // 隱藏不必要的 UI (保留天數分頁列)
             let bottomNav = document.querySelector('.bottom-nav');
             if (bottomNav) bottomNav.style.display = 'none';
             let globalControls = document.querySelector('.global-controls');
             if (globalControls) globalControls.style.display = 'none';
+            
+            // 處理 Sticky Tabs 在沒有控制列時的置頂問題
             let dayTabsContainer = document.getElementById('day-tabs-container');
-            if (dayTabsContainer) dayTabsContainer.style.display = 'none';
+            if (dayTabsContainer) {
+                dayTabsContainer.style.top = '0px'; 
+            }
             
             document.querySelectorAll('.add-btn, .delete-btn').forEach(el => el.style.display = 'none');
             
@@ -528,16 +533,6 @@
                 itTab.style.display = 'block';
                 itTab.style.paddingBottom = '40px'; 
             }
-            
-            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            cards.forEach((card, idx) => {
-                if (allowedIndexes.includes(idx)) {
-                    card.style.display = 'block';
-                    card.style.marginBottom = '20px';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
 
             document.querySelectorAll('.editable').forEach(el => {
                 el.setAttribute('contenteditable', 'false');
@@ -575,7 +570,6 @@
                 if (!text) text = '參考連結';
                 let noteEl = btn.closest('.content-box').querySelector('.item-note');
                 if(noteEl && noteEl.innerText.trim() === '備註：') { noteEl.innerHTML = ''; }
-                // 🌟 改為一般 <a> 標籤，不加 _blank，也不加 window.open
                 let linkHtml = ` <a contenteditable="false" href="${url}" class="note-link"><span class="material-icons-round" style="font-size:12px;">link</span>${text}</a> &nbsp;`;
                 if(noteEl) noteEl.innerHTML += linkHtml;
                 saveData();
@@ -653,8 +647,12 @@
         function adjustStickyTabs() {
             let gc = document.querySelector('.global-controls');
             let tabs = document.getElementById('day-tabs-container');
-            if (gc && tabs) {
-                tabs.style.top = gc.offsetHeight + 'px';
+            if (tabs) {
+                if (gc && gc.style.display !== 'none') {
+                    tabs.style.top = gc.offsetHeight + 'px';
+                } else {
+                    tabs.style.top = '0px';
+                }
             }
         }
         window.addEventListener('resize', adjustStickyTabs);
@@ -732,40 +730,66 @@
             let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
             if (origin && origin !== '輸入行程名稱') { mapUrl += `&origin=${encodeURIComponent(origin)}`; }
             
-            // 🌟 直接改變當前網址，避免產生幽靈空白頁
             window.location.href = mapUrl;
         }
 
         function updateDayTabs() {
             let container = document.getElementById('day-tabs-container');
             if (!container) return; 
+            
+            let href = window.location.href;
+            let shareMatch = href.match(/[?&]share=([0-9,，、]+)/);
+            let allowedIndexes = null;
+            if (shareMatch) {
+                let shareParam = shareMatch[1].replace(/，/g, ',').replace(/、/g, ',');
+                allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
+            }
+
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            let html = ''; let activeIndex = 0;
+            let html = ''; 
+            let activeIndex = -1;
+            
             cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; });
+
+            if (allowedIndexes && !allowedIndexes.includes(activeIndex)) {
+                activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
+            }
+
             cards.forEach((card, index) => {
+                if (allowedIndexes && !allowedIndexes.includes(index)) return; 
+
                 let titleEl = card.querySelector('.section-title');
                 let title = titleEl ? titleEl.innerText : '';
                 let dateMatch = title.match(/\d{1,2}\/\d{1,2}/);
                 let dateStr = dateMatch ? dateMatch[0] : '日期';
                 let isActive = (index === activeIndex) ? 'active' : '';
-                html += `<div class="day-tab ${isActive}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`;
+                
+                html += `<div class="day-tab ${isActive}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`;
             });
             container.innerHTML = html;
-            if (cards.length > 0) { if (activeIndex >= cards.length) activeIndex = 0; switchDayCard(activeIndex); }
+            
+            if (cards.length > 0) { 
+                if (activeIndex === -1 || activeIndex >= cards.length) {
+                    activeIndex = (allowedIndexes && allowedIndexes.length > 0 && allowedIndexes[0] < cards.length) ? allowedIndexes[0] : 0;
+                }
+                switchDayCard(activeIndex); 
+            }
             setTimeout(adjustStickyTabs, 50);
         }
 
         function switchDayCard(targetIndex) {
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            let tabs = document.querySelectorAll('.day-tab');
             cards.forEach((card, idx) => {
+                let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`);
                 if (idx === targetIndex) {
                     card.style.display = 'block';
-                    if(tabs[idx]) tabs[idx].classList.add('active');
-                    if(tabs[idx]) tabs[idx].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                    if(tab) {
+                        tab.classList.add('active');
+                        tab.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                    }
                 } else {
                     card.style.display = 'none';
-                    if(tabs[idx]) tabs[idx].classList.remove('active');
+                    if(tab) tab.classList.remove('active');
                 }
             });
             saveData(); 
@@ -806,7 +830,7 @@
                     </div>
                     <div class="action-row">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                        <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                        <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                     </div>
                 </div>
@@ -855,7 +879,6 @@
             let text = parentBox.innerText; 
             let urlMatch = text.match(/https?:\/\/[^\s\)]+/);
             if (urlMatch) {
-                // 🌟 改用 location.href 避免空白頁
                 window.location.href = urlMatch[0];
             } else {
                 let manualUrl = prompt('未偵測到網址，請直接貼上連結 (需包含 http)：', 'https://');
@@ -876,8 +899,7 @@
             if(url && text) {
                 const div = document.createElement('div');
                 div.className = 'link-item flex-between';
-                // 🌟 移除 target="_blank"
-                div.innerHTML = `<a href="${url}" style="flex-grow:1; color:var(--primary-color); font-weight:bold; text-decoration:none;">${text}</a><span class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>`;
+                div.innerHTML = `<a href="${url}" class="note-link" style="flex-grow:1; color:var(--primary-color); font-weight:bold; text-decoration:none;">${text}</a><span class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>`;
                 document.getElementById(containerId).appendChild(div); saveData();
             }
         }
@@ -1194,16 +1216,10 @@
             if (new URLSearchParams(window.location.search).get('share')) return;
 
             if (!skipHistory) { recordHistory(); }
-            
-            const state = { 
-                html: document.getElementById('main-container').innerHTML, 
-                heroHtml: document.getElementById('hero-container').innerHTML, 
-                payersData: payers
-            };
+            const state = { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: payers };
             const payload = JSON.stringify(state);
             localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
             localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
-            
             if(!API_URL.startsWith("https://script.google.com")) {
                 setStatus('cloud_off', '本機模式(未綁雲端)', true);
                 if(isManual) alert("❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)"); return;
@@ -1316,7 +1332,6 @@
                     }
                 });
 
-                // 🌟 大掃除：自動拔除舊存檔中殘留的 target="_blank" 與 onclick 屬性
                 document.querySelectorAll('a').forEach(a => {
                     if (a.getAttribute('target') === '_blank') {
                         a.removeAttribute('target');
