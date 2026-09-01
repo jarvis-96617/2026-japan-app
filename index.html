@@ -173,12 +173,19 @@
 <body>
 
     <div id="splash-screen">
-        <img src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
+        <img id="splash-bg-img" src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
         <div class="splash-text">
             <h2>2026 京阪之旅</h2>
             <p>行程載入中...</p>
         </div>
     </div>
+    
+    <script>
+        if (window.location.search.includes('share=')) {
+            var splashImg = document.getElementById('splash-bg-img');
+            if (splashImg) splashImg.style.display = 'none';
+        }
+    </script>
 
     <div class="hero" id="hero-container">
         <h1 class="editable" contenteditable="true">2026 京阪六天五夜</h1>
@@ -187,20 +194,21 @@
 
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:6px; flex-grow:1; min-width:0; overflow:hidden;">
+            <!-- 🌟 全新同色系藍色漸層按鈕 -->
             <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto;">
-                <button class="manual-save-btn" onclick="forceManualSave()">
+                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;">
                     <span class="material-icons-round" style="font-size:13px;">save</span> 儲存
                 </button>
-                <button class="manual-save-btn" onclick="undoAction()">
+                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;">
                     <span class="material-icons-round" style="font-size:13px;">undo</span> 復原
                 </button>
-                <button class="manual-save-btn" onclick="redoAction()">
+                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;">
                     <span class="material-icons-round" style="font-size:13px;">redo</span> 重做
                 </button>
-                <button class="manual-save-btn" onclick="location.reload()">
+                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;">
                     <span class="material-icons-round" style="font-size:13px;">refresh</span> 重載
                 </button>
-                <button class="manual-save-btn" onclick="generateShareLink()">
+                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;">
                     <span class="material-icons-round" style="font-size:13px;">share</span> 分享
                 </button>
             </div>
@@ -244,7 +252,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">76</span> 分鐘</div>
                             </div>
                         </div>
@@ -268,7 +276,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                             </div>
                         </div>
@@ -309,7 +317,7 @@
                     </div>
                     <div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">四条河原町温泉 空庭テラス京都</div>
                     <div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：IN1649836333<br>入住時間：15:00~24:00<br>退房時間：~11:00<br>房型：高級雙人房</div>
-                    <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>
+                    <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 6px 12px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>
                 </div>
             </div>
             <button class="add-btn" onclick="addHotelCard()" style="background: var(--primary-color); color: white;">+ 新增住宿區塊</button>
@@ -339,7 +347,7 @@
                 <div style="margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                     <div style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">付款人清單：</div>
                     <div id="payer-tags-container"></div>
-                    <button onclick="addPayer()" class="btn-nav" style="background: #eef2f5; color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
+                    <button onclick="addPayer()" class="btn-nav" style="background: #eef2f5; color: var(--primary-color); width: fit-content; padding: 6px 12px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
                 </div>
                 <table id="budget-table">
                     <tr><th>項目</th><th>付款人</th><th>幣別</th><th>金額</th><th>操作</th></tr>
@@ -359,7 +367,7 @@
                         <div class="content-box">
                             <div class="item-title editable" contenteditable="true">日本網路 eSIM (機場開通)</div>
                             <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
-                            <div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div>
+                            <div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:6px 12px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div>
                         </div>
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                     </div>
@@ -513,13 +521,11 @@
             shareParam = shareParam.replace(/，/g, ',').replace(/、/g, ',');
             let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
             
-            // 隱藏不必要的 UI (保留天數分頁列)
             let bottomNav = document.querySelector('.bottom-nav');
             if (bottomNav) bottomNav.style.display = 'none';
             let globalControls = document.querySelector('.global-controls');
             if (globalControls) globalControls.style.display = 'none';
             
-            // 處理 Sticky Tabs 在沒有控制列時的置頂問題
             let dayTabsContainer = document.getElementById('day-tabs-container');
             if (dayTabsContainer) {
                 dayTabsContainer.style.top = '0px'; 
@@ -858,7 +864,7 @@
             let container = document.getElementById('hotel-cards-container');
             let div = document.createElement('div');
             div.className = 'glass-card hotel-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><span class="delete-btn" onclick="deleteHotelCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><span class="delete-btn" onclick="deleteHotelCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 6px 12px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>`;
             container.appendChild(div); saveData();
         }
 
@@ -951,7 +957,7 @@
                     <div class="content-box">
                         <div class="item-title editable" contenteditable="true">輸入預訂項目</div>
                         <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
-                        <div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div>
+                        <div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:6px 12px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div>
                     </div>
                     <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                 `;
@@ -1017,6 +1023,10 @@
             const tr = document.createElement('tr');
             tr.className = 'budget-row';
             let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
+            
+            // 🌟 自動為新增的數字加上會計格式
+            let formattedAmt = Number(String(amount).replace(/,/g, '') || 0).toLocaleString('en-US');
+            
             tr.innerHTML = `
                 <td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td>
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td>
@@ -1026,7 +1036,7 @@
                         <option value="JPY" ${currency==='JPY'?'selected':''}>JPY</option>
                     </select>
                 </td>
-                <td><input type="text" class="amount-input" value="${amount}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value || 0).toLocaleString('en-US'); calcBudget(); saveData();"></td>
+                <td><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();"></td>
                 <td style="text-align:center;">
     <div style="display:inline-flex; flex-direction:row; align-items:center; gap:8px; padding:4px 8px; border:1px dashed #ccc; border-radius:6px; background:#fafafa;">
         <div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>
@@ -1045,10 +1055,19 @@
             rows.forEach(r => {
                 let person = r.querySelector('.payer-select')?.value;
                 let rowCurr = r.querySelector('.curr-select')?.value;
-                let amountInput = r.querySelector('.amount-input')?.value;
-                if(amountInput === undefined) return;
+                let amountInputEl = r.querySelector('.amount-input');
+                if(!amountInputEl) return;
                 
-                let amount = parseFloat(amountInput.replace(/,/g, '')) || 0;
+                let valStr = amountInputEl.value.replace(/,/g, '');
+                let amount = parseFloat(valStr) || 0;
+                
+                // 🌟 即時將計算過程中的數字強制轉換成千分位格式 (會計符號)
+                if (document.activeElement !== amountInputEl) {
+                    let formatted = amount.toLocaleString('en-US');
+                    amountInputEl.value = formatted;
+                    amountInputEl.setAttribute('value', formatted); // 更新 HTML 屬性確保存檔正確
+                }
+                
                 let amtInTWD = amount * (exchangeRatesToTWD[rowCurr] || 1);
                 if(person) { if(!totals[person]) totals[person] = 0; totals[person] += amtInTWD; }
                 grandTotal += amtInTWD;
@@ -1202,7 +1221,11 @@
         });
         
         document.addEventListener('input', function(e) {
-            if (e.target.tagName === 'INPUT' && e.target.type === 'text') { e.target.setAttribute('value', e.target.value); }
+            if (e.target.tagName === 'INPUT' && e.target.type === 'text') { 
+                e.target.setAttribute('value', e.target.value); 
+                // 若輸入的是金額，即刻重算(但不即刻重置格式，等blur再加逗號)
+                if(e.target.classList.contains('amount-input')) { calcBudget(); }
+            }
             if (e.target.classList.contains('luggage-item-title')) { predictLuggageType(e.target); }
             if (e.target.classList.contains('section-title') && e.target.closest('.day-card')) { updateDayTabs(); }
             let card = e.target.closest('.day-card');
@@ -1291,6 +1314,14 @@
 
         function finalizeLoad() {
             try {
+                // 🌟 大掃除：幫舊版的數字加上千分位逗號
+                document.querySelectorAll('.amount-input').forEach(input => {
+                    let val = parseFloat(input.value.replace(/,/g, '')) || 0;
+                    let formatted = val.toLocaleString('en-US');
+                    input.value = formatted;
+                    input.setAttribute('value', formatted);
+                });
+                
                 calcBudget();
 
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
