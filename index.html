@@ -125,7 +125,7 @@
         .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; }
         .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
 
-        /* Buttons & Labels (修復破圖與分流) */
+        /* Buttons & Labels */
         .action-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;}
         .action-row::-webkit-scrollbar { display: none; }
         
@@ -175,7 +175,7 @@
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--primary-color); font-weight: 700; transform: translateY(-2px); }
         .nav-item .material-icons-round { font-size: 24px; margin-bottom: 2px; }
-        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content { display: none; animation: fadeIn 0.3s; position: relative; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
@@ -202,7 +202,6 @@
 
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:6px; flex-grow:1; min-width:0; overflow:hidden;">
-            <!-- 🌟 修正：控制列文字精簡，顏色統一 -->
             <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto;">
                 <button class="manual-save-btn" onclick="forceManualSave()">
                     <span class="material-icons-round" style="font-size:13px;">save</span> 儲存
@@ -216,7 +215,7 @@
                 <button class="manual-save-btn" onclick="location.reload()">
                     <span class="material-icons-round" style="font-size:13px;">refresh</span> 重載
                 </button>
-                <!-- 🌟 專屬分享按鈕 -->
+                <!-- 🌟 專屬分享按鈕 (改用同一主色系) -->
                 <button class="manual-save-btn" onclick="generateShareLink()">
                     <span class="material-icons-round" style="font-size:13px;">share</span> 分享
                 </button>
@@ -261,7 +260,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">76</span> 分鐘</div>
                             </div>
                         </div>
@@ -285,8 +284,8 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
-                                <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
+                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                             </div>
                         </div>
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
@@ -487,12 +486,11 @@
             renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
         }
 
-        // 🌟 一鍵產生專屬分享網址
+        // 🌟 針對手機完美的一鍵分享複製機制
         function generateShareLink() {
             let input = prompt('請輸入你想分享給朋友的「天數數字」\n(例如想分享第2天與第3天，請輸入 2,3)：');
             if (!input) return;
             
-            // 過濾並清理輸入格式
             let days = input.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d) && d > 0);
             if (days.length === 0) {
                 alert('輸入格式錯誤，請輸入數字並以逗號分隔。');
@@ -502,18 +500,28 @@
             let currentUrl = window.location.href.split('?')[0];
             let shareUrl = currentUrl + '?share=' + days.join(',');
             
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert('✅ 專屬分享網址已成功複製！\n您可以直接貼給朋友。\n\n當朋友開啟此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁。');
-                }).catch(() => {
-                    prompt('請複製以下專屬分享網址傳給朋友：\n(朋友開啟後將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程)', shareUrl);
-                });
-            } else {
-                prompt('請複製以下專屬分享網址傳給朋友：\n(朋友開啟後將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程)', shareUrl);
+            // 建立一個暫存的 textarea 來執行高兼容性複製
+            let textArea = document.createElement("textarea");
+            textArea.value = shareUrl;
+            textArea.style.position = "fixed"; // 避免畫面跳動
+            textArea.style.top = "-9999px";
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // iOS 特化相容設定
+            
+            try {
+                document.execCommand('copy');
+                alert('✅ 專屬分享網址已成功複製！\n您可以直接去 LINE 或對話框「貼上」給朋友。\n\n當朋友開啟此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁。');
+            } catch (err) {
+                prompt('系統無法自動複製，請自行拷貝以下網址：', shareUrl);
             }
+            
+            document.body.removeChild(textArea);
         }
 
-        // 🌟 啟動分享模式 (Read-Only)
+        // 啟動分享模式 (Read-Only)
         function applyShareMode() {
             let urlParams = new URLSearchParams(window.location.search);
             let shareParam = urlParams.get('share');
@@ -521,7 +529,6 @@
             
             let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1);
             
-            // 隱藏不必要的 UI
             let bottomNav = document.querySelector('.bottom-nav');
             if (bottomNav) bottomNav.style.display = 'none';
             let globalControls = document.querySelector('.global-controls');
@@ -531,7 +538,6 @@
             
             document.querySelectorAll('.add-btn, .delete-btn').forEach(el => el.style.display = 'none');
             
-            // 只顯示行程 Tab
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
             let itTab = document.getElementById('tab-itinerary');
             if (itTab) {
@@ -539,7 +545,6 @@
                 itTab.style.paddingBottom = '40px'; 
             }
             
-            // 只顯示指定天數
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
             cards.forEach((card, idx) => {
                 if (allowedIndexes.includes(idx)) {
@@ -550,13 +555,11 @@
                 }
             });
 
-            // 鎖定編輯狀態
             document.querySelectorAll('.editable').forEach(el => {
                 el.setAttribute('contenteditable', 'false');
                 el.style.border = 'none';
             });
             
-            // 隱藏拖曳把手並取消互動
             let style = document.createElement('style');
             style.innerHTML = `
                 .timeline-item::before { display: none !important; }
@@ -814,7 +817,7 @@
                     </div>
                     <div class="action-row">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                        <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                        <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                     </div>
                 </div>
@@ -1194,7 +1197,6 @@
         });
 
         function saveData(isManual = false, skipHistory = false) {
-            // 🌟 網址分享模式下，禁止執行存檔，確保朋友無法覆寫你的雲端資料
             if (new URLSearchParams(window.location.search).get('share')) return;
 
             if (!skipHistory) { recordHistory(); }
@@ -1277,7 +1279,6 @@
                 });
             });
 
-            // 確保行程按鈕樣式無痛升級
             document.querySelectorAll('.btn-nav').forEach(btn => {
                 btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = '';
                 if (btn.closest('#itinerary-days-container')) {
@@ -1305,7 +1306,6 @@
             updateDayTabs(); initHistory(); initSortable(); 
             document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
             
-            // 🌟 核心：載入完成後，檢查是否進入分享模式
             applyShareMode();
 
             setTimeout(() => {
