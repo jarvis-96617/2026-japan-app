@@ -65,7 +65,7 @@
 
         /* Container & Cards */
         .container { padding: 0 15px; }
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s ease; }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); }
         
         /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
@@ -111,23 +111,38 @@
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
         /* 橫向滑動天數分頁樣式 */
-        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 50px; z-index: 15; background: var(--bg-color); }
+        .day-tabs-wrapper { 
+            display: flex; overflow-x: auto; gap: 8px; 
+            padding: 10px 15px 10px 15px; 
+            margin-left: -15px; margin-right: -15px; 
+            margin-bottom: 8px; 
+            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; 
+            position: sticky; top: 50px; z-index: 15; background: var(--bg-color); 
+        }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3); }
         .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; }
         .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
 
-        /* Buttons & Labels */
+        /* Buttons & Labels (修復破圖與分流) */
         .action-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;}
         .action-row::-webkit-scrollbar { display: none; }
         
-        /* 一般文字按鈕 */
-        .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap; }
+        /* 一般按鈕：膠囊狀、可放文字 (適用住宿、記帳、待辦) */
+        .btn-nav { 
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px; 
+            background: var(--primary-color); color: white; 
+            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; 
+            text-decoration: none; cursor: pointer; border: none; flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap;
+        }
         .btn-nav:active { transform: scale(0.95); }
         
-        /* 行程專屬圓形按鈕 */
-        .btn-circle { width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0; }
+        /* 行程專用按鈕：純圖示、正圓形 */
+        .btn-circle {
+            width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0;
+        }
         
         .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 8px 3px 4px; border-radius:15px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0; height: 30px; box-sizing: border-box;}
         .transport-icon { font-size: 15px !important; background: #ffffff; color: var(--primary-color); border: 1px solid #4a6fa5; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; transition: 0.15s;}
@@ -160,7 +175,7 @@
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--primary-color); font-weight: 700; transform: translateY(-2px); }
         .nav-item .material-icons-round { font-size: 24px; margin-bottom: 2px; }
-        .tab-content { display: none; animation: fadeIn 0.3s; position: relative; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
@@ -168,18 +183,6 @@
         .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 16px 0 8px; border-bottom: 1px solid #eaeaea; padding-bottom: 4px;}
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
-
-        /* 🌟 密碼鎖特效樣式 */
-        .blur-lock { filter: blur(10px) grayscale(40%); pointer-events: none; user-select: none; opacity: 0.5; }
-        .lock-overlay { 
-            position: sticky; top: 35vh; left: 0; right: 0; margin: -20px auto 40px auto; 
-            width: 85%; max-width: 320px; background: rgba(255,255,255,0.95); 
-            padding: 24px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
-            z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 15px; 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.6);
-        }
-        .lock-input { padding: 12px; border: 2px solid var(--primary-color); border-radius: 8px; text-align: center; font-size: 18px; letter-spacing: 4px; width: 100%; outline: none; font-weight: bold; color: var(--primary-color); background: #fafafa; }
-        .lock-input:focus { background: white; box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2); }
     </style>
 </head>
 <body>
@@ -199,20 +202,23 @@
 
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:6px; flex-grow:1; min-width:0; overflow:hidden;">
+            <!-- 🌟 修正：控制列文字精簡，顏色統一 -->
             <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto;">
                 <button class="manual-save-btn" onclick="forceManualSave()">
                     <span class="material-icons-round" style="font-size:13px;">save</span> 儲存
                 </button>
-                <button class="manual-save-btn" onclick="undoAction()" style="background:#f0ad4e;">
+                <button class="manual-save-btn" onclick="undoAction()">
                     <span class="material-icons-round" style="font-size:13px;">undo</span> 復原
                 </button>
-                <!-- 🌟 專屬分享按鈕 -->
-                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#00897b;">
-                    <span class="material-icons-round" style="font-size:13px;">share</span> 分享
+                <button class="manual-save-btn" onclick="redoAction()">
+                    <span class="material-icons-round" style="font-size:13px;">redo</span> 重做
                 </button>
-                <!-- 密碼鎖定按鈕 -->
-                <button class="manual-save-btn" id="page-lock-btn" onclick="togglePageLock()" style="background:#9c27b0;">
-                    <span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock_open</span> 上鎖
+                <button class="manual-save-btn" onclick="location.reload()">
+                    <span class="material-icons-round" style="font-size:13px;">refresh</span> 重載
+                </button>
+                <!-- 🌟 專屬分享按鈕 -->
+                <button class="manual-save-btn" onclick="generateShareLink()">
+                    <span class="material-icons-round" style="font-size:13px;">share</span> 分享
                 </button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
@@ -280,7 +286,7 @@
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
                                 <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
-                                <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
+                                <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                             </div>
                         </div>
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
@@ -446,21 +452,8 @@
         let redoStack = [];
         let currentStateSnapshot = null;
 
-        let tabPasswords = {}; 
-        let unlockedTabs = new Set();
-
         function captureState() {
-            let tempContainer = document.createElement('div');
-            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
-            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-
-            return { 
-                html: tempContainer.innerHTML, 
-                heroHtml: document.getElementById('hero-container').innerHTML, 
-                payersData: JSON.parse(JSON.stringify(payers)),
-                tabPasswordsData: JSON.parse(JSON.stringify(tabPasswords))
-            };
+            return { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
         }
 
         function initHistory() {
@@ -490,22 +483,11 @@
         function applyState(state) {
             document.getElementById('main-container').innerHTML = state.html;
             document.getElementById('hero-container').innerHTML = state.heroHtml;
-            payers = state.payersData; 
-            if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData;
-            
-            document.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-
-            currentStateSnapshot = captureState(); 
-            renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); 
-            
-            let currentTab = document.querySelector('.tab-content.active');
-            if(currentTab) renderTabLockState(currentTab.id);
-            
-            saveData(false, true); 
+            payers = state.payersData; currentStateSnapshot = captureState(); 
+            renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
         }
 
-        // 🌟 專屬分享連結功能
+        // 🌟 一鍵產生專屬分享網址
         function generateShareLink() {
             let input = prompt('請輸入你想分享給朋友的「天數數字」\n(例如想分享第2天與第3天，請輸入 2,3)：');
             if (!input) return;
@@ -520,10 +502,11 @@
             let currentUrl = window.location.href.split('?')[0];
             let shareUrl = currentUrl + '?share=' + days.join(',');
             
-            // 複製到剪貼簿
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert('✅ 專屬分享網址已成功複製！\n您可以直接貼給朋友。\n\n當朋友點擊此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁內容。');
+                    alert('✅ 專屬分享網址已成功複製！\n您可以直接貼給朋友。\n\n當朋友開啟此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁。');
+                }).catch(() => {
+                    prompt('請複製以下專屬分享網址傳給朋友：\n(朋友開啟後將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程)', shareUrl);
                 });
             } else {
                 prompt('請複製以下專屬分享網址傳給朋友：\n(朋友開啟後將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程)', shareUrl);
@@ -538,37 +521,36 @@
             
             let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1);
             
-            // 隱藏不必要的 UI (導航列、控制列、天數分頁、新增/刪除按鈕)
+            // 隱藏不必要的 UI
             let bottomNav = document.querySelector('.bottom-nav');
             if (bottomNav) bottomNav.style.display = 'none';
-            
             let globalControls = document.querySelector('.global-controls');
             if (globalControls) globalControls.style.display = 'none';
-            
             let dayTabsContainer = document.getElementById('day-tabs-container');
             if (dayTabsContainer) dayTabsContainer.style.display = 'none';
             
             document.querySelectorAll('.add-btn, .delete-btn').forEach(el => el.style.display = 'none');
             
-            // 只顯示行程 Tab，並展開所有允許的天數
+            // 只顯示行程 Tab
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
             let itTab = document.getElementById('tab-itinerary');
             if (itTab) {
                 itTab.style.display = 'block';
-                itTab.style.paddingBottom = '40px'; // 移除底部導航列後，增加底部留白
+                itTab.style.paddingBottom = '40px'; 
             }
             
+            // 只顯示指定天數
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
             cards.forEach((card, idx) => {
                 if (allowedIndexes.includes(idx)) {
                     card.style.display = 'block';
-                    card.style.marginBottom = '20px'; // 讓多天連續顯示時有間距
+                    card.style.marginBottom = '20px';
                 } else {
-                    card.style.display = 'none'; // 隱藏沒被分享的天數
+                    card.style.display = 'none';
                 }
             });
 
-            // 鎖定編輯狀態 (純檢視模式 Read-Only)
+            // 鎖定編輯狀態
             document.querySelectorAll('.editable').forEach(el => {
                 el.setAttribute('contenteditable', 'false');
                 el.style.border = 'none';
@@ -584,92 +566,7 @@
             `;
             document.head.appendChild(style);
             
-            return true; // 代表已進入分享模式
-        }
-
-        function togglePageLock() {
-            let activeTab = document.querySelector('.tab-content.active');
-            if (!activeTab) return;
-            let currentTabId = activeTab.id;
-
-            if (tabPasswords[currentTabId]) {
-                if (confirm('此頁面已上鎖。要完全解除密碼保護嗎？')) {
-                    delete tabPasswords[currentTabId];
-                    unlockedTabs.delete(currentTabId);
-                    renderTabLockState(currentTabId);
-                    updateLockButtonUI();
-                    saveData();
-                }
-            } else {
-                let pwd = prompt('為此頁面設定一組密碼：\n(提醒：此為軟性鎖定，僅防一般窺探)');
-                if (pwd && pwd.trim() !== '') {
-                    tabPasswords[currentTabId] = pwd.trim();
-                    unlockedTabs.add(currentTabId); 
-                    renderTabLockState(currentTabId);
-                    updateLockButtonUI();
-                    saveData();
-                    alert('密碼設定成功！下次重新載入網頁時將會要求輸入密碼。');
-                }
-            }
-        }
-
-        function renderTabLockState(tabId) {
-            // 🌟 如果是網址分享模式，直接跳過密碼鎖，讓朋友順利觀看
-            if (new URLSearchParams(window.location.search).get('share')) return;
-
-            let tabEl = document.getElementById(tabId);
-            if (!tabEl) return;
-
-            let existingOverlay = tabEl.querySelector('.lock-overlay');
-            if (existingOverlay) existingOverlay.remove();
-
-            let cards = tabEl.querySelectorAll('.glass-card, .add-btn');
-
-            if (tabPasswords[tabId] && !unlockedTabs.has(tabId)) {
-                cards.forEach(c => c.classList.add('blur-lock'));
-                
-                let overlay = document.createElement('div');
-                overlay.className = 'lock-overlay';
-                overlay.innerHTML = `
-                    <span class="material-icons-round" style="font-size:42px; color:var(--primary-color);">lock</span>
-                    <div style="font-size:15px; font-weight:bold; color:#444; letter-spacing:1px;">此頁面已鎖定保護</div>
-                    <input type="password" class="lock-input" placeholder="請輸入密碼" id="pwd-${tabId}" onkeypress="if(event.key === 'Enter') verifyPassword('${tabId}')">
-                    <button class="btn-nav" style="width:100%; padding:10px; justify-content:center; font-size:15px; border-radius:8px;" onclick="verifyPassword('${tabId}')">解鎖</button>
-                `;
-                tabEl.appendChild(overlay);
-            } else {
-                cards.forEach(c => c.classList.remove('blur-lock'));
-            }
-        }
-
-        function verifyPassword(tabId) {
-            let input = document.getElementById(`pwd-${tabId}`);
-            if (!input) return;
-            if (input.value === tabPasswords[tabId]) {
-                unlockedTabs.add(tabId);
-                renderTabLockState(tabId);
-                updateLockButtonUI();
-            } else {
-                alert('密碼錯誤！');
-                input.value = '';
-            }
-        }
-
-        function updateLockButtonUI() {
-            let activeTab = document.querySelector('.tab-content.active');
-            let iconEl = document.getElementById('page-lock-icon');
-            let btnEl = document.getElementById('page-lock-btn');
-            if(!activeTab || !iconEl || !btnEl) return;
-
-            if(tabPasswords[activeTab.id]) {
-                iconEl.innerText = 'lock';
-                btnEl.style.background = '#e53935'; 
-                btnEl.innerHTML = `<span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock</span> 已上鎖`;
-            } else {
-                iconEl.innerText = 'lock_open';
-                btnEl.style.background = '#9c27b0'; 
-                btnEl.innerHTML = `<span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock_open</span> 頁面上鎖`;
-            }
+            return true;
         }
 
         function toggleTransportMode(iconEl, event) {
@@ -793,10 +690,6 @@
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
             window.scrollTo(0,0);
-            
-            renderTabLockState(tabId);
-            updateLockButtonUI();
-
             if(tabId === 'tab-budget') calcBudget();
             if(tabId === 'tab-itinerary') adjustStickyTabs();
         }
@@ -1305,18 +1198,7 @@
             if (new URLSearchParams(window.location.search).get('share')) return;
 
             if (!skipHistory) { recordHistory(); }
-            
-            let tempContainer = document.createElement('div');
-            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
-            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-
-            const state = { 
-                html: tempContainer.innerHTML, 
-                heroHtml: document.getElementById('hero-container').innerHTML, 
-                payersData: payers,
-                tabPasswordsData: tabPasswords
-            };
+            const state = { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: payers };
             const payload = JSON.stringify(state);
             localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
             localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
@@ -1350,7 +1232,6 @@
                     document.getElementById('main-container').innerHTML = state.html;
                     if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                     if(state.payersData) payers = state.payersData;
-                    if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData; 
                     renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
                 } else {
                     addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); setStatus('cloud_done', '建立新雲端存檔');
@@ -1366,7 +1247,6 @@
                 if(state.html) document.getElementById('main-container').innerHTML = state.html;
                 if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                 if(state.payersData) payers = state.payersData;
-                if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData; 
                 renderPayerTags(); rebindEvents();
             } else { addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); }
             finalizeLoad();
@@ -1374,10 +1254,6 @@
 
         function finalizeLoad() {
             calcBudget();
-            
-            document.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             const itTab = document.getElementById('tab-itinerary');
@@ -1401,6 +1277,7 @@
                 });
             });
 
+            // 確保行程按鈕樣式無痛升級
             document.querySelectorAll('.btn-nav').forEach(btn => {
                 btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = '';
                 if (btn.closest('#itinerary-days-container')) {
@@ -1429,14 +1306,7 @@
             document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
             
             // 🌟 核心：載入完成後，檢查是否進入分享模式
-            let isShareMode = applyShareMode();
-            
-            if (!isShareMode) {
-                // 如果不是分享模式，才觸發密碼鎖
-                let activeTab = document.querySelector('.tab-content.active');
-                if (activeTab) renderTabLockState(activeTab.id);
-                updateLockButtonUI();
-            }
+            applyShareMode();
 
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
