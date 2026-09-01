@@ -200,8 +200,7 @@
                 <button class="manual-save-btn" onclick="location.reload()">
                     <span class="material-icons-round" style="font-size:13px;">refresh</span> 重載
                 </button>
-                <!-- 專屬分享按鈕 -->
-                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#00897b;">
+                <button class="manual-save-btn" onclick="generateShareLink()">
                     <span class="material-icons-round" style="font-size:13px;">share</span> 分享
                 </button>
             </div>
@@ -245,7 +244,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">76</span> 分鐘</div>
                             </div>
                         </div>
@@ -269,7 +268,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                             </div>
                         </div>
@@ -731,7 +730,9 @@
             }
             let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
             if (origin && origin !== '輸入行程名稱') { mapUrl += `&origin=${encodeURIComponent(origin)}`; }
-            window.open(mapUrl, '_blank');
+            
+            // 🌟 修正點：將 window.open 改為直接改變當前網址，避免產生幽靈空白頁
+            window.location.href = mapUrl;
         }
 
         function updateDayTabs() {
@@ -1187,6 +1188,7 @@
         });
 
         function saveData(isManual = false, skipHistory = false) {
+            // 🌟 網址分享模式下，禁止執行存檔，確保朋友無法覆寫你的雲端資料
             if (new URLSearchParams(window.location.search).get('share')) return;
 
             if (!skipHistory) { recordHistory(); }
@@ -1214,6 +1216,7 @@
         function loadData() {
             let isLoaded = false;
             
+            // 🌟 網路異常防呆：若伺服器回應太慢，超過 10 秒直接進入離線模式，避免卡死
             const fallbackTimeout = setTimeout(() => {
                 if(!isLoaded) {
                     isLoaded = true;
@@ -1317,11 +1320,13 @@
                 updateDayTabs(); initHistory(); initSortable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
                 
+                // 🌟 核心：載入完成後，檢查是否進入分享模式
                 applyShareMode();
 
             } catch(error) {
                 console.error("載入解析錯誤: ", error);
             } finally {
+                // 🌟 終極防呆保證：無論如何一定移除載入畫面！
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
                     if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
