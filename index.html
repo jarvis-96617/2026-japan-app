@@ -65,7 +65,7 @@
 
         /* Container & Cards */
         .container { padding: 0 15px; }
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s ease; }
         
         /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
@@ -111,14 +111,7 @@
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
         /* 橫向滑動天數分頁樣式 */
-        .day-tabs-wrapper { 
-            display: flex; overflow-x: auto; gap: 8px; 
-            padding: 10px 15px 10px 15px; 
-            margin-left: -15px; margin-right: -15px; 
-            margin-bottom: 8px; 
-            scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; 
-            position: sticky; top: 50px; z-index: 15; background: var(--bg-color); 
-        }
+        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 50px; z-index: 15; background: var(--bg-color); }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3); }
@@ -130,19 +123,11 @@
         .action-row::-webkit-scrollbar { display: none; }
         
         /* 一般按鈕：膠囊狀、可放文字 (適用住宿、記帳、待辦) */
-        .btn-nav { 
-            display: inline-flex; align-items: center; justify-content: center; gap: 4px; 
-            background: var(--primary-color); color: white; 
-            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; 
-            text-decoration: none; cursor: pointer; border: none; flex-shrink: 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap;
-        }
+        .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap; }
         .btn-nav:active { transform: scale(0.95); }
         
         /* 行程專用按鈕：純圖示、正圓形 */
-        .btn-circle {
-            width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0;
-        }
+        .btn-circle { width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0; }
         
         .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 8px 3px 4px; border-radius:15px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0; height: 30px; box-sizing: border-box;}
         .transport-icon { font-size: 15px !important; background: #ffffff; color: var(--primary-color); border: 1px solid #4a6fa5; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; transition: 0.15s;}
@@ -183,6 +168,18 @@
         .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 16px 0 8px; border-bottom: 1px solid #eaeaea; padding-bottom: 4px;}
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
+
+        /* 密碼鎖特效樣式 */
+        .blur-lock { filter: blur(10px) grayscale(40%); pointer-events: none; user-select: none; opacity: 0.5; }
+        .lock-overlay { 
+            position: sticky; top: 35vh; left: 0; right: 0; margin: -20px auto 40px auto; 
+            width: 85%; max-width: 320px; background: rgba(255,255,255,0.95); 
+            padding: 24px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+            z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 15px; 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.6);
+        }
+        .lock-input { padding: 12px; border: 2px solid var(--primary-color); border-radius: 8px; text-align: center; font-size: 18px; letter-spacing: 4px; width: 100%; outline: none; font-weight: bold; color: var(--primary-color); background: #fafafa; }
+        .lock-input:focus { background: white; box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2); }
     </style>
 </head>
 <body>
@@ -215,9 +212,11 @@
                 <button class="manual-save-btn" onclick="location.reload()">
                     <span class="material-icons-round" style="font-size:13px;">refresh</span> 重載
                 </button>
-                <!-- 🌟 專屬分享按鈕 (改用同一主色系) -->
                 <button class="manual-save-btn" onclick="generateShareLink()">
                     <span class="material-icons-round" style="font-size:13px;">share</span> 分享
+                </button>
+                <button class="manual-save-btn" id="page-lock-btn" onclick="togglePageLock()" style="background:#9c27b0;">
+                    <span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock_open</span> 上鎖
                 </button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
@@ -260,7 +259,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">76</span> 分鐘</div>
                             </div>
                         </div>
@@ -284,7 +283,7 @@
                             </div>
                             <div class="action-row">
                                 <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                                 <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                             </div>
                         </div>
@@ -451,8 +450,21 @@
         let redoStack = [];
         let currentStateSnapshot = null;
 
+        let tabPasswords = {}; 
+        let unlockedTabs = new Set();
+
         function captureState() {
-            return { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
+            let tempContainer = document.createElement('div');
+            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
+            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+
+            return { 
+                html: tempContainer.innerHTML, 
+                heroHtml: document.getElementById('hero-container').innerHTML, 
+                payersData: JSON.parse(JSON.stringify(payers)),
+                tabPasswordsData: JSON.parse(JSON.stringify(tabPasswords))
+            };
         }
 
         function initHistory() {
@@ -482,34 +494,44 @@
         function applyState(state) {
             document.getElementById('main-container').innerHTML = state.html;
             document.getElementById('hero-container').innerHTML = state.heroHtml;
-            payers = state.payersData; currentStateSnapshot = captureState(); 
-            renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
+            payers = state.payersData; 
+            if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData;
+            
+            document.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+            document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+
+            currentStateSnapshot = captureState(); 
+            renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); 
+            
+            let currentTab = document.querySelector('.tab-content.active');
+            if(currentTab) renderTabLockState(currentTab.id);
+            
+            saveData(false, true); 
         }
 
-        // 🌟 針對手機完美的一鍵分享複製機制
         function generateShareLink() {
             let input = prompt('請輸入你想分享給朋友的「天數數字」\n(例如想分享第2天與第3天，請輸入 2,3)：');
             if (!input) return;
             
-            let days = input.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d) && d > 0);
+            let cleanInput = input.replace(/，/g, ',').replace(/、/g, ',');
+            let days = cleanInput.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d) && d > 0);
             if (days.length === 0) {
                 alert('輸入格式錯誤，請輸入數字並以逗號分隔。');
                 return;
             }
             
-            let currentUrl = window.location.href.split('?')[0];
+            let currentUrl = window.location.href.split('?')[0].split('#')[0];
             let shareUrl = currentUrl + '?share=' + days.join(',');
             
-            // 建立一個暫存的 textarea 來執行高兼容性複製
             let textArea = document.createElement("textarea");
             textArea.value = shareUrl;
-            textArea.style.position = "fixed"; // 避免畫面跳動
+            textArea.style.position = "fixed"; 
             textArea.style.top = "-9999px";
             document.body.appendChild(textArea);
             
             textArea.focus();
             textArea.select();
-            textArea.setSelectionRange(0, 99999); // iOS 特化相容設定
+            textArea.setSelectionRange(0, 99999); 
             
             try {
                 document.execCommand('copy');
@@ -521,13 +543,14 @@
             document.body.removeChild(textArea);
         }
 
-        // 啟動分享模式 (Read-Only)
         function applyShareMode() {
-            let urlParams = new URLSearchParams(window.location.search);
-            let shareParam = urlParams.get('share');
+            let href = window.location.href;
+            let shareMatch = href.match(/[?&]share=([0-9,，、]+)/);
+            let shareParam = shareMatch ? shareMatch[1] : null;
             if (!shareParam) return false;
             
-            let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1);
+            shareParam = shareParam.replace(/，/g, ',').replace(/、/g, ',');
+            let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
             
             let bottomNav = document.querySelector('.bottom-nav');
             if (bottomNav) bottomNav.style.display = 'none';
@@ -572,6 +595,92 @@
             return true;
         }
 
+        function togglePageLock() {
+            let activeTab = document.querySelector('.tab-content.active');
+            if (!activeTab) return;
+            let currentTabId = activeTab.id;
+
+            if (tabPasswords[currentTabId]) {
+                if (confirm('此頁面已上鎖。要完全解除密碼保護嗎？')) {
+                    delete tabPasswords[currentTabId];
+                    unlockedTabs.delete(currentTabId);
+                    renderTabLockState(currentTabId);
+                    updateLockButtonUI();
+                    saveData();
+                }
+            } else {
+                let pwd = prompt('為此頁面設定一組密碼：\n(提醒：此為軟性鎖定，僅防一般窺探)');
+                if (pwd && pwd.trim() !== '') {
+                    tabPasswords[currentTabId] = pwd.trim();
+                    unlockedTabs.add(currentTabId); 
+                    renderTabLockState(currentTabId);
+                    updateLockButtonUI();
+                    saveData();
+                    alert('密碼設定成功！下次重新載入網頁時將會要求輸入密碼。');
+                }
+            }
+        }
+
+        function renderTabLockState(tabId) {
+            let href = window.location.href;
+            let isShare = href.match(/[?&]share=/);
+            if (isShare) return;
+
+            let tabEl = document.getElementById(tabId);
+            if (!tabEl) return;
+
+            let existingOverlay = tabEl.querySelector('.lock-overlay');
+            if (existingOverlay) existingOverlay.remove();
+
+            let cards = tabEl.querySelectorAll('.glass-card, .add-btn');
+
+            if (tabPasswords[tabId] && !unlockedTabs.has(tabId)) {
+                cards.forEach(c => c.classList.add('blur-lock'));
+                
+                let overlay = document.createElement('div');
+                overlay.className = 'lock-overlay';
+                overlay.innerHTML = `
+                    <span class="material-icons-round" style="font-size:42px; color:var(--primary-color);">lock</span>
+                    <div style="font-size:15px; font-weight:bold; color:#444; letter-spacing:1px;">此頁面已鎖定保護</div>
+                    <input type="password" class="lock-input" placeholder="請輸入密碼" id="pwd-${tabId}" onkeypress="if(event.key === 'Enter') verifyPassword('${tabId}')">
+                    <button class="btn-nav" style="width:100%; padding:10px; justify-content:center; font-size:15px; border-radius:8px;" onclick="verifyPassword('${tabId}')">解鎖</button>
+                `;
+                tabEl.appendChild(overlay);
+            } else {
+                cards.forEach(c => c.classList.remove('blur-lock'));
+            }
+        }
+
+        function verifyPassword(tabId) {
+            let input = document.getElementById(`pwd-${tabId}`);
+            if (!input) return;
+            if (input.value === tabPasswords[tabId]) {
+                unlockedTabs.add(tabId);
+                renderTabLockState(tabId);
+                updateLockButtonUI();
+            } else {
+                alert('密碼錯誤！');
+                input.value = '';
+            }
+        }
+
+        function updateLockButtonUI() {
+            let activeTab = document.querySelector('.tab-content.active');
+            let iconEl = document.getElementById('page-lock-icon');
+            let btnEl = document.getElementById('page-lock-btn');
+            if(!activeTab || !iconEl || !btnEl) return;
+
+            if(tabPasswords[activeTab.id]) {
+                iconEl.innerText = 'lock';
+                btnEl.style.background = '#e53935'; 
+                btnEl.innerHTML = `<span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock</span> 已上鎖`;
+            } else {
+                iconEl.innerText = 'lock_open';
+                btnEl.style.background = '#9c27b0'; 
+                btnEl.innerHTML = `<span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock_open</span> 上鎖`;
+            }
+        }
+
         function toggleTransportMode(iconEl, event) {
             event.stopPropagation();
             let modes = ['directions_transit', 'directions_walk', 'directions_car'];
@@ -607,6 +716,8 @@
 
             items.forEach((item, index) => {
                 let timeCol = item.querySelector('.time-column');
+                if (!timeCol) return; 
+
                 let startEl = item.querySelector('.start-time');
                 let durationEl = item.querySelector('.duration');
                 let endEl = item.querySelector('.end-time');
@@ -693,6 +804,10 @@
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
             window.scrollTo(0,0);
+            
+            renderTabLockState(tabId);
+            updateLockButtonUI();
+
             if(tabId === 'tab-budget') calcBudget();
             if(tabId === 'tab-itinerary') adjustStickyTabs();
         }
@@ -817,7 +932,7 @@
                     </div>
                     <div class="action-row">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                        <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                        <button class="btn-nav btn-circle" style="background:#66bb6a;" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                     </div>
                 </div>
@@ -1030,9 +1145,11 @@
             const rows = document.querySelectorAll('#budget-tbody .budget-row');
             let totals = {}; let grandTotal = 0;
             rows.forEach(r => {
-                let person = r.querySelector('.payer-select').value;
-                let rowCurr = r.querySelector('.curr-select').value;
-                let amountInput = r.querySelector('.amount-input').value;
+                let person = r.querySelector('.payer-select')?.value;
+                let rowCurr = r.querySelector('.curr-select')?.value;
+                let amountInput = r.querySelector('.amount-input')?.value;
+                if(amountInput === undefined) return;
+                
                 let amount = parseFloat(amountInput.replace(/,/g, '')) || 0;
                 let amtInTWD = amount * (exchangeRatesToTWD[rowCurr] || 1);
                 if(person) { if(!totals[person]) totals[person] = 0; totals[person] += amtInTWD; }
@@ -1042,7 +1159,8 @@
             for(let p in totals) { resHTML += `<div class="flex-between" style="font-size:14px; margin-bottom:6px;"><span> ${p}</span><span>NT$${totals[p].toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`; }
             resHTML += `<hr style="margin:10px 0; border:0; border-top:1px solid #ccc;">`;
             resHTML += `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px;"><span> 旅程總花費：</span><span>NT$${grandTotal.toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`;
-            document.getElementById('budget-result').innerHTML = resHTML;
+            let resEl = document.getElementById('budget-result');
+            if(resEl) resEl.innerHTML = resHTML;
         }
 
         function switchTodoPerson(personName) {
@@ -1197,10 +1315,22 @@
         });
 
         function saveData(isManual = false, skipHistory = false) {
-            if (new URLSearchParams(window.location.search).get('share')) return;
+            let href = window.location.href;
+            if (href.match(/[?&]share=/)) return;
 
             if (!skipHistory) { recordHistory(); }
-            const state = { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: payers };
+            
+            let tempContainer = document.createElement('div');
+            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
+            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+
+            const state = { 
+                html: tempContainer.innerHTML, 
+                heroHtml: document.getElementById('hero-container').innerHTML, 
+                payersData: payers,
+                tabPasswordsData: tabPasswords
+            };
             const payload = JSON.stringify(state);
             localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
             localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
@@ -1222,24 +1352,45 @@
         }
 
         function loadData() {
+            let isLoaded = false;
+            
+            // 🌟 網路異常防呆：若伺服器回應太慢，超過 10 秒直接進入離線模式，避免卡死
+            const fallbackTimeout = setTimeout(() => {
+                if(!isLoaded) {
+                    isLoaded = true;
+                    loadFromLocal();
+                    setStatus('cloud_off', '網路逾時(讀取本機)', true);
+                }
+            }, 10000);
+
             const template = document.getElementById('default-template');
             if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
             const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal');
             if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
             if(!API_URL.startsWith("https://script.google.com")) {
-                loadFromLocal(); setStatus('cloud_off', '本機模式(未綁雲端)', true); return;
+                if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '本機模式(未綁雲端)', true); }
+                return;
             }
             fetch(API_URL).then(res => res.json()).then(state => {
+                if(isLoaded) return;
+                isLoaded = true;
+                clearTimeout(fallbackTimeout);
                 if (state && state.html) {
                     document.getElementById('main-container').innerHTML = state.html;
                     if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                     if(state.payersData) payers = state.payersData;
+                    if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData; 
                     renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
                 } else {
                     addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); setStatus('cloud_done', '建立新雲端存檔');
                 }
                 finalizeLoad();
-            }).catch(e => { loadFromLocal(); setStatus('cloud_off', '離線模式(讀取本機)', true); });
+            }).catch(e => { 
+                if(isLoaded) return;
+                isLoaded = true;
+                clearTimeout(fallbackTimeout);
+                loadFromLocal(); setStatus('cloud_off', '離線模式(讀取本機)', true); 
+            });
         }
 
         function loadFromLocal() {
@@ -1249,69 +1400,85 @@
                 if(state.html) document.getElementById('main-container').innerHTML = state.html;
                 if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                 if(state.payersData) payers = state.payersData;
+                if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData; 
                 renderPayerTags(); rebindEvents();
             } else { addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); }
             finalizeLoad();
         }
 
         function finalizeLoad() {
-            calcBudget();
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            const itTab = document.getElementById('tab-itinerary');
-            const firstNav = document.querySelectorAll('.nav-item')[0];
-            if(itTab) itTab.classList.add('active');
-            if(firstNav) firstNav.classList.add('active');
+            try {
+                calcBudget();
+                
+                document.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+                document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
 
-            if (itTab && !document.getElementById('day-tabs-container')) {
-                let tabsContainer = document.createElement('div'); tabsContainer.id = 'day-tabs-container'; tabsContainer.className = 'day-tabs-wrapper';
-                let daysContainer = document.getElementById('itinerary-days-container');
-                if (daysContainer) { itTab.insertBefore(tabsContainer, daysContainer); }
-            }
-            
-            document.querySelectorAll('.luggage-select').forEach(sel => {
-                let currentVal = sel.value || '背包'; if (currentVal === '手提') currentVal = '背包'; 
-                sel.innerHTML = `<option value="背包">背包</option><option value="小包包">小包包</option><option value="託運">託運</option>`;
-                sel.value = currentVal;
-                Array.from(sel.options).forEach(opt => {
-                    if (opt.value === currentVal) opt.setAttribute('selected', 'selected');
-                    else opt.removeAttribute('selected');
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                const itTab = document.getElementById('tab-itinerary');
+                const firstNav = document.querySelectorAll('.nav-item')[0];
+                if(itTab) itTab.classList.add('active');
+                if(firstNav) firstNav.classList.add('active');
+
+                if (itTab && !document.getElementById('day-tabs-container')) {
+                    let tabsContainer = document.createElement('div'); tabsContainer.id = 'day-tabs-container'; tabsContainer.className = 'day-tabs-wrapper';
+                    let daysContainer = document.getElementById('itinerary-days-container');
+                    if (daysContainer) { itTab.insertBefore(tabsContainer, daysContainer); }
+                }
+                
+                document.querySelectorAll('.luggage-select').forEach(sel => {
+                    let currentVal = sel.value || '背包'; if (currentVal === '手提') currentVal = '背包'; 
+                    sel.innerHTML = `<option value="背包">背包</option><option value="小包包">小包包</option><option value="託運">託運</option>`;
+                    sel.value = currentVal;
+                    Array.from(sel.options).forEach(opt => {
+                        if (opt.value === currentVal) opt.setAttribute('selected', 'selected');
+                        else opt.removeAttribute('selected');
+                    });
                 });
-            });
 
-            document.querySelectorAll('.btn-nav').forEach(btn => {
-                btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = '';
-                if (btn.closest('#itinerary-days-container')) {
-                    if (btn.innerText.includes('導航') || btn.innerHTML.includes('place')) {
-                        btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">place</span>';
-                        btn.classList.add('btn-circle');
+                document.querySelectorAll('.btn-nav').forEach(btn => {
+                    btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = '';
+                    if (btn.closest('#itinerary-days-container')) {
+                        if (btn.innerText.includes('導航') || btn.innerHTML.includes('place')) {
+                            btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">place</span>';
+                            btn.classList.add('btn-circle');
+                        }
+                        if (btn.innerText.includes('連結') || btn.innerHTML.includes('add_link')) {
+                            btn.innerHTML = '<span class="material-icons-round" style="font-size:18px;">add_link</span>';
+                            btn.classList.add('btn-circle');
+                        }
+                    } else {
+                        btn.classList.remove('btn-circle');
                     }
-                    if (btn.innerText.includes('連結') || btn.innerHTML.includes('add_link')) {
-                        btn.innerHTML = '<span class="material-icons-round" style="font-size:18px;">add_link</span>';
-                        btn.classList.add('btn-circle');
+                });
+
+                document.querySelectorAll('.timeline-item').forEach(item => {
+                    let box = item.querySelector('.content-box');
+                    let actionRow = item.querySelector('.action-row');
+                    if(box && actionRow && actionRow.parentNode !== box) {
+                        box.appendChild(actionRow);
                     }
-                } else {
-                    btn.classList.remove('btn-circle');
+                });
+
+                updateDayTabs(); initHistory(); initSortable(); 
+                document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
+                
+                let isShareMode = applyShareMode();
+                if (!isShareMode) {
+                    let activeTab = document.querySelector('.tab-content.active');
+                    if (activeTab) renderTabLockState(activeTab.id);
+                    updateLockButtonUI();
                 }
-            });
 
-            document.querySelectorAll('.timeline-item').forEach(item => {
-                let box = item.querySelector('.content-box');
-                let actionRow = item.querySelector('.action-row');
-                if(box && actionRow && actionRow.parentNode !== box) {
-                    box.appendChild(actionRow);
-                }
-            });
-
-            updateDayTabs(); initHistory(); initSortable(); 
-            document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
-            
-            applyShareMode();
-
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
-            }, 0); 
+            } catch(error) {
+                console.error("載入解析錯誤: ", error);
+            } finally {
+                // 🌟 終極防呆保證：無論如何一定移除載入畫面！
+                setTimeout(() => {
+                    const splash = document.getElementById('splash-screen');
+                    if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
+                }, 100); 
+            }
         }
 
         function rebindEvents() {
