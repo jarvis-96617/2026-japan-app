@@ -168,18 +168,6 @@
         .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 16px 0 8px; border-bottom: 1px solid #eaeaea; padding-bottom: 4px;}
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
-
-        /* 密碼鎖特效樣式 */
-        .blur-lock { filter: blur(10px) grayscale(40%); pointer-events: none; user-select: none; opacity: 0.5; }
-        .lock-overlay { 
-            position: sticky; top: 35vh; left: 0; right: 0; margin: -20px auto 40px auto; 
-            width: 85%; max-width: 320px; background: rgba(255,255,255,0.95); 
-            padding: 24px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
-            z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 15px; 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.6);
-        }
-        .lock-input { padding: 12px; border: 2px solid var(--primary-color); border-radius: 8px; text-align: center; font-size: 18px; letter-spacing: 4px; width: 100%; outline: none; font-weight: bold; color: var(--primary-color); background: #fafafa; }
-        .lock-input:focus { background: white; box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2); }
     </style>
 </head>
 <body>
@@ -212,11 +200,9 @@
                 <button class="manual-save-btn" onclick="location.reload()">
                     <span class="material-icons-round" style="font-size:13px;">refresh</span> 重載
                 </button>
-                <button class="manual-save-btn" onclick="generateShareLink()">
+                <!-- 專屬分享按鈕 -->
+                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#00897b;">
                     <span class="material-icons-round" style="font-size:13px;">share</span> 分享
-                </button>
-                <button class="manual-save-btn" id="page-lock-btn" onclick="togglePageLock()" style="background:#9c27b0;">
-                    <span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock_open</span> 上鎖
                 </button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
@@ -450,21 +436,8 @@
         let redoStack = [];
         let currentStateSnapshot = null;
 
-        let tabPasswords = {}; 
-        let unlockedTabs = new Set();
-
         function captureState() {
-            let tempContainer = document.createElement('div');
-            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
-            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-
-            return { 
-                html: tempContainer.innerHTML, 
-                heroHtml: document.getElementById('hero-container').innerHTML, 
-                payersData: JSON.parse(JSON.stringify(payers)),
-                tabPasswordsData: JSON.parse(JSON.stringify(tabPasswords))
-            };
+            return { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
         }
 
         function initHistory() {
@@ -494,19 +467,8 @@
         function applyState(state) {
             document.getElementById('main-container').innerHTML = state.html;
             document.getElementById('hero-container').innerHTML = state.heroHtml;
-            payers = state.payersData; 
-            if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData;
-            
-            document.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-
-            currentStateSnapshot = captureState(); 
-            renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); 
-            
-            let currentTab = document.querySelector('.tab-content.active');
-            if(currentTab) renderTabLockState(currentTab.id);
-            
-            saveData(false, true); 
+            payers = state.payersData; currentStateSnapshot = captureState(); 
+            renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
         }
 
         function generateShareLink() {
@@ -593,92 +555,6 @@
             document.head.appendChild(style);
             
             return true;
-        }
-
-        function togglePageLock() {
-            let activeTab = document.querySelector('.tab-content.active');
-            if (!activeTab) return;
-            let currentTabId = activeTab.id;
-
-            if (tabPasswords[currentTabId]) {
-                if (confirm('此頁面已上鎖。要完全解除密碼保護嗎？')) {
-                    delete tabPasswords[currentTabId];
-                    unlockedTabs.delete(currentTabId);
-                    renderTabLockState(currentTabId);
-                    updateLockButtonUI();
-                    saveData();
-                }
-            } else {
-                let pwd = prompt('為此頁面設定一組密碼：\n(提醒：此為軟性鎖定，僅防一般窺探)');
-                if (pwd && pwd.trim() !== '') {
-                    tabPasswords[currentTabId] = pwd.trim();
-                    unlockedTabs.add(currentTabId); 
-                    renderTabLockState(currentTabId);
-                    updateLockButtonUI();
-                    saveData();
-                    alert('密碼設定成功！下次重新載入網頁時將會要求輸入密碼。');
-                }
-            }
-        }
-
-        function renderTabLockState(tabId) {
-            let href = window.location.href;
-            let isShare = href.match(/[?&]share=/);
-            if (isShare) return;
-
-            let tabEl = document.getElementById(tabId);
-            if (!tabEl) return;
-
-            let existingOverlay = tabEl.querySelector('.lock-overlay');
-            if (existingOverlay) existingOverlay.remove();
-
-            let cards = tabEl.querySelectorAll('.glass-card, .add-btn');
-
-            if (tabPasswords[tabId] && !unlockedTabs.has(tabId)) {
-                cards.forEach(c => c.classList.add('blur-lock'));
-                
-                let overlay = document.createElement('div');
-                overlay.className = 'lock-overlay';
-                overlay.innerHTML = `
-                    <span class="material-icons-round" style="font-size:42px; color:var(--primary-color);">lock</span>
-                    <div style="font-size:15px; font-weight:bold; color:#444; letter-spacing:1px;">此頁面已鎖定保護</div>
-                    <input type="password" class="lock-input" placeholder="請輸入密碼" id="pwd-${tabId}" onkeypress="if(event.key === 'Enter') verifyPassword('${tabId}')">
-                    <button class="btn-nav" style="width:100%; padding:10px; justify-content:center; font-size:15px; border-radius:8px;" onclick="verifyPassword('${tabId}')">解鎖</button>
-                `;
-                tabEl.appendChild(overlay);
-            } else {
-                cards.forEach(c => c.classList.remove('blur-lock'));
-            }
-        }
-
-        function verifyPassword(tabId) {
-            let input = document.getElementById(`pwd-${tabId}`);
-            if (!input) return;
-            if (input.value === tabPasswords[tabId]) {
-                unlockedTabs.add(tabId);
-                renderTabLockState(tabId);
-                updateLockButtonUI();
-            } else {
-                alert('密碼錯誤！');
-                input.value = '';
-            }
-        }
-
-        function updateLockButtonUI() {
-            let activeTab = document.querySelector('.tab-content.active');
-            let iconEl = document.getElementById('page-lock-icon');
-            let btnEl = document.getElementById('page-lock-btn');
-            if(!activeTab || !iconEl || !btnEl) return;
-
-            if(tabPasswords[activeTab.id]) {
-                iconEl.innerText = 'lock';
-                btnEl.style.background = '#e53935'; 
-                btnEl.innerHTML = `<span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock</span> 已上鎖`;
-            } else {
-                iconEl.innerText = 'lock_open';
-                btnEl.style.background = '#9c27b0'; 
-                btnEl.innerHTML = `<span class="material-icons-round" style="font-size:13px;" id="page-lock-icon">lock_open</span> 上鎖`;
-            }
         }
 
         function toggleTransportMode(iconEl, event) {
@@ -804,10 +680,6 @@
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
             window.scrollTo(0,0);
-            
-            renderTabLockState(tabId);
-            updateLockButtonUI();
-
             if(tabId === 'tab-budget') calcBudget();
             if(tabId === 'tab-itinerary') adjustStickyTabs();
         }
@@ -1315,22 +1187,10 @@
         });
 
         function saveData(isManual = false, skipHistory = false) {
-            let href = window.location.href;
-            if (href.match(/[?&]share=/)) return;
+            if (new URLSearchParams(window.location.search).get('share')) return;
 
             if (!skipHistory) { recordHistory(); }
-            
-            let tempContainer = document.createElement('div');
-            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
-            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-
-            const state = { 
-                html: tempContainer.innerHTML, 
-                heroHtml: document.getElementById('hero-container').innerHTML, 
-                payersData: payers,
-                tabPasswordsData: tabPasswords
-            };
+            const state = { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: payers };
             const payload = JSON.stringify(state);
             localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
             localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
@@ -1354,7 +1214,6 @@
         function loadData() {
             let isLoaded = false;
             
-            // 🌟 網路異常防呆：若伺服器回應太慢，超過 10 秒直接進入離線模式，避免卡死
             const fallbackTimeout = setTimeout(() => {
                 if(!isLoaded) {
                     isLoaded = true;
@@ -1379,7 +1238,6 @@
                     document.getElementById('main-container').innerHTML = state.html;
                     if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                     if(state.payersData) payers = state.payersData;
-                    if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData; 
                     renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
                 } else {
                     addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); setStatus('cloud_done', '建立新雲端存檔');
@@ -1400,7 +1258,6 @@
                 if(state.html) document.getElementById('main-container').innerHTML = state.html;
                 if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                 if(state.payersData) payers = state.payersData;
-                if(state.tabPasswordsData) tabPasswords = state.tabPasswordsData; 
                 renderPayerTags(); rebindEvents();
             } else { addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); }
             finalizeLoad();
@@ -1409,9 +1266,6 @@
         function finalizeLoad() {
             try {
                 calcBudget();
-                
-                document.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-                document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
 
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                 document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
@@ -1463,17 +1317,11 @@
                 updateDayTabs(); initHistory(); initSortable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
                 
-                let isShareMode = applyShareMode();
-                if (!isShareMode) {
-                    let activeTab = document.querySelector('.tab-content.active');
-                    if (activeTab) renderTabLockState(activeTab.id);
-                    updateLockButtonUI();
-                }
+                applyShareMode();
 
             } catch(error) {
                 console.error("載入解析錯誤: ", error);
             } finally {
-                // 🌟 終極防呆保證：無論如何一定移除載入畫面！
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
                     if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
