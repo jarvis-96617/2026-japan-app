@@ -4,17 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2026 京阪</title>
-    <!-- 啟用全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="京阪">
-    
     <link rel="apple-touch-icon" href="icon.png">
-    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    
-    <!-- 載入觸控拖曳排序套件 SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
@@ -30,19 +25,24 @@
             --danger-color: #e57373;
         }
 
+        /* 🌙 深色模式色彩變數 */
+        body.dark-mode {
+            --bg-color: #121212;
+            --primary-color: #7ba3d8; 
+            --text-main: #e0e0e0;
+            --text-muted: #aaaaaa;
+            --glass-bg: rgba(30, 30, 30, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
 
         /* Splash Screen */
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #eef2f5 0%, #d4e0eb 100%); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.3s ease;
-        }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #eef2f5 0%, #d4e0eb 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s ease; }
         #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.85; }
         #splash-screen .splash-text { position: absolute; bottom: 12%; z-index: 10; background: rgba(255,255,255,0.9); padding: 15px 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
-        #splash-screen h2 { color: var(--primary-color); font-size: 26px; margin-bottom: 8px;}
+        #splash-screen h2 { color: #4a6fa5; font-size: 26px; margin-bottom: 8px;}
         #splash-screen p { color: #555; font-size: 14px; font-weight: bold; }
 
         /* Header Hero */
@@ -53,13 +53,8 @@
         .hero .editable:focus { background: rgba(255, 255, 255, 0.2); outline: none; }
 
         /* Global Controls */
-        .global-controls { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 8px 15px; background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            margin-bottom: 0px; position: sticky; top: 0; z-index: 20; 
-            box-shadow: 0 1px 5px rgba(0,0,0,0.05); 
-        }
+        .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 0px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 5px rgba(0,0,0,0.05); transition: 0.3s; }
+        body.dark-mode .global-controls { background: rgba(18, 18, 18, 0.95); }
         .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 5px 6px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; }
         .manual-save-btn:active { transform: scale(0.95); }
 
@@ -67,18 +62,20 @@
         .container { padding: 0 15px; }
         .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s ease; }
         
-        /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
         .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; -webkit-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important; }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
+        body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
         /* Lists & Items */
-        .timeline-item { display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; flex-wrap: nowrap; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        .timeline-item { display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease, border-color 0.3s; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; flex-wrap: nowrap; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        body.dark-mode .timeline-item { border-bottom-color: #333; }
         .timeline-item:last-child { border-bottom: none; }
         .timeline-item.completed { opacity: 0.35; }
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { padding: 4px 4px; }
-        .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px;}
+        .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px; transition: 0.3s;}
+        body.dark-mode .todo-category-header { color: #ddd; border-bottom-color: #444; }
         
         .checkbox-wrapper { flex-shrink: 0; padding-top: 2px; }
         .custom-checkbox { width: 20px; height: 20px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
@@ -87,32 +84,39 @@
         
         /* 拖曳視覺效果 */
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; }
+        body.dark-mode .sortable-ghost { background-color: #333 !important; }
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; }
+        body.dark-mode .sortable-drag { background-color: #1e1e1e !important; }
         
-        /* 拖曳把手圖示 */
         #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 24px !important; }
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
+        body.dark-mode #itinerary-days-container .timeline-item::before { color: #555; }
 
-        /* Time Column (自動計算與相隔時間) */
+        /* Time Column */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
         .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); cursor: text; margin-bottom: 3px; line-height: 1; }
-        .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; }
+        .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; transition: 0.3s;}
+        body.dark-mode .duration-wrap { background: #2a2a2a; border-color: #444; color: #aaa; }
         .duration { font-weight: bold; color: var(--primary-color); min-width: 14px; display: inline-block; text-align: center; }
         .end-time { font-size: 11px; color: #aaa; font-weight: 500; line-height: 1; }
         
-        /* 空檔與預計抵達時間樣式 */
         .auto-start { font-size: 10px; color: #888; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;}
-        .gap-text { font-size: 10px; color: #ba68c8; font-weight: bold; line-height: 1.2; text-align: center; background: #f3e5f5; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap;}
+        .gap-text { font-size: 10px; color: #ba68c8; font-weight: bold; line-height: 1.2; text-align: center; background: #f3e5f5; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap; transition: 0.3s;}
+        body.dark-mode .gap-text { background: rgba(186, 104, 200, 0.15); color: #ce93d8; }
 
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px;}
         .item-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
-        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid #ccc; font-size: 12px; margin-bottom: 2px; color: #666; width: 100%; word-break: break-word; line-height: 1.4;}
-        .note-link { display: inline-flex; align-items: center; gap: 2px; background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 12px; text-decoration: none; font-size: 11px; margin-top: 4px; margin-right: 4px; font-weight: bold; border: 1px solid #bbdefb;}
-        .note-link:active { background: #bbdefb; }
+        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid #ccc; font-size: 12px; margin-bottom: 2px; color: #666; width: 100%; word-break: break-word; line-height: 1.4; transition: 0.3s;}
+        body.dark-mode .item-note { color: #aaa; border-left-color: #555; }
+        .note-link { display: inline-flex; align-items: center; gap: 2px; background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 12px; text-decoration: none; font-size: 11px; margin-top: 4px; margin-right: 4px; font-weight: bold; border: 1px solid #bbdefb; transition: 0.3s;}
+        body.dark-mode .note-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; color: #90caf9;}
+        
+        select, input { transition: 0.3s; }
+        body.dark-mode select, body.dark-mode input { background: #2a2a2a; color: #e0e0e0; border: 1px solid #444;}
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
         /* 橫向滑動天數分頁樣式 */
-        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 50px; z-index: 15; background: var(--bg-color); }
+        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 50px; z-index: 15; background: var(--bg-color); transition: 0.3s; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3); }
@@ -122,26 +126,28 @@
         /* Buttons & Labels */
         .action-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;}
         .action-row::-webkit-scrollbar { display: none; }
-        
-        /* 一般按鈕 */
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap; }
         .btn-nav:active { transform: scale(0.95); }
-        
-        /* 行程專用按鈕 */
         .btn-circle { width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0; }
         
-        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 8px 3px 4px; border-radius:15px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0; height: 30px; box-sizing: border-box;}
+        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 8px 3px 4px; border-radius:15px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0; height: 30px; box-sizing: border-box; transition: 0.3s;}
+        body.dark-mode .travel-time-wrap { background: #2a2a2a; border-color: #444; color: #ccc;}
         .transport-icon { font-size: 15px !important; background: #ffffff; color: var(--primary-color); border: 1px solid #4a6fa5; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer; transition: 0.15s;}
-        .transport-icon:active { background: #eef2f5; transform: scale(0.85); }
+        body.dark-mode .transport-icon { background: #1e1e1e; border-color: var(--primary-color);}
+        .transport-icon:active { transform: scale(0.85); }
 
         .delete-btn { color: var(--danger-color); cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 4px; margin-top: 0px; flex-shrink: 0;}
-        .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px;}
-        .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px; transition: 0.3s;}
+        body.dark-mode .add-btn { background: rgba(74, 111, 165, 0.2); color: #90caf9;}
+        .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.3s;}
+        body.dark-mode .link-item { background: #222; }
 
-        /* Currency & Budget (預算表極致壓縮排版防破圖) */
+        /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
-        #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold;}
-        #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; }
+        #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
+        body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
+        #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
+        body.dark-mode #budget-table td { border-bottom-color: #333; }
         
         #budget-table th:nth-child(1) { width: 30%; }
         #budget-table th:nth-child(2) { width: 20%; }
@@ -150,21 +156,25 @@
         #budget-table th:nth-child(5) { width: 17%; }
 
         .amount-input { width: 100%; box-sizing: border-box; font-size: 12px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0;}
-        .curr-select, .payer-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; }
-        .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-right: 5px; margin-bottom: 5px; }
+        .curr-select, .payer-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; }
+        .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-right: 5px; margin-bottom: 5px; transition: 0.3s;}
+        body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
         /* Receipt Box & Image Gallery */
         .receipt-box { width: 20px; height: 20px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; flex-shrink: 0;}
+        body.dark-mode .receipt-box { background: #222; border-color: #555; }
         .receipt-thumb-wrap { position: relative; width: 20px; height: 20px; margin: 0 auto; flex-shrink: 0;}
         .receipt-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .upload-area { border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 12px; cursor: pointer; margin-top: 15px; background: rgba(255,255,255,0.5); }
+        .upload-area { border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 12px; cursor: pointer; margin-top: 15px; background: rgba(255,255,255,0.5); transition: 0.3s;}
+        body.dark-mode .upload-area { background: rgba(30,30,30,0.5); border-color: #555;}
         .thumbnail-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
         .img-wrapper { position: relative; width: 70px; height: 70px; }
         .img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         /* Bottom Nav & Modals */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;}
+        body.dark-mode .bottom-nav { background: rgba(30,30,30,0.85); border-top-color: #444; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);}
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--primary-color); font-weight: 700; transform: translateY(-2px); }
         .nav-item .material-icons-round { font-size: 24px; margin-bottom: 2px; }
@@ -175,6 +185,18 @@
         .modal img { max-width: 95%; max-height: 90%; border-radius: 8px; }
         .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
+
+        /* 🌟 PDF 匯出隱藏與排版設定 */
+        @media print {
+            .global-controls, .bottom-nav, .add-btn, .delete-btn, .hero, .day-tabs-wrapper, .item-thumb-box, .transport-icon, .btn-circle, .btn-nav, .img-del-btn { display: none !important; }
+            body { background: white !important; color: black !important; padding-bottom: 0 !important; }
+            body.dark-mode { filter: invert(1) hue-rotate(180deg); } /* 列印時強制轉回白底黑字 */
+            .container { padding: 0 !important; }
+            .glass-card { background: none !important; border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; margin-bottom: 20px;}
+            .tab-content { display: block !important; } 
+            #itinerary-days-container .day-card { display: block !important; } 
+            .timeline-item { border-bottom: 1px solid #eee !important; break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
@@ -192,6 +214,10 @@
             var splashImg = document.getElementById('splash-bg-img');
             if (splashImg) splashImg.style.display = 'none';
         }
+        // 初始化深色模式
+        if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) {
+            document.body.classList.add('dark-mode');
+        }
     </script>
 
     <div class="hero" id="hero-container">
@@ -201,30 +227,23 @@
 
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:6px; flex-grow:1; min-width:0; overflow:hidden;">
-            <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto;">
-                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;">
-                    <span class="material-icons-round" style="font-size:13px;">save</span> 儲存
-                </button>
-                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;">
-                    <span class="material-icons-round" style="font-size:13px;">undo</span> 復原
-                </button>
-                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;">
-                    <span class="material-icons-round" style="font-size:13px;">redo</span> 重做
-                </button>
-                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;">
-                    <span class="material-icons-round" style="font-size:13px;">refresh</span> 重載
-                </button>
-                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;">
-                    <span class="material-icons-round" style="font-size:13px;">share</span> 分享
-                </button>
+            <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
+                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;"><span class="material-icons-round" style="font-size:13px;">save</span> 儲存</button>
+                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;"><span class="material-icons-round" style="font-size:13px;">undo</span> 復原</button>
+                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;"><span class="material-icons-round" style="font-size:13px;">redo</span> 重做</button>
+                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;"><span class="material-icons-round" style="font-size:13px;">refresh</span> 重載</button>
+                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;"><span class="material-icons-round" style="font-size:13px;">share</span> 分享</button>
+                <!-- 🌟 新增深色模式切換與 PDF 匯出 -->
+                <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151;"><span class="material-icons-round" id="dark-mode-icon" style="font-size:13px;">dark_mode</span> 切換</button>
+                <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b;"><span class="material-icons-round" style="font-size:13px;">picture_as_pdf</span> 匯出</button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <!-- 🌟 動態即時匯率顯示區 -->
-        <div id="exchange-rate-display" onclick="fetchExchangeRate(true)" style="font-size: 10px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 4px 8px; border-radius: 8px; flex-shrink:0; margin-left: 8px; cursor: pointer; line-height: 1.2; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            日圓匯率<br><span style="font-size:13px; color:#e53935;">載入中</span>
+        <!-- 🌟 動態即時匯率顯示區 (可點擊切換幣別) -->
+        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="font-size: 10px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 4px 8px; border-radius: 8px; flex-shrink:0; margin-left: 8px; cursor: pointer; line-height: 1.2; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition:0.3s;">
+            JPY 匯率<br><span style="font-size:13px; color:#e53935;" id="rate-num">載入中</span>
         </div>
     </div>
 
@@ -351,17 +370,17 @@
         <div id="tab-budget" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
-                <div style="margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="margin-bottom: 15px; background: transparent; padding: 4px; border-radius: 8px;">
                     <div style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">付款人清單：</div>
                     <div id="payer-tags-container"></div>
-                    <button onclick="addPayer()" class="btn-nav" style="background: #eef2f5; color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
+                    <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
                 </div>
                 <table id="budget-table">
                     <tr><th>項目</th><th>付款人</th><th>幣別</th><th>金額</th><th>操作</th></tr>
                     <tbody id="budget-tbody"></tbody>
                 </table>
                 <button class="add-btn" onclick="addBudgetRow()">+ 新增記帳項目</button>
-                <div id="budget-result" style="margin-top:20px; padding-top:15px; border-top:1px dashed #ccc; line-height: 1.8;"></div>
+                <div id="budget-result" style="margin-top:10px; padding-top:10px; border-top:1px dashed #ccc; line-height: 1.8;"></div>
             </div>
         </div>
 
@@ -383,7 +402,7 @@
             </div>
 
             <div class="glass-card">
-                <div class="flex-between" style="margin-bottom: 15px;">
+                <div class="flex-between" style="margin-bottom: 10px;">
                     <h2 class="section-title" style="margin-bottom: 0;"><span class="material-icons-round">luggage</span> 事前準備類</h2>
                     <div class="person-select-wrapper" style="display:flex; align-items:center; gap:5px;">
                         <select id="todo-person-select" onchange="switchTodoPerson(this.value)" style="border:2px solid var(--primary-color); color:var(--primary-color); font-weight:bold; border-radius:6px; padding:2px;"><option value="預設範本" selected>預設範本</option></select>
@@ -413,7 +432,7 @@
                             <select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
-                        <div class="flex-between" style="gap:10px; margin-top:15px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
+                        <div class="flex-between" style="gap:10px; margin-top:10px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
                     </div>
                 </div>
             </div>
@@ -446,12 +465,94 @@
         let currentItemThumbBox = null;
         let syncTimeout = null;
         
-        // 🌟 預設匯率字典
-        let exchangeRatesToTWD = { JPY: 0.2150, TWD: 1 };
+        // 🌟 記錄所有的匯率 (對台幣)
+        let allRatesToTWD = { TWD: 1 };
+        // 🌟 當前使用者選擇的旅遊幣別 (預設 JPY)
+        let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
         
         let undoStack = [];
         let redoStack = [];
         let currentStateSnapshot = null;
+
+        // 深色模式切換
+        function toggleDarkMode() {
+            let isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('travelAppDarkMode', isDark);
+            let icon = document.getElementById('dark-mode-icon');
+            if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode';
+        }
+        
+        // 🌟 PDF 匯出功能
+        function exportToPDF() {
+            alert('💡 小撇步：\n在即將跳出的列印預覽畫面中，您可以直接「用兩指往外放大」畫面，就能瞬間把行程表存成高畫質 PDF 檔喔！');
+            // 將所有天數卡片展開以確保完整列印
+            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
+            let originalDisplays = [];
+            cards.forEach(c => { originalDisplays.push(c.style.display); c.style.display = 'block'; });
+            
+            window.print();
+            
+            // 印完恢復原狀 (如果不是在分享模式下)
+            if (!new URLSearchParams(window.location.search).get('share')) {
+                cards.forEach((c, idx) => { c.style.display = originalDisplays[idx]; });
+            }
+        }
+
+        // 🌟 動態獲取最新即時匯率
+        function fetchExchangeRate(manual = false) {
+            if(manual) setStatus('sync', '更新匯率中...');
+            
+            fetch('https://open.er-api.com/v6/latest/TWD')
+            .then(res => res.json())
+            .then(data => {
+                if(data && data.rates) {
+                    // API 回傳的是 1 TWD = 多少外幣。我們需要的是 1外幣 = 多少 TWD。
+                    allRatesToTWD['JPY'] = 1 / (data.rates['JPY'] || 4.65);
+                    allRatesToTWD['KRW'] = 1 / (data.rates['KRW'] || 41.5);
+                    allRatesToTWD['THB'] = 1 / (data.rates['THB'] || 1.12);
+                    allRatesToTWD['USD'] = 1 / (data.rates['USD'] || 0.031);
+                    allRatesToTWD['EUR'] = 1 / (data.rates['EUR'] || 0.029);
+                    
+                    updateRateDisplay();
+                    calcBudget();
+                    if(manual) setStatus('cloud_done', '匯率已更新');
+                }
+            })
+            .catch(e => {
+                if(manual) setStatus('cloud_off', '匯率取得失敗', true);
+                updateRateDisplay();
+            });
+        }
+        
+        function updateRateDisplay() {
+            let rate = allRatesToTWD[currentTravelCurrency] || 0;
+            document.getElementById('exchange-rate-display').innerHTML = `${currentTravelCurrency} 匯率<br><span style="font-size:13px; color:#e53935;">${rate.toFixed(4)}</span>`;
+        }
+
+        // 🌟 切換主要旅遊幣別
+        function changeTravelCurrency() {
+            let curr = prompt('請輸入旅遊當地幣別代碼\n(例如 JPY日圓, KRW韓元, THB泰銖, USD美金)：', currentTravelCurrency);
+            if(curr) {
+                curr = curr.toUpperCase().trim();
+                currentTravelCurrency = curr;
+                localStorage.setItem('travelAppCurrency', currentTravelCurrency);
+                
+                // 動態更新下拉選單
+                updateCurrencyOptionsInTable();
+                fetchExchangeRate(true);
+            }
+        }
+
+        function updateCurrencyOptionsInTable() {
+            document.querySelectorAll('.curr-select').forEach(sel => {
+                let currentVal = sel.value;
+                let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR'];
+                if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
+                if(!opts.includes(currentVal)) opts.push(currentVal); // 保留舊的冷門幣別
+                
+                sel.innerHTML = opts.map(c => `<option value="${c}" ${c===currentVal?'selected':''}>${c}</option>`).join('');
+            });
+        }
 
         function captureState() {
             return { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
@@ -486,25 +587,6 @@
             document.getElementById('hero-container').innerHTML = state.heroHtml;
             payers = state.payersData; currentStateSnapshot = captureState(); 
             renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
-        }
-
-        // 🌟 獲取最新即時匯率
-        function fetchExchangeRate(manual = false) {
-            if(manual) setStatus('sync', '更新匯率中...');
-            fetch('https://open.er-api.com/v6/latest/JPY')
-            .then(res => res.json())
-            .then(data => {
-                if(data && data.rates && data.rates.TWD) {
-                    exchangeRatesToTWD.JPY = data.rates.TWD;
-                    document.getElementById('exchange-rate-display').innerHTML = `日圓匯率<br><span style="font-size:13px; color:#e53935;">${data.rates.TWD.toFixed(4)}</span>`;
-                    calcBudget();
-                    if(manual) setStatus('cloud_done', '匯率已更新');
-                }
-            })
-            .catch(e => {
-                if(manual) setStatus('cloud_off', '匯率取得失敗', true);
-                document.getElementById('exchange-rate-display').innerHTML = `日圓匯率<br><span style="font-size:13px; color:#e53935;">${exchangeRatesToTWD.JPY}</span>`;
-            });
         }
 
         function generateShareLink() {
@@ -615,7 +697,7 @@
                 if (!text) text = '參考連結';
                 let noteEl = btn.closest('.content-box').querySelector('.item-note');
                 if(noteEl && noteEl.innerText.trim() === '備註：') { noteEl.innerHTML = ''; }
-                let linkHtml = ` <a contenteditable="false" href="${url}" class="note-link" onclick="window.open(this.href, '_blank'); return false;"><span class="material-icons-round" style="font-size:12px;">link</span>${text}</a> &nbsp;`;
+                let linkHtml = ` <a contenteditable="false" href="${url}" class="note-link"><span class="material-icons-round" style="font-size:12px;">link</span>${text}</a> &nbsp;`;
                 if(noteEl) noteEl.innerHTML += linkHtml;
                 saveData();
             }
@@ -1057,16 +1139,20 @@
             input.value = ''; input.click();
         }
 
-        function addBudgetRow(item = '新項目', payerName = payers[0], currency = 'JPY', amount = '0') {
+        // 🌟 新增記帳項目：寫死當下最新匯率 (Snapshot 機制)
+        function addBudgetRow(item = '新項目', payerName = payers[0], currency = currentTravelCurrency, amount = '0') {
             const tbody = document.getElementById('budget-tbody');
             const tr = document.createElement('tr');
             tr.className = 'budget-row';
             
-            // 🌟 建立新項目時，立刻綁定當下的匯率
-            let currentRate = exchangeRatesToTWD[currency] || 1;
+            // 綁定當下的匯率快照 (Snapshot)
+            let currentRate = allRatesToTWD[currency] || 1;
             tr.setAttribute('data-rate', currentRate);
 
             let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
+            let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR'];
+            if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
+            let currencyOpts = opts.map(c => `<option value="${c}" ${c===currency?'selected':''}>${c}</option>`).join('');
             
             let formattedAmt = Number(String(amount).replace(/,/g, '') || 0).toLocaleString('en-US');
             
@@ -1074,9 +1160,8 @@
                 <td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td>
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td>
                 <td>
-                    <select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', exchangeRatesToTWD[this.value] || 1); saveData(); calcBudget();">
-                        <option value="TWD" ${currency==='TWD'?'selected':''}>TWD</option>
-                        <option value="JPY" ${currency==='JPY'?'selected':''}>JPY</option>
+                    <select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();">
+                        ${currencyOpts}
                     </select>
                 </td>
                 <td><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();"></td>
@@ -1108,15 +1193,14 @@
                     amountInputEl.setAttribute('value', formatted); 
                 }
 
-                // 🌟 匯率鎖定機制：如果沒有綁定匯率（舊版存檔），自動以預設匯率綁定
+                // 🌟 使用鎖定的匯率計算
                 let rowRate = parseFloat(r.getAttribute('data-rate'));
                 if (isNaN(rowRate) || !rowRate) {
-                    rowRate = exchangeRatesToTWD[rowCurr] || 1;
+                    rowRate = exchangeRatesToTWD[rowCurr] || 1; // 相容舊版資料
                     r.setAttribute('data-rate', rowRate);
                 }
                 
-                // 確保台幣匯率始終為 1
-                if (rowCurr === 'TWD') rowRate = 1;
+                if (rowCurr === 'TWD') rowRate = 1; // 台幣永遠是 1
                 
                 let amtInTWD = amount * rowRate;
                 if(person) { if(!totals[person]) totals[person] = 0; totals[person] += amtInTWD; }
@@ -1338,7 +1422,8 @@
                     if(state.payersData) payers = state.payersData;
                     renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
                 } else {
-                    addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); setStatus('cloud_done', '建立新雲端存檔');
+                    // 相容舊存檔寫法
+                    addBudgetRow('住宿訂金', payers[0], 'JPY', '60580'); setStatus('cloud_done', '建立新雲端存檔');
                 }
                 finalizeLoad();
             }).catch(e => { 
@@ -1357,7 +1442,7 @@
                 if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                 if(state.payersData) payers = state.payersData;
                 renderPayerTags(); rebindEvents();
-            } else { addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); }
+            } else { addBudgetRow('住宿訂金', payers[0], 'JPY', '60580'); }
             finalizeLoad();
         }
 
@@ -1428,6 +1513,7 @@
                     }
                 });
 
+                updateCurrencyOptionsInTable();
                 updateDayTabs(); initHistory(); initSortable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
                 
@@ -1436,9 +1522,8 @@
             } catch(error) {
                 console.error("載入解析錯誤: ", error);
             } finally {
-                // 🌟 載入完成後，自動去抓取最新即時匯率
+                // 讀取完畢後，抓取匯率
                 fetchExchangeRate();
-
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
                     if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
