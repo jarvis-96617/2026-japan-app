@@ -125,7 +125,7 @@
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
         /* 橫向滑動天數分頁樣式 */
-        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 50px; z-index: 15; background: var(--bg-color); transition: 0.3s; }
+        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 45px; z-index: 15; background: var(--bg-color); transition: 0.3s; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3); }
@@ -196,7 +196,7 @@
         .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
 
-        /* 🌟 PDF 匯出隱藏與排版設定 */
+        /* PDF 匯出隱藏與排版設定 */
         @media print {
             .global-controls, .bottom-nav, .add-btn, .delete-btn, .hero, .day-tabs-wrapper, .item-thumb-box, .transport-icon, .btn-circle, .btn-nav, .img-del-btn, .cat-action-icon, .action-row { display: none !important; }
             body { background: white !important; color: black !important; padding-bottom: 0 !important; }
@@ -224,20 +224,25 @@
             var splashImg = document.getElementById('splash-bg-img');
             if (splashImg) splashImg.style.display = 'none';
         }
-        // 🌟 初始化深色模式偏好
         if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) {
             document.body.classList.add('dark-mode');
         }
     </script>
 
-    <div class="hero" id="hero-container">
-        <h1 class="editable" contenteditable="true">2026 京阪六天五夜</h1>
-        <p class="editable" contenteditable="true">09/25 - 09/30 | 2人同行 | 京都 & 大阪</p>
+    <div style="position: relative;">
+        <div class="hero" id="hero-container">
+            <h1 class="editable" contenteditable="true">2026 京阪六天五夜</h1>
+            <p class="editable" contenteditable="true" style="max-width: 75%;">09/25 - 09/30 | 2人同行 | 京都 & 大阪</p>
+        </div>
+        
+        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="position: absolute; right: 15px; bottom: 15px; z-index: 10; font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.9); text-align: right; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; border: 1px solid rgba(255,255,255,0.2);">
+            <span id="curr-label">JPY</span> 匯率 <span style="font-size:14px; color:#ffca28; margin-left:2px;" id="rate-num">載入中</span>
+        </div>
     </div>
 
-    <div class="global-controls">
-        <div style="display:flex; flex-direction:column; gap:6px; flex-grow:1; min-width:0; overflow:hidden;">
-            <div style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
+    <div class="global-controls" style="padding: 8px 15px 6px 15px;">
+        <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
+            <div style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
                 <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;"><span class="material-icons-round" style="font-size:13px;">save</span> 儲存</button>
                 <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;"><span class="material-icons-round" style="font-size:13px;">undo</span> 復原</button>
                 <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;"><span class="material-icons-round" style="font-size:13px;">redo</span> 重做</button>
@@ -249,10 +254,6 @@
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
-        </div>
-        <!-- 🌟 單行精簡版即時匯率顯示區 -->
-        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="font-size: 11px; font-weight: bold; color: var(--primary-color); display: flex; align-items: center; gap: 4px; background: #eef2f5; padding: 4px 10px; border-radius: 8px; flex-shrink:0; margin-left: 8px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition:0.3s; white-space: nowrap;">
-            <span id="curr-label">JPY</span> 匯率 <span style="font-size:13px; color:#e53935; margin-left:2px;" id="rate-num">載入中</span>
         </div>
     </div>
 
@@ -379,7 +380,6 @@
         <div id="tab-budget" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
-                <!-- 🌟 預算排版緊湊優化 -->
                 <div style="margin-bottom: 8px; background: transparent; padding: 0px;">
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
                         <span style="font-size: 12px; color: var(--primary-color); font-weight: bold;">付款人：</span>
@@ -387,12 +387,17 @@
                         <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); padding: 2px 8px; border-radius: 12px; box-shadow: none;">+ 新增</button>
                     </div>
                 </div>
+                
+                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: var(--glass-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--glass-border);">
+                    輸入金額會自動套用會計格式。最右側框框可點擊上傳發票/收據照片。
+                </div>
+
                 <table id="budget-table">
                     <tr><th>項目</th><th>付款人</th><th>幣別</th><th>金額</th><th>操作</th></tr>
                     <tbody id="budget-tbody"></tbody>
                 </table>
-                <button class="add-btn" onclick="addBudgetRow()">+ 新增記帳項目</button>
-                <div id="budget-result" style="margin-top:10px; padding-top:10px; border-top:1px dashed #ccc; line-height: 1.8;"></div>
+                <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 4px;">+ 新增記帳項目</button>
+                <div id="budget-result" style="margin-top:8px; padding-top:8px; border-top:1px dashed #ccc; line-height: 1.6;"></div>
             </div>
         </div>
 
@@ -504,7 +509,6 @@
             }
         }
 
-        // 🌟 呼叫後端 API 刪除雲端圖片
         function deleteImageFromCloud(imgUrl) {
             if (!imgUrl || !imgUrl.includes('id=')) return;
             let match = imgUrl.match(/id=([^&]+)/);
@@ -569,24 +573,31 @@
             });
         }
 
-        // 🌟 強效 DOM 淨化：在存檔前，清除所有操作殘留物
+        // 🌟 終極 DOM 淨化：存檔前徹底清除所有無用樣式與屬性
         function captureState() {
-            let tempContainer = document.createElement('div');
-            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
+            let tempMain = document.createElement('div');
+            tempMain.innerHTML = document.getElementById('main-container').innerHTML;
             
-            // 清除深色模式、密碼鎖定遺留的 class
-            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-            
-            // 清除拖曳套件產生的垃圾 class
-            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
-                el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
+            let tempHero = document.createElement('div');
+            tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
+
+            [tempMain, tempHero].forEach(container => {
+                container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+                container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+                
+                container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
+                    el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
+                });
+                container.querySelectorAll('[draggable]').forEach(el => el.removeAttribute('draggable'));
+                container.querySelectorAll('.timeline-item').forEach(el => el.removeAttribute('style'));
+                container.querySelectorAll('[class=""]').forEach(el => el.removeAttribute('class'));
             });
 
-            // 清除可能殘留的 inline style (避免拖曳到一半當機導致位置寫死)
-            tempContainer.querySelectorAll('.timeline-item').forEach(el => el.removeAttribute('style'));
-
-            return { html: tempContainer.innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
+            return { 
+                html: tempMain.innerHTML, 
+                heroHtml: tempHero.innerHTML, 
+                payersData: JSON.parse(JSON.stringify(payers)) 
+            };
         }
 
         function initHistory() {
@@ -845,7 +856,6 @@
             element.classList.toggle('completed'); saveData();
         }
 
-        // 🌟 刪除清單項目時，一併刪除附帶的雲端圖片
         function deleteItem(btnElement, event) {
             event.stopPropagation();
             if(confirm("確定要刪除這個項目嗎？")) {
@@ -1211,7 +1221,6 @@
             tbody.appendChild(tr); calcBudget(); saveData();
         }
 
-        // 🌟 刪除預算項目時，一併刪除附屬的收據圖片
         function deleteBudgetRow(btn) {
             if(confirm('確定刪除此記帳項目嗎？')) {
                 let tr = btn.closest('tr');
@@ -1259,6 +1268,36 @@
             resHTML += `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px;"><span> 旅程總花費：</span><span>NT$${grandTotal.toLocaleString('en-US', {maximumFractionDigits:0})}</span></div>`;
             let resEl = document.getElementById('budget-result');
             if(resEl) resEl.innerHTML = resHTML;
+        }
+
+        function switchTodoPerson(personName) {
+            document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none');
+            let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`);
+            if(target) target.style.display = 'block';
+            let select = document.getElementById('todo-person-select');
+            Array.from(select.options).forEach(opt => {
+                if(opt.value === personName) opt.setAttribute('selected', 'selected');
+                else opt.removeAttribute('selected');
+            });
+            saveData();
+        }
+
+        function addNewTodoPerson() {
+            let name = prompt('請輸入要新增的人員名稱：');
+            if(!name || name.trim() === '') return;
+            if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; }
+            let currentTemplateName = document.getElementById('todo-person-select').value;
+            let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`);
+            let newList = defaultList.cloneNode(true);
+            newList.setAttribute('data-person', name);
+            newList.style.display = 'none';
+            newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed'));
+            document.getElementById('person-todo-container').appendChild(newList);
+            let select = document.getElementById('todo-person-select');
+            let opt = document.createElement('option');
+            opt.value = name; opt.innerText = name;
+            select.appendChild(opt); select.value = name;
+            switchTodoPerson(name); initSortable(); 
         }
 
         let currentUploadTarget = '';
@@ -1312,7 +1351,6 @@
             if (file && currentReceiptBox) {
                 compressImage(file, function(compressedDataUrl) {
                     uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
-                        // 🌟 加入雲端同步刪除按鈕
                         currentReceiptBox.outerHTML = `
                             <div class="receipt-thumb-wrap">
                                 <img src="${driveUrl}" onclick="openImageModal(this.src, event)">
@@ -1324,7 +1362,6 @@
             }
         }
 
-        // 🌟 刪除收據縮圖，並發送雲端刪除指令
         function deleteReceiptThumb(btn, event) {
             event.stopPropagation();
             if(confirm('確定移除此收據圖片？')) {
@@ -1352,7 +1389,6 @@
             }
         }
 
-        // 🌟 刪除行程縮圖，並發送雲端刪除指令
         function deleteItemThumb(delBtn, event) {
             event.stopPropagation();
             if(confirm('確定移除此圖片？')) {
@@ -1366,7 +1402,6 @@
             }
         }
 
-        // 🌟 刪除相簿縮圖，並發送雲端刪除指令
         function addImageToGallery(src, containerId) {
             const wrapper = document.createElement('div'); wrapper.className = 'img-wrapper';
             const img = document.createElement('img'); img.src = src; img.onclick = function(e) { openImageModal(this.src, e); };
@@ -1417,6 +1452,7 @@
             saveData(); 
         });
 
+        // 🌟 核心存檔邏輯：套用深度淨化與壓縮演算法
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             if (!skipHistory) { recordHistory(); }
@@ -1471,7 +1507,9 @@
                 
                 let state = rawData;
                 if (rawData && rawData.isCompressed) {
-                    try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
+                    try {
+                        state = JSON.parse(LZString.decompressFromUTF16(rawData.data));
+                    } catch(e) { console.error("解壓縮失敗", e); }
                 }
 
                 if (state && state.html) {
@@ -1497,8 +1535,11 @@
                 let state = null;
                 try {
                     let parsed = JSON.parse(saved);
-                    if (parsed.isCompressed) { state = JSON.parse(LZString.decompressFromUTF16(parsed.data)); } 
-                    else { state = parsed; }
+                    if (parsed.isCompressed) {
+                        state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
+                    } else {
+                        state = parsed;
+                    }
                 } catch(e) {}
                 
                 if(state && state.html) document.getElementById('main-container').innerHTML = state.html;
