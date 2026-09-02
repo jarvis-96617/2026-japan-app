@@ -1257,11 +1257,14 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200; let scaleSize = 1;
+                    // 🌟 升級 1：將最大寬度從 1200 縮小至 600，大幅減少體積
+                    const MAX_WIDTH = 600; 
+                    let scaleSize = 1;
                     if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
                     canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8); 
+                    // 🌟 升級 2：將 JPEG 壓縮率從 0.8 (80%) 調降至 0.6 (60%)
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
                     callback(dataUrl);
                 }
                 img.src = e.target.result;
