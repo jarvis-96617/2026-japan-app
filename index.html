@@ -241,6 +241,34 @@
     <div id="mobile-tooltip"></div>
     
     <script>
+        // 初始化全域防呆與計時器
+        let isAppReady = false;
+        let lastActiveTime = Date.now();
+
+        // 🌟 防呆：休眠喚醒自動同步 (防舊電腦覆蓋雲端)
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible') {
+                // 超過 30 分鐘 (1800000 毫秒) 沒動靜，視為休眠喚醒
+                if (Date.now() - lastActiveTime > 1800000) {
+                    isAppReady = false; 
+                    const splash = document.getElementById('splash-screen');
+                    if (splash) {
+                        let msgEl = splash.querySelector('.splash-text p');
+                        if(msgEl) msgEl.innerText = '喚醒裝置，同步最新資料...';
+                        splash.style.display = 'flex';
+                        splash.style.opacity = '1';
+                    }
+                    loadData(); 
+                }
+            }
+            lastActiveTime = Date.now();
+        });
+
+        // 監聽使用者操作更新活動時間
+        ['touchstart', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, () => { lastActiveTime = Date.now(); }, {passive: true});
+        });
+
         if (window.location.search.includes('share=')) {
             var splashImg = document.getElementById('splash-bg-img');
             if (splashImg) splashImg.style.display = 'none';
@@ -703,9 +731,11 @@
             tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
             [tempMain, tempHero].forEach(container => {
+                // 清除鎖定相關廢棄 class
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 
+                // 清除 Sortable 拖曳殘留 class
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
@@ -1551,7 +1581,7 @@
             if(statusEl) { statusEl.innerHTML = `<span class="material-icons-round" style="font-size:14px; color: ${isError ? 'var(--danger-color)' : '#4CAF50'};">${icon}</span> <span>${text}</span>`; }
         }
 
-        function forceManualSave() { setStatus('sync', '手Upload中...'); saveData(true); }
+        function forceManualSave() { setStatus('sync', '手動上傳中...'); saveData(true); }
 
         document.addEventListener('change', function(e) {
             if (e.target.tagName === 'SELECT') {
@@ -1576,12 +1606,18 @@
             saveData(); 
         });
 
-        // 🌟 核心存檔邏輯：套用深度淨化與壓縮演算法
+        // 🌟 核心存檔邏輯：套用深度淨化與壓縮演算法，並加入防呆鎖
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
+            
+            // 🌟 防呆鎖：如果 App 還沒載入完畢（或正在休眠喚醒同步），禁止覆寫雲端
+            if (!isAppReady) {
+                console.warn("系統同步中，阻擋舊資料覆寫");
+                return;
+            }
+
             if (!skipHistory) { recordHistory(); }
             
-            // 🌟 統一使用深度淨化過的核心狀態，不留一絲垃圾標籤
             const state = captureState(); 
             const payload = JSON.stringify({ 
                 isCompressed: true, 
@@ -1753,8 +1789,12 @@
                 console.error("載入解析錯誤: ", error);
             } finally {
                 fetchExchangeRate();
-                // 🌟 啟動專屬手機的長按提示引擎
                 initMobileTooltips();
+                
+                // 🌟 所有資料渲染完畢後，解開存檔鎖定
+                isAppReady = true;
+                lastActiveTime = Date.now();
+                
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
                     if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
