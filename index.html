@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2026 京阪</title>
+    <!-- 啟用全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="京阪">
     
     <link rel="apple-touch-icon" href="icon.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
@@ -30,6 +32,7 @@
             --danger-color: #e57373;
         }
 
+        /* 🌙 深色模式色彩變數 */
         body.dark-mode {
             --bg-color: #121212;
             --primary-color: #7ba3d8; 
@@ -66,6 +69,7 @@
         .container { padding: 0 15px; }
         .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s ease; }
         
+        /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
         .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; -webkit-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important; }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
@@ -79,9 +83,7 @@
         .timeline-item.completed { opacity: 0.35; }
         
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { padding: 4px 4px; }
-        
-        /* 🌟 綠框文字單行處理 */
-        .todo-category-header { font-size: 13px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px; transition: 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px; transition: 0.3s;}
         body.dark-mode .todo-category-header { color: #ddd; border-bottom-color: #444; }
         
         .checkbox-wrapper { flex-shrink: 0; padding-top: 2px; }
@@ -89,6 +91,7 @@
         .completed .custom-checkbox { background: var(--primary-color); }
         .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 13px; }
         
+        /* 拖曳視覺效果 */
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; }
         body.dark-mode .sortable-ghost { background-color: #333 !important; }
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; }
@@ -149,23 +152,22 @@
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.3s;}
         body.dark-mode .link-item { background: #222; }
 
-        /* 🌟 橘框優化：記帳表極致壓縮 */
+        /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
-        #budget-table th { background: #eef2f5; padding: 4px 1px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s; white-space: nowrap;}
+        #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
-        #budget-table td { padding: 4px 1px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
+        #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        /* 調整欄寬以解決空白與換行 */
-        #budget-table th:nth-child(1) { width: 33%; } 
-        #budget-table th:nth-child(2) { width: 22%; } 
-        #budget-table th:nth-child(3) { width: 15%; } 
-        #budget-table th:nth-child(4) { width: 18%; } 
-        #budget-table th:nth-child(5) { width: 12%; }
+        #budget-table th:nth-child(1) { width: 30%; }
+        #budget-table th:nth-child(2) { width: 20%; }
+        #budget-table th:nth-child(3) { width: 14%; }
+        #budget-table th:nth-child(4) { width: 19%; }
+        #budget-table th:nth-child(5) { width: 17%; }
 
         .amount-input { width: 100%; box-sizing: border-box; font-size: 12px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0;}
         .curr-select, .payer-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; }
-        .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-right: 5px; margin-bottom: 5px; transition: 0.3s;}
+        .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
         /* Receipt Box & Image Gallery */
@@ -178,7 +180,7 @@
         .thumbnail-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
         .img-wrapper { position: relative; width: 70px; height: 70px; }
         .img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 5; }
 
         /* Bottom Nav & Modals */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;}
@@ -194,10 +196,11 @@
         .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
 
+        /* 🌟 PDF 匯出隱藏與排版設定 */
         @media print {
-            .global-controls, .bottom-nav, .add-btn, .delete-btn, .hero, .day-tabs-wrapper, .item-thumb-box, .transport-icon, .btn-circle, .btn-nav, .img-del-btn { display: none !important; }
+            .global-controls, .bottom-nav, .add-btn, .delete-btn, .hero, .day-tabs-wrapper, .item-thumb-box, .transport-icon, .btn-circle, .btn-nav, .img-del-btn, .cat-action-icon, .action-row { display: none !important; }
             body { background: white !important; color: black !important; padding-bottom: 0 !important; }
-            body.dark-mode { filter: invert(1) hue-rotate(180deg); }
+            body.dark-mode { filter: invert(1) hue-rotate(180deg); } 
             .container { padding: 0 !important; }
             .glass-card { background: none !important; border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; margin-bottom: 20px;}
             .tab-content { display: block !important; } 
@@ -221,6 +224,7 @@
             var splashImg = document.getElementById('splash-bg-img');
             if (splashImg) splashImg.style.display = 'none';
         }
+        // 🌟 初始化深色模式偏好
         if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) {
             document.body.classList.add('dark-mode');
         }
@@ -246,8 +250,9 @@
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="font-size: 10px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 4px 8px; border-radius: 8px; flex-shrink:0; margin-left: 8px; cursor: pointer; line-height: 1.2; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition:0.3s;">
-            JPY 匯率<br><span style="font-size:13px; color:#e53935;" id="rate-num">載入中</span>
+        <!-- 🌟 單行精簡版即時匯率顯示區 -->
+        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="font-size: 11px; font-weight: bold; color: var(--primary-color); display: flex; align-items: center; gap: 4px; background: #eef2f5; padding: 4px 10px; border-radius: 8px; flex-shrink:0; margin-left: 8px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition:0.3s; white-space: nowrap;">
+            <span id="curr-label">JPY</span> 匯率 <span style="font-size:13px; color:#e53935; margin-left:2px;" id="rate-num">載入中</span>
         </div>
     </div>
 
@@ -289,6 +294,30 @@
                         <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                     </div>
                     
+                    <div class="timeline-item" onclick="toggleComplete(this, event)">
+                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                        <div class="time-column">
+                            <div class="start-time editable" contenteditable="true">18:00</div>
+                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">20</span> 分</div>
+                            <div class="end-time">18:20</div>
+                        </div>
+                        <div class="content-box">
+                            <div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;">
+                                <div style="flex-grow: 1; min-width: 0;">
+                                    <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">京都車站</span></div>
+                                    <div class="item-note editable" contenteditable="true">備註：轉乘烏丸線</div>
+                                </div>
+                                <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;"><span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span></div>
+                            </div>
+                            <div class="action-row">
+                                <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
+                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
+                                <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
+                            </div>
+                        </div>
+                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                    </div>
+
                     <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
                 </div>
             </div>
@@ -300,6 +329,7 @@
                 <h2 class="section-title"><span class="material-icons-round">directions_transit</span> 交通票券與指南</h2>
                 <div id="transport-text-list" style="margin-top: 15px;">
                     <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">機場至京都：JR 特急 Haruka</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
+                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">市區交通：Apple Pay ICOCA</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
                 </div>
                 <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 5px;">+ 新增交通指南</button>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
@@ -349,10 +379,13 @@
         <div id="tab-budget" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
-                <div style="margin-bottom: 15px; background: transparent; padding: 4px; border-radius: 8px;">
-                    <div style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">付款人清單：</div>
-                    <div id="payer-tags-container"></div>
-                    <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
+                <!-- 🌟 預算排版緊湊優化 -->
+                <div style="margin-bottom: 8px; background: transparent; padding: 0px;">
+                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
+                        <span style="font-size: 12px; color: var(--primary-color); font-weight: bold;">付款人：</span>
+                        <span id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:5px;"></span>
+                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); padding: 2px 8px; border-radius: 12px; box-shadow: none;">+ 新增</button>
+                    </div>
                 </div>
                 <table id="budget-table">
                     <tr><th>項目</th><th>付款人</th><th>幣別</th><th>金額</th><th>操作</th></tr>
@@ -405,6 +438,12 @@
                             <select class="luggage-select"><option value="背包">背包</option><option value="小包包">小包包</option><option value="託運" selected>託運</option></select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
+                        <div class="timeline-item" onclick="toggleComplete(this, event)">
+                            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                            <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
+                            <select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select>
+                            <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                        </div>
                         <div class="flex-between" style="gap:10px; margin-top:15px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
                     </div>
                 </div>
@@ -431,7 +470,6 @@
     </div>
 
     <script>
-        // ⚠️ 請記得把這裡換成你剛重新部署的 Google Script URL
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         
         let payers = ['本人', '家人']; 
@@ -466,8 +504,21 @@
             }
         }
 
+        // 🌟 呼叫後端 API 刪除雲端圖片
+        function deleteImageFromCloud(imgUrl) {
+            if (!imgUrl || !imgUrl.includes('id=')) return;
+            let match = imgUrl.match(/id=([^&]+)/);
+            if (match && match[1]) {
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'deleteImage', fileId: match[1] })
+                }).catch(e => console.log('雲端圖片刪除指令發送失敗', e));
+            }
+        }
+
         function fetchExchangeRate(manual = false) {
             if(manual) setStatus('sync', '更新匯率中...');
+            
             fetch('https://open.er-api.com/v6/latest/TWD')
             .then(res => res.json())
             .then(data => {
@@ -491,7 +542,8 @@
         
         function updateRateDisplay() {
             let rate = allRatesToTWD[currentTravelCurrency] || 0;
-            document.getElementById('exchange-rate-display').innerHTML = `${currentTravelCurrency} 匯率<br><span style="font-size:13px; color:#e53935;">${rate.toFixed(4)}</span>`;
+            document.getElementById('curr-label').innerText = currentTravelCurrency;
+            document.getElementById('rate-num').innerText = rate.toFixed(4);
         }
 
         function changeTravelCurrency() {
@@ -500,6 +552,7 @@
                 curr = curr.toUpperCase().trim();
                 currentTravelCurrency = curr;
                 localStorage.setItem('travelAppCurrency', currentTravelCurrency);
+                
                 updateCurrencyOptionsInTable();
                 fetchExchangeRate(true);
             }
@@ -511,19 +564,34 @@
                 let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR'];
                 if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
                 if(!opts.includes(currentVal)) opts.push(currentVal); 
+                
                 sel.innerHTML = opts.map(c => `<option value="${c}" ${c===currentVal?'selected':''}>${c}</option>`).join('');
             });
         }
 
-        // 🌟 DOM 淨化機制
+        // 🌟 強效 DOM 淨化：在存檔前，清除所有操作殘留物
         function captureState() {
             let tempContainer = document.createElement('div');
             tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
-            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag').forEach(el => el.classList.remove('sortable-ghost', 'sortable-drag'));
+            
+            // 清除深色模式、密碼鎖定遺留的 class
+            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+            
+            // 清除拖曳套件產生的垃圾 class
+            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
+                el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
+            });
+
+            // 清除可能殘留的 inline style (避免拖曳到一半當機導致位置寫死)
+            tempContainer.querySelectorAll('.timeline-item').forEach(el => el.removeAttribute('style'));
+
             return { html: tempContainer.innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
         }
 
-        function initHistory() { undoStack = []; redoStack = []; currentStateSnapshot = captureState(); }
+        function initHistory() {
+            undoStack = []; redoStack = []; currentStateSnapshot = captureState();
+        }
 
         function recordHistory() {
             if (!currentStateSnapshot) return;
@@ -555,52 +623,89 @@
         function generateShareLink() {
             let input = prompt('請輸入你想分享給朋友的「天數數字」\n(例如想分享第2天與第3天，請輸入 2,3)：');
             if (!input) return;
+            
             let cleanInput = input.replace(/，/g, ',').replace(/、/g, ',');
             let days = cleanInput.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d) && d > 0);
-            if (days.length === 0) { alert('輸入格式錯誤，請輸入數字並以逗號分隔。'); return; }
+            if (days.length === 0) {
+                alert('輸入格式錯誤，請輸入數字並以逗號分隔。');
+                return;
+            }
             
             let currentUrl = window.location.href.split('?')[0].split('#')[0];
             let shareUrl = currentUrl + '?share=' + days.join(',');
             
             let textArea = document.createElement("textarea");
             textArea.value = shareUrl;
-            textArea.style.position = "fixed"; textArea.style.top = "-9999px";
+            textArea.style.position = "fixed"; 
+            textArea.style.top = "-9999px";
             document.body.appendChild(textArea);
-            textArea.focus(); textArea.select(); textArea.setSelectionRange(0, 99999); 
+            
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); 
+            
             try {
                 document.execCommand('copy');
                 alert('✅ 專屬分享網址已成功複製！\n您可以直接去 LINE 或對話框「貼上」給朋友。\n\n當朋友開啟此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁。');
-            } catch (err) { prompt('系統無法自動複製，請自行拷貝以下網址：', shareUrl); }
+            } catch (err) {
+                prompt('系統無法自動複製，請自行拷貝以下網址：', shareUrl);
+            }
+            
             document.body.removeChild(textArea);
         }
 
         function applyShareMode() {
             let href = window.location.href;
             let shareMatch = href.match(/[?&]share=([0-9,，、]+)/);
-            if (!shareMatch) return false;
-            let shareParam = shareMatch[1].replace(/，/g, ',').replace(/、/g, ',');
+            let shareParam = shareMatch ? shareMatch[1] : null;
+            if (!shareParam) return false;
+            
+            shareParam = shareParam.replace(/，/g, ',').replace(/、/g, ',');
             let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
             
-            document.querySelector('.bottom-nav')?.setAttribute('style', 'display: none !important;');
-            document.querySelector('.global-controls')?.setAttribute('style', 'display: none !important;');
-            let dayTabsContainer = document.getElementById('day-tabs-container');
-            if (dayTabsContainer) dayTabsContainer.style.top = '0px'; 
+            let bottomNav = document.querySelector('.bottom-nav');
+            if (bottomNav) bottomNav.style.display = 'none';
+            let globalControls = document.querySelector('.global-controls');
+            if (globalControls) globalControls.style.display = 'none';
             
-            document.querySelectorAll('.add-btn, .delete-btn').forEach(el => el.style.display = 'none');
+            let dayTabsContainer = document.getElementById('day-tabs-container');
+            if (dayTabsContainer) {
+                dayTabsContainer.style.top = '0px'; 
+            }
+            
+            document.querySelectorAll('.add-btn, .delete-btn, .img-del-btn').forEach(el => el.style.display = 'none');
+            
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
             let itTab = document.getElementById('tab-itinerary');
-            if (itTab) { itTab.style.display = 'block'; itTab.style.paddingBottom = '40px'; }
+            if (itTab) {
+                itTab.style.display = 'block';
+                itTab.style.paddingBottom = '40px'; 
+            }
             
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
             cards.forEach((card, idx) => {
-                card.style.display = allowedIndexes.includes(idx) ? 'block' : 'none';
-                if(allowedIndexes.includes(idx)) card.style.marginBottom = '20px';
+                if (allowedIndexes.includes(idx)) {
+                    card.style.display = 'block';
+                    card.style.marginBottom = '20px';
+                } else {
+                    card.style.display = 'none';
+                }
             });
 
-            document.querySelectorAll('.editable').forEach(el => { el.setAttribute('contenteditable', 'false'); el.style.border = 'none'; });
+            document.querySelectorAll('.editable').forEach(el => {
+                el.setAttribute('contenteditable', 'false');
+                el.style.border = 'none';
+            });
+            
             let style = document.createElement('style');
-            style.innerHTML = `.timeline-item::before { display: none !important; } .timeline-item { padding-left: 8px !important; } .custom-checkbox, .item-thumb-box, .transport-icon, .img-del-btn { pointer-events: none !important; display: none !important;} .hero .editable { pointer-events: none !important; }`;
+            style.innerHTML = `
+                .timeline-item::before { display: none !important; }
+                .timeline-item { padding-left: 8px !important; }
+                .custom-checkbox, .item-thumb-box, .transport-icon { pointer-events: none !important; }
+                .hero .editable { pointer-events: none !important; }
+            `;
             document.head.appendChild(style);
+            
             return true;
         }
 
@@ -619,7 +724,8 @@
             event.preventDefault(); event.stopPropagation();
             let url = prompt('請輸入參考網址 (需包含 http/https)：', 'https://');
             if (url && url.startsWith('http')) {
-                let text = prompt('請輸入連結顯示名稱：', '參考連結') || '參考連結';
+                let text = prompt('請輸入連結顯示名稱：', '參考連結');
+                if (!text) text = '參考連結';
                 let noteEl = btn.closest('.content-box').querySelector('.item-note');
                 if(noteEl && noteEl.innerText.trim() === '備註：') { noteEl.innerHTML = ''; }
                 let linkHtml = ` <a contenteditable="false" href="${url}" class="note-link"><span class="material-icons-round" style="font-size:12px;">link</span>${text}</a> &nbsp;`;
@@ -631,7 +737,10 @@
         function recalculateDayTime(dayCardElement) {
             let items = dayCardElement.querySelectorAll('.timeline-item');
             if (items.length === 0) return;
-            let prevEndTimeMins = null, prevTravelMins = null, prevTimeCol = null;
+
+            let prevEndTimeMins = null;
+            let prevTravelMins = null;
+            let prevTimeCol = null;
 
             items.forEach((item, index) => {
                 let timeCol = item.querySelector('.time-column');
@@ -651,25 +760,40 @@
 
                 let startMins = 0;
                 let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
-                if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
+                if (timeMatch) {
+                    startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
+                }
 
                 let duration = parseInt(durationEl.innerText.trim()) || 0;
                 let endMins = startMins + duration;
-                endEl.innerText = `${String(Math.floor(endMins / 60) % 24).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
+                let endHours = Math.floor(endMins / 60) % 24;
+                let displayEndMins = endMins % 60;
+                endEl.innerText = `${String(endHours).padStart(2, '0')}:${String(displayEndMins).padStart(2, '0')}`;
 
                 if (index > 0 && prevTimeCol) {
                     let expectedStartMins = prevEndTimeMins + (prevTravelMins || 0);
+                    let expHours = Math.floor(expectedStartMins / 60) % 24;
+                    let expMins = expectedStartMins % 60;
+                    
                     let gap = startMins - expectedStartMins;
                     if (gap < -300) gap += 24 * 60; 
 
-                    let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start';
-                    autoStartEl.innerText = `預計 ${String(Math.floor(expectedStartMins / 60) % 24).padStart(2, '0')}:${String(expectedStartMins % 60).padStart(2, '0')}`;
-                    
-                    let gapEl = document.createElement('div'); gapEl.className = 'gap-text';
-                    if (gap < 0) { gapEl.style.color = '#e57373'; gapEl.innerText = `重疊 ${Math.abs(gap)} 分`; } 
-                    else { gapEl.innerText = `隔 ${gap} 分`; }
+                    let autoStartEl = document.createElement('div');
+                    autoStartEl.className = 'auto-start';
+                    autoStartEl.innerText = `預計 ${String(expHours).padStart(2, '0')}:${String(expMins).padStart(2, '0')}`;
 
-                    prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
+                    let gapEl = document.createElement('div');
+                    gapEl.className = 'gap-text';
+                    
+                    if (gap < 0) {
+                        gapEl.style.color = '#e57373';
+                        gapEl.innerText = `重疊 ${Math.abs(gap)} 分`;
+                    } else {
+                        gapEl.innerText = `隔 ${gap} 分`;
+                    }
+
+                    prevTimeCol.appendChild(autoStartEl);
+                    prevTimeCol.appendChild(gapEl);
                 }
 
                 prevEndTimeMins = endMins;
@@ -681,16 +805,29 @@
         function adjustStickyTabs() {
             let gc = document.querySelector('.global-controls');
             let tabs = document.getElementById('day-tabs-container');
-            if (tabs) tabs.style.top = (gc && gc.style.display !== 'none') ? gc.offsetHeight + 'px' : '0px';
+            if (tabs) {
+                if (gc && gc.style.display !== 'none') {
+                    tabs.style.top = gc.offsetHeight + 'px';
+                } else {
+                    tabs.style.top = '0px';
+                }
+            }
         }
         window.addEventListener('resize', adjustStickyTabs);
 
         function initSortable() {
             if (typeof Sortable === 'undefined') return;
-            const sortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } };
-            document.querySelectorAll('.day-card').forEach(card => { if (!card.sortable) card.sortable = Sortable.create(card, sortableOptions); });
-            ['transport-text-list', 'shopping-list', 'booking-list'].forEach(id => { let el = document.getElementById(id); if (el && !el.sortable) el.sortable = Sortable.create(el, sortableOptions); });
-            document.querySelectorAll('.person-todo-list').forEach(list => { if (!list.sortable) list.sortable = Sortable.create(list, sortableOptions); });
+            const sortableOptions = {
+                animation: 150, delay: 250, delayOnTouchOnly: true,
+                draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img', 
+                preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+                onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); }
+            };
+            document.querySelectorAll('.day-card').forEach(card => { if (!card.sortable) { card.sortable = Sortable.create(card, sortableOptions); } });
+            const transportList = document.getElementById('transport-text-list'); if (transportList && !transportList.sortable) { transportList.sortable = Sortable.create(transportList, sortableOptions); }
+            const shoppingList = document.getElementById('shopping-list'); if (shoppingList && !shoppingList.sortable) { shoppingList.sortable = Sortable.create(shoppingList, sortableOptions); }
+            const bookingList = document.getElementById('booking-list'); if (bookingList && !bookingList.sortable) { bookingList.sortable = Sortable.create(bookingList, sortableOptions); }
+            document.querySelectorAll('.person-todo-list').forEach(list => { if (!list.sortable) { list.sortable = Sortable.create(list, sortableOptions); } });
         }
 
         function switchTab(tabId, element) {
@@ -708,12 +845,19 @@
             element.classList.toggle('completed'); saveData();
         }
 
+        // 🌟 刪除清單項目時，一併刪除附帶的雲端圖片
         function deleteItem(btnElement, event) {
             event.stopPropagation();
             if(confirm("確定要刪除這個項目嗎？")) {
+                let item = btnElement.closest('.timeline-item, .link-item, .todo-category-header');
+                
+                let img = item.querySelector('img');
+                if (img) deleteImageFromCloud(img.src);
+                
                 let card = btnElement.closest('.day-card');
-                btnElement.closest('.timeline-item, .link-item, .todo-category-header').remove();
-                if(card) recalculateDayTime(card); saveData();
+                item.remove();
+                if(card) recalculateDayTime(card); 
+                saveData();
             }
         }
 
@@ -750,6 +894,7 @@
             }
             let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
             if (origin && origin !== '輸入行程名稱') { mapUrl += `&origin=${encodeURIComponent(origin)}`; }
+            
             window.location.href = mapUrl;
         }
 
@@ -766,33 +911,47 @@
             }
 
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            let html = ''; let activeIndex = -1;
+            let html = ''; 
+            let activeIndex = -1;
+            
             cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; });
-            if (allowedIndexes && !allowedIndexes.includes(activeIndex)) activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
+
+            if (allowedIndexes && !allowedIndexes.includes(activeIndex)) {
+                activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
+            }
 
             cards.forEach((card, index) => {
                 if (allowedIndexes && !allowedIndexes.includes(index)) return; 
+
                 let titleEl = card.querySelector('.section-title');
                 let title = titleEl ? titleEl.innerText : '';
                 let dateMatch = title.match(/\d{1,2}\/\d{1,2}/);
                 let dateStr = dateMatch ? dateMatch[0] : '日期';
                 let isActive = (index === activeIndex) ? 'active' : '';
+                
                 html += `<div class="day-tab ${isActive}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`;
             });
             container.innerHTML = html;
+            
             if (cards.length > 0) { 
-                if (activeIndex === -1 || activeIndex >= cards.length) activeIndex = (allowedIndexes && allowedIndexes.length > 0 && allowedIndexes[0] < cards.length) ? allowedIndexes[0] : 0;
+                if (activeIndex === -1 || activeIndex >= cards.length) {
+                    activeIndex = (allowedIndexes && allowedIndexes.length > 0 && allowedIndexes[0] < cards.length) ? allowedIndexes[0] : 0;
+                }
                 switchDayCard(activeIndex); 
             }
             setTimeout(adjustStickyTabs, 50);
         }
 
         function switchDayCard(targetIndex) {
-            document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => {
+            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
+            cards.forEach((card, idx) => {
                 let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`);
                 if (idx === targetIndex) {
                     card.style.display = 'block';
-                    if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); }
+                    if(tab) {
+                        tab.classList.add('active');
+                        tab.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                    }
                 } else {
                     card.style.display = 'none';
                     if(tab) tab.classList.remove('active');
@@ -806,7 +965,8 @@
             let dayCount = container.querySelectorAll('.day-card').length + 1;
             let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; 
             div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
-            container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); 
+            container.appendChild(div);
+            updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); 
         }
 
         function deleteDayCard(btn, event) {
@@ -820,10 +980,17 @@
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div><div class="end-time">13:00</div></div>
+                <div class="time-column">
+                    <div class="start-time editable" contenteditable="true">12:00</div>
+                    <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div>
+                    <div class="end-time">13:00</div>
+                </div>
                 <div class="content-box">
                     <div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;">
-                        <div style="flex-grow: 1; min-width: 0;"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div><div class="item-note editable" contenteditable="true">備註：</div></div>
+                        <div style="flex-grow: 1; min-width: 0;">
+                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
+                            <div class="item-note editable" contenteditable="true">備註：</div>
+                        </div>
                         <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;"><span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span></div>
                     </div>
                     <div class="action-row">
@@ -835,7 +1002,8 @@
                 <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement);
-            let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
+            let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card);
+            saveData();
         }
 
         function addTransportText(btn) {
@@ -866,7 +1034,8 @@
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
-            if (wrapper) wrapper.appendChild(newItem); else target.insertBefore(newItem, btnElement); saveData();
+            if (wrapper) wrapper.appendChild(newItem); else target.insertBefore(newItem, btnElement);
+            saveData();
         }
 
         function openLinkFromText(btn, event) {
@@ -874,12 +1043,16 @@
             let parentBox = btn.closest('.content-box');
             let text = parentBox.innerText; 
             let urlMatch = text.match(/https?:\/\/[^\s\)]+/);
-            if (urlMatch) { window.location.href = urlMatch[0]; } 
-            else {
+            if (urlMatch) {
+                window.location.href = urlMatch[0];
+            } else {
                 let manualUrl = prompt('未偵測到網址，請直接貼上連結 (需包含 http)：', 'https://');
                 if (manualUrl && manualUrl.startsWith('http')) {
                     let noteEl = parentBox.querySelector('.item-note');
-                    if(noteEl && noteEl.innerText.trim() === '備註/貼上連結：') { noteEl.innerText = manualUrl; saveData(); }
+                    if(noteEl && noteEl.innerText.trim() === '備註/貼上連結：') {
+                        noteEl.innerText = manualUrl;
+                        saveData();
+                    }
                     window.location.href = manualUrl;
                 }
             }
@@ -938,7 +1111,15 @@
             newItem.className = 'timeline-item';
             newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             if (containerId === 'booking-list') {
-                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+                newItem.innerHTML = `
+                    <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                    <div class="content-box">
+                        <div class="item-title editable" contenteditable="true">輸入預訂項目</div>
+                        <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
+                        <div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div>
+                    </div>
+                    <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                `;
             } else {
                 newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             }
@@ -1023,11 +1204,23 @@
                 <td style="text-align:center;">
     <div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; white-space: nowrap;">
         <div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>
-        <span class="material-icons-round" style="color:var(--danger-color); font-size:16px; cursor:pointer;" onclick="let tr=this.closest('tr'); let img=tr.querySelector('.receipt-thumb-wrap img'); if(img && img.src) deleteImageFromDrive(img.src); tr.remove(); calcBudget(); saveData();">delete</span>
+        <span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span>
     </div>
 </td>
             `;
             tbody.appendChild(tr); calcBudget(); saveData();
+        }
+
+        // 🌟 刪除預算項目時，一併刪除附屬的收據圖片
+        function deleteBudgetRow(btn) {
+            if(confirm('確定刪除此記帳項目嗎？')) {
+                let tr = btn.closest('tr');
+                let img = tr.querySelector('.receipt-thumb-wrap img');
+                if (img) deleteImageFromCloud(img.src);
+                tr.remove();
+                calcBudget();
+                saveData();
+            }
         }
 
         function calcBudget() {
@@ -1053,6 +1246,7 @@
                     rowRate = exchangeRatesToTWD[rowCurr] || 1; 
                     r.setAttribute('data-rate', rowRate);
                 }
+                
                 if (rowCurr === 'TWD') rowRate = 1; 
                 
                 let amtInTWD = amount * rowRate;
@@ -1067,13 +1261,11 @@
             if(resEl) resEl.innerHTML = resHTML;
         }
 
-        // 🌟 呼叫 Google Script 同步刪除雲端圖片
-        function deleteImageFromDrive(imgUrl) {
-            if (!imgUrl || !imgUrl.startsWith('http')) return;
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'deleteImage', url: imgUrl })
-            }).catch(e => console.error('Failed to delete image from Drive', e));
+        let currentUploadTarget = '';
+        function triggerUpload(targetId) { 
+            currentUploadTarget = targetId; 
+            const input = document.getElementById('global-file-input');
+            input.value = ''; input.click(); 
         }
 
         function compressImage(file, callback) {
@@ -1120,20 +1312,25 @@
             if (file && currentReceiptBox) {
                 compressImage(file, function(compressedDataUrl) {
                     uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
-                        // 🌟 記帳截圖支援單點刪除
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this.src, event)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-5px; right:-5px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; cursor:pointer; z-index:2;">&times;</div></div>`; saveData();
+                        // 🌟 加入雲端同步刪除按鈕
+                        currentReceiptBox.outerHTML = `
+                            <div class="receipt-thumb-wrap">
+                                <img src="${driveUrl}" onclick="openImageModal(this.src, event)">
+                                <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
+                            </div>`; 
+                        saveData();
                     });
                 });
             }
         }
 
-        // 🌟 刪除單個記帳截圖並恢復空白框
-        function deleteReceiptThumb(delBtn, event) {
+        // 🌟 刪除收據縮圖，並發送雲端刪除指令
+        function deleteReceiptThumb(btn, event) {
             event.stopPropagation();
-            if(confirm('確定移除此憑證？(雲端檔案也將同步刪除)')) {
-                let wrap = delBtn.closest('.receipt-thumb-wrap');
+            if(confirm('確定移除此收據圖片？')) {
+                let wrap = btn.closest('.receipt-thumb-wrap');
                 let img = wrap.querySelector('img');
-                if(img && img.src) deleteImageFromDrive(img.src);
+                if (img) deleteImageFromCloud(img.src);
                 wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
                 saveData();
             }
@@ -1145,33 +1342,41 @@
                 compressImage(file, function(compressedDataUrl) {
                     uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
                         currentItemThumbBox.style.border = 'none';
-                        currentItemThumbBox.innerHTML = `<img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openImageModal(this.src, event)"><div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>`;
+                        currentItemThumbBox.innerHTML = `
+                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openImageModal(this.src, event)">
+                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
+                        `;
                         saveData();
                     });
                 });
             }
         }
 
+        // 🌟 刪除行程縮圖，並發送雲端刪除指令
         function deleteItemThumb(delBtn, event) {
             event.stopPropagation();
-            if(confirm('確定移除此圖片？(雲端檔案也將同步刪除)')) {
-                let box = delBtn.closest('.item-thumb-box'); 
+            if(confirm('確定移除此圖片？')) {
+                let box = delBtn.closest('.item-thumb-box');
                 let img = box.querySelector('img');
-                if(img && img.src) deleteImageFromDrive(img.src); // 🌟 呼叫刪除
+                if (img) deleteImageFromCloud(img.src);
+                
                 box.style.border = '1px dashed #ccc';
-                box.innerHTML = `<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>`; saveData();
+                box.innerHTML = `<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>`; 
+                saveData();
             }
         }
 
+        // 🌟 刪除相簿縮圖，並發送雲端刪除指令
         function addImageToGallery(src, containerId) {
             const wrapper = document.createElement('div'); wrapper.className = 'img-wrapper';
             const img = document.createElement('img'); img.src = src; img.onclick = function(e) { openImageModal(this.src, e); };
             const delBtn = document.createElement('div'); delBtn.className = 'img-del-btn'; delBtn.innerHTML = '&times;';
             delBtn.onclick = function(e) { 
                 e.stopPropagation(); 
-                if(confirm("確定要刪除這張圖片嗎？(雲端檔案也將同步刪除)")) { 
-                    if(img && img.src) deleteImageFromDrive(img.src);
-                    wrapper.remove(); saveData(); 
+                if(confirm("確定要刪除這張圖片嗎？")) { 
+                    deleteImageFromCloud(img.src);
+                    wrapper.remove(); 
+                    saveData(); 
                 } 
             };
             wrapper.appendChild(img); wrapper.appendChild(delBtn); document.getElementById(containerId).appendChild(wrapper);
@@ -1189,32 +1394,39 @@
 
         function forceManualSave() { setStatus('sync', '手動上傳中...'); saveData(true); }
 
-        // 🌟 終極淨化與無損壓縮存檔
+        document.addEventListener('change', function(e) {
+            if (e.target.tagName === 'SELECT') {
+                Array.from(e.target.options).forEach(opt => {
+                    if(opt.value === e.target.value) opt.setAttribute('selected', 'selected');
+                    else opt.removeAttribute('selected');
+                }); saveData();
+            }
+        });
+        
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'text') { 
+                e.target.setAttribute('value', e.target.value); 
+                if(e.target.classList.contains('amount-input')) { calcBudget(); }
+            }
+            if (e.target.classList.contains('luggage-item-title')) { predictLuggageType(e.target); }
+            if (e.target.classList.contains('section-title') && e.target.closest('.day-card')) { updateDayTabs(); }
+            let card = e.target.closest('.day-card');
+            if (card && (e.target.classList.contains('start-time') || e.target.classList.contains('duration') || e.target.classList.contains('travel-time'))) {
+                recalculateDayTime(card);
+            }
+            saveData(); 
+        });
+
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
-
             if (!skipHistory) { recordHistory(); }
             
-            let tempContainer = document.createElement('div');
-            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
-            
-            // 🧹 淨化廢棄標籤與樣式
-            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
-            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag').forEach(el => el.classList.remove('sortable-ghost', 'sortable-drag'));
+            const payload = JSON.stringify({ 
+                isCompressed: true, 
+                data: LZString.compressToUTF16(JSON.stringify(captureState())) 
+            });
 
-            const state = { 
-                html: tempContainer.innerHTML, 
-                heroHtml: document.getElementById('hero-container').innerHTML, 
-                payersData: payers
-            };
-            
-            // 🚀 執行 LZ-String 超高密度壓縮
-            const jsonString = JSON.stringify(state);
-            const compressedData = LZString.compressToUTF16(jsonString);
-            const finalPayload = JSON.stringify({ isCompressed: true, data: compressedData });
-
-            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', finalPayload);
+            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
             localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
             
             if(!API_URL.startsWith("https://script.google.com")) {
@@ -1223,7 +1435,7 @@
             }
             setStatus('sync', '雲端同步壓縮檔中...'); clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
-                fetch(API_URL, { method: 'POST', body: finalPayload }).then(res => res.json()).then(data => {
+                fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
                     if(data.status === "success") { 
                         setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 儲存成功！高壓縮檔案已同步至 Google 雲端。");
                     }
@@ -1237,7 +1449,11 @@
         function loadData() {
             let isLoaded = false;
             const fallbackTimeout = setTimeout(() => {
-                if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '網路逾時(讀取本機)', true); }
+                if(!isLoaded) {
+                    isLoaded = true;
+                    loadFromLocal();
+                    setStatus('cloud_off', '網路逾時(讀取本機)', true);
+                }
             }, 10000);
 
             const template = document.getElementById('default-template');
@@ -1250,12 +1466,12 @@
             }
             fetch(API_URL).then(res => res.json()).then(rawData => {
                 if(isLoaded) return;
-                isLoaded = true; clearTimeout(fallbackTimeout);
+                isLoaded = true;
+                clearTimeout(fallbackTimeout);
                 
-                // 🚀 自動解壓縮引擎
                 let state = rawData;
                 if (rawData && rawData.isCompressed) {
-                    try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) { console.error("解壓縮失敗", e); }
+                    try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
                 }
 
                 if (state && state.html) {
@@ -1269,7 +1485,8 @@
                 finalizeLoad();
             }).catch(e => { 
                 if(isLoaded) return;
-                isLoaded = true; clearTimeout(fallbackTimeout);
+                isLoaded = true;
+                clearTimeout(fallbackTimeout);
                 loadFromLocal(); setStatus('cloud_off', '離線模式(讀取本機)', true); 
             });
         }
@@ -1280,7 +1497,8 @@
                 let state = null;
                 try {
                     let parsed = JSON.parse(saved);
-                    if (parsed.isCompressed) { state = JSON.parse(LZString.decompressFromUTF16(parsed.data)); } else { state = parsed; }
+                    if (parsed.isCompressed) { state = JSON.parse(LZString.decompressFromUTF16(parsed.data)); } 
+                    else { state = parsed; }
                 } catch(e) {}
                 
                 if(state && state.html) document.getElementById('main-container').innerHTML = state.html;
@@ -1296,7 +1514,8 @@
                 document.querySelectorAll('.amount-input').forEach(input => {
                     let val = parseFloat(input.value.replace(/,/g, '')) || 0;
                     let formatted = val.toLocaleString('en-US');
-                    input.value = formatted; input.setAttribute('value', formatted);
+                    input.value = formatted;
+                    input.setAttribute('value', formatted);
                 });
                 
                 calcBudget();
@@ -1319,34 +1538,53 @@
                     sel.innerHTML = `<option value="背包">背包</option><option value="小包包">小包包</option><option value="託運">託運</option>`;
                     sel.value = currentVal;
                     Array.from(sel.options).forEach(opt => {
-                        if (opt.value === currentVal) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected');
+                        if (opt.value === currentVal) opt.setAttribute('selected', 'selected');
+                        else opt.removeAttribute('selected');
                     });
                 });
 
                 document.querySelectorAll('.btn-nav').forEach(btn => {
                     btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = '';
                     if (btn.closest('#itinerary-days-container')) {
-                        if (btn.innerText.includes('導航') || btn.innerHTML.includes('place')) { btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">place</span>'; btn.classList.add('btn-circle'); }
-                        if (btn.innerText.includes('連結') || btn.innerHTML.includes('add_link')) { btn.innerHTML = '<span class="material-icons-round" style="font-size:18px;">add_link</span>'; btn.classList.add('btn-circle'); }
-                    } else { btn.classList.remove('btn-circle'); }
+                        if (btn.innerText.includes('導航') || btn.innerHTML.includes('place')) {
+                            btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">place</span>';
+                            btn.classList.add('btn-circle');
+                        }
+                        if (btn.innerText.includes('連結') || btn.innerHTML.includes('add_link')) {
+                            btn.innerHTML = '<span class="material-icons-round" style="font-size:18px;">add_link</span>';
+                            btn.classList.add('btn-circle');
+                        }
+                    } else {
+                        btn.classList.remove('btn-circle');
+                    }
                 });
 
                 document.querySelectorAll('a').forEach(a => {
-                    if (a.getAttribute('target') === '_blank') a.removeAttribute('target');
-                    if (a.hasAttribute('onclick') && a.getAttribute('onclick').includes('window.open')) a.removeAttribute('onclick');
+                    if (a.getAttribute('target') === '_blank') {
+                        a.removeAttribute('target');
+                    }
+                    if (a.hasAttribute('onclick') && a.getAttribute('onclick').includes('window.open')) {
+                        a.removeAttribute('onclick');
+                    }
                 });
 
                 document.querySelectorAll('.timeline-item').forEach(item => {
-                    let box = item.querySelector('.content-box'); let actionRow = item.querySelector('.action-row');
-                    if(box && actionRow && actionRow.parentNode !== box) box.appendChild(actionRow);
+                    let box = item.querySelector('.content-box');
+                    let actionRow = item.querySelector('.action-row');
+                    if(box && actionRow && actionRow.parentNode !== box) {
+                        box.appendChild(actionRow);
+                    }
                 });
 
-                updateCurrencyOptionsInTable(); updateDayTabs(); initHistory(); initSortable(); 
+                updateCurrencyOptionsInTable();
+                updateDayTabs(); initHistory(); initSortable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
+                
                 applyShareMode();
 
-            } catch(error) { console.error("載入解析錯誤: ", error); } 
-            finally {
+            } catch(error) {
+                console.error("載入解析錯誤: ", error);
+            } finally {
                 fetchExchangeRate();
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
@@ -1355,6 +1593,35 @@
             }
         }
 
+        function rebindEvents() {
+            document.querySelectorAll('.img-wrapper').forEach(wrapper => {
+                const img = wrapper.querySelector('img'); const delBtn = wrapper.querySelector('.img-del-btn');
+                if(img) img.onclick = function(e) { openImageModal(this.src, e); };
+                if(delBtn) delBtn.onclick = function(e) { 
+                    e.stopPropagation(); 
+                    if(confirm("確定刪除？")) { 
+                        if(img) deleteImageFromCloud(img.src);
+                        wrapper.remove(); 
+                        saveData(); 
+                    } 
+                };
+            });
+            document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
+                const img = wrap.querySelector('img'); 
+                const delBtn = wrap.querySelector('div[onclick*="deleteReceiptThumb"]');
+                if(img && !delBtn) {
+                    wrap.outerHTML = `
+                        <div class="receipt-thumb-wrap">
+                            <img src="${img.src}" onclick="openImageModal(this.src, event)">
+                            <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
+                        </div>`;
+                }
+            });
+            document.querySelectorAll('.item-thumb-box img').forEach(img => {
+                img.onclick = function(e) { openImageModal(this.src, e); };
+            });
+        }
+        
         window.onload = loadData;
     </script>
 </body>
