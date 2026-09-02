@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2026 京阪</title>
-    <!-- 啟用全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="京阪">
@@ -32,7 +31,6 @@
             --danger-color: #e57373;
         }
 
-        /* 🌙 深色模式色彩變數 */
         body.dark-mode {
             --bg-color: #121212;
             --primary-color: #7ba3d8; 
@@ -69,7 +67,6 @@
         .container { padding: 0 15px; }
         .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s ease; }
         
-        /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
         .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; -webkit-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important; }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
@@ -135,7 +132,6 @@
         /* Buttons & Labels */
         .action-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;}
         .action-row::-webkit-scrollbar { display: none; }
-        
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap; }
         .btn-nav:active { transform: scale(0.95); }
         .btn-circle { width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0; }
@@ -180,7 +176,7 @@
         .thumbnail-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
         .img-wrapper { position: relative; width: 70px; height: 70px; }
         .img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; }
 
         /* Bottom Nav & Modals */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;}
@@ -196,11 +192,10 @@
         .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
 
-        /* 🌟 PDF 匯出隱藏與排版設定 */
         @media print {
             .global-controls, .bottom-nav, .add-btn, .delete-btn, .hero, .day-tabs-wrapper, .item-thumb-box, .transport-icon, .btn-circle, .btn-nav, .img-del-btn { display: none !important; }
             body { background: white !important; color: black !important; padding-bottom: 0 !important; }
-            body.dark-mode { filter: invert(1) hue-rotate(180deg); } /* 列印時強制轉回白底黑字 */
+            body.dark-mode { filter: invert(1) hue-rotate(180deg); } 
             .container { padding: 0 !important; }
             .glass-card { background: none !important; border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; margin-bottom: 20px;}
             .tab-content { display: block !important; } 
@@ -224,7 +219,6 @@
             var splashImg = document.getElementById('splash-bg-img');
             if (splashImg) splashImg.style.display = 'none';
         }
-        // 🌟 初始化深色模式偏好
         if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) {
             document.body.classList.add('dark-mode');
         }
@@ -243,7 +237,6 @@
                 <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;"><span class="material-icons-round" style="font-size:13px;">redo</span> 重做</button>
                 <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;"><span class="material-icons-round" style="font-size:13px;">refresh</span> 重載</button>
                 <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;"><span class="material-icons-round" style="font-size:13px;">share</span> 分享</button>
-                <!-- 🌟 新增深色模式切換與 PDF 匯出 -->
                 <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151;"><span class="material-icons-round" id="dark-mode-icon" style="font-size:13px;">dark_mode</span> 切換</button>
                 <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b;"><span class="material-icons-round" style="font-size:13px;">picture_as_pdf</span> 匯出</button>
             </div>
@@ -251,7 +244,6 @@
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <!-- 🌟 動態即時匯率顯示區 (點擊可切換國家幣別) -->
         <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="font-size: 10px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 4px 8px; border-radius: 8px; flex-shrink:0; margin-left: 8px; cursor: pointer; line-height: 1.2; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition:0.3s;">
             JPY 匯率<br><span style="font-size:13px; color:#e53935;" id="rate-num">載入中</span>
         </div>
@@ -378,13 +370,16 @@
         </div>
 
         <div id="tab-budget" class="tab-content">
-            <div class="glass-card">
-                <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
-                <div style="margin-bottom: 15px; background: transparent; padding: 4px; border-radius: 8px;">
-                    <div style="font-size: 13px; color: #555; margin-bottom: 8px; font-weight: bold;">付款人清單：</div>
+            <div class="glass-card" style="padding-top: 10px;">
+                <h2 class="section-title" style="margin-bottom: 5px;"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
+                <!-- 🌟 修正：移除多餘的 margin-bottom 與 padding，消除橘框空白 -->
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 13px; color: #555; margin-bottom: 4px; font-weight: bold;">付款人清單：</div>
                     <div id="payer-tags-container"></div>
-                    <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
+                    <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none; margin-top: 4px;">+ 新增付款人</button>
                 </div>
+                <!-- 🌟 修正：綠框提示文字改為單行且自動截斷 -->
+                <div style="font-size: 10px; color: #888; margin-bottom: 8px; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">輸入金額自動套用會計格式。最右側框框可上傳發票收據照片。</div>
                 <table id="budget-table">
                     <tr><th>項目</th><th>付款人</th><th>幣別</th><th>金額</th><th>操作</th></tr>
                     <tbody id="budget-tbody"></tbody>
@@ -475,16 +470,13 @@
         let currentItemThumbBox = null;
         let syncTimeout = null;
         
-        // 🌟 記錄所有的匯率 (對台幣)
         let allRatesToTWD = { TWD: 1 };
-        // 🌟 當前使用者選擇的旅遊幣別 (預設 JPY)
         let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
         
         let undoStack = [];
         let redoStack = [];
         let currentStateSnapshot = null;
 
-        // 🌟 深色模式切換
         function toggleDarkMode() {
             let isDark = document.body.classList.toggle('dark-mode');
             localStorage.setItem('travelAppDarkMode', isDark);
@@ -492,7 +484,6 @@
             if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode';
         }
         
-        // 🌟 PDF 匯出功能
         function exportToPDF() {
             alert('💡 小撇步：\n在即將跳出的列印預覽畫面中，您可以直接「用兩指往外放大」畫面，就能瞬間把行程表存成高畫質 PDF 檔喔！');
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
@@ -506,7 +497,6 @@
             }
         }
 
-        // 🌟 動態獲取最新即時匯率
         function fetchExchangeRate(manual = false) {
             if(manual) setStatus('sync', '更新匯率中...');
             
@@ -536,7 +526,6 @@
             document.getElementById('exchange-rate-display').innerHTML = `${currentTravelCurrency} 匯率<br><span style="font-size:13px; color:#e53935;">${rate.toFixed(4)}</span>`;
         }
 
-        // 🌟 切換主要旅遊幣別
         function changeTravelCurrency() {
             let curr = prompt('請輸入旅遊當地幣別代碼\n(例如 JPY日圓, KRW韓元, THB泰銖, USD美金)：', currentTravelCurrency);
             if(curr) {
@@ -560,10 +549,18 @@
             });
         }
 
+        // 🌟 核心：存檔前的 DOM 極致淨化掃描
         function captureState() {
             let tempContainer = document.createElement('div');
             tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
-            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag').forEach(el => el.classList.remove('sortable-ghost', 'sortable-drag'));
+            
+            // 清除所有的鎖定特效與拖曳垃圾標籤
+            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
+                el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
+            });
+            
             return { html: tempContainer.innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
         }
 
@@ -1148,13 +1145,11 @@
             input.value = ''; input.click();
         }
 
-        // 🌟 新增記帳項目：寫死當下最新匯率 (Snapshot 機制)
         function addBudgetRow(item = '新項目', payerName = payers[0], currency = currentTravelCurrency, amount = '0') {
             const tbody = document.getElementById('budget-tbody');
             const tr = document.createElement('tr');
             tr.className = 'budget-row';
             
-            // 綁定當下的匯率快照 (Snapshot)
             let currentRate = allRatesToTWD[currency] || 1;
             tr.setAttribute('data-rate', currentRate);
 
@@ -1202,14 +1197,13 @@
                     amountInputEl.setAttribute('value', formatted); 
                 }
 
-                // 🌟 使用鎖定的匯率計算
                 let rowRate = parseFloat(r.getAttribute('data-rate'));
                 if (isNaN(rowRate) || !rowRate) {
-                    rowRate = exchangeRatesToTWD[rowCurr] || 1; // 相容舊版資料
+                    rowRate = exchangeRatesToTWD[rowCurr] || 1; 
                     r.setAttribute('data-rate', rowRate);
                 }
                 
-                if (rowCurr === 'TWD') rowRate = 1; // 台幣永遠是 1
+                if (rowCurr === 'TWD') rowRate = 1; 
                 
                 let amtInTWD = amount * rowRate;
                 if(person) { if(!totals[person]) totals[person] = 0; totals[person] += amtInTWD; }
@@ -1223,34 +1217,12 @@
             if(resEl) resEl.innerHTML = resHTML;
         }
 
-        function switchTodoPerson(personName) {
-            document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none');
-            let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`);
-            if(target) target.style.display = 'block';
-            let select = document.getElementById('todo-person-select');
-            Array.from(select.options).forEach(opt => {
-                if(opt.value === personName) opt.setAttribute('selected', 'selected');
-                else opt.removeAttribute('selected');
-            });
-            saveData();
-        }
-
-        function addNewTodoPerson() {
-            let name = prompt('請輸入要新增的人員名稱：');
-            if(!name || name.trim() === '') return;
-            if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; }
-            let currentTemplateName = document.getElementById('todo-person-select').value;
-            let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`);
-            let newList = defaultList.cloneNode(true);
-            newList.setAttribute('data-person', name);
-            newList.style.display = 'none';
-            newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed'));
-            document.getElementById('person-todo-container').appendChild(newList);
-            let select = document.getElementById('todo-person-select');
-            let opt = document.createElement('option');
-            opt.value = name; opt.innerText = name;
-            select.appendChild(opt); select.value = name;
-            switchTodoPerson(name); initSortable(); 
+        // 🌟 雲端圖片同步刪除 API 呼叫
+        function deleteImageFromDrive(imageUrl) {
+            const payload = JSON.stringify({ action: 'deleteImage', url: imageUrl });
+            fetch(API_URL, { method: 'POST', body: payload })
+            .then(res => res.json()).then(data => { console.log('雲端圖片刪除指令已發送'); })
+            .catch(e => { console.error('雲端圖片刪除失敗', e); });
         }
 
         let currentUploadTarget = '';
@@ -1304,9 +1276,28 @@
             if (file && currentReceiptBox) {
                 compressImage(file, function(compressedDataUrl) {
                     uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this.src, event)"></div>`; saveData();
+                        // 🌟 預算收據：加入專屬的紅框刪除按鈕
+                        currentReceiptBox.outerHTML = `
+                            <div class="receipt-thumb-wrap">
+                                <img src="${driveUrl}" onclick="openImageModal(this.src, event)">
+                                <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2;">&times;</div>
+                            </div>
+                        `; 
+                        saveData();
                     });
                 });
+            }
+        }
+        
+        // 🌟 預算收據專用刪除功能 (連動雲端)
+        function deleteReceiptThumb(delBtn, event) {
+            event.stopPropagation();
+            if(confirm('確定移除此收據圖片？(雲端檔案也會同步刪除)')) {
+                let wrap = delBtn.closest('.receipt-thumb-wrap');
+                let imgUrl = wrap.querySelector('img').src;
+                deleteImageFromDrive(imgUrl);
+                wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
+                saveData();
             }
         }
 
@@ -1328,9 +1319,14 @@
 
         function deleteItemThumb(delBtn, event) {
             event.stopPropagation();
-            if(confirm('確定移除此圖片？')) {
-                let box = delBtn.closest('.item-thumb-box'); box.style.border = '1px dashed #ccc';
-                box.innerHTML = `<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>`; saveData();
+            if(confirm('確定移除此圖片？(雲端檔案也會同步刪除)')) {
+                let box = delBtn.closest('.item-thumb-box');
+                let imgUrl = box.querySelector('img').src;
+                deleteImageFromDrive(imgUrl);
+                
+                box.style.border = '1px dashed #ccc';
+                box.innerHTML = `<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>`; 
+                saveData();
             }
         }
 
@@ -1338,7 +1334,14 @@
             const wrapper = document.createElement('div'); wrapper.className = 'img-wrapper';
             const img = document.createElement('img'); img.src = src; img.onclick = function(e) { openImageModal(this.src, e); };
             const delBtn = document.createElement('div'); delBtn.className = 'img-del-btn'; delBtn.innerHTML = '&times;';
-            delBtn.onclick = function(e) { e.stopPropagation(); if(confirm("確定要刪除這張圖片嗎？")) { wrapper.remove(); saveData(); } };
+            delBtn.onclick = function(e) { 
+                e.stopPropagation(); 
+                if(confirm("確定要刪除這張圖片嗎？(雲端檔案也會同步刪除)")) { 
+                    deleteImageFromDrive(src);
+                    wrapper.remove(); 
+                    saveData(); 
+                } 
+            };
             wrapper.appendChild(img); wrapper.appendChild(delBtn); document.getElementById(containerId).appendChild(wrapper);
         }
 
@@ -1377,7 +1380,7 @@
             saveData(); 
         });
 
-        // 🌟 核心升級：存檔時執行 DOM 淨化與 LZ-String 無損壓縮
+        // 🌟 終極淨化 + LZ-String 高效壓縮存檔
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
 
@@ -1385,11 +1388,13 @@
             
             let tempContainer = document.createElement('div');
             tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
+            
+            // 🧹 深度淨化 DOM：移除臨時特效、拖曳殘留，確保檔案純淨
             tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
             tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-            
-            // 🧹 執行 DOM 淨化：自動刪除廢棄標籤，極致瘦身
-            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag').forEach(el => el.classList.remove('sortable-ghost', 'sortable-drag'));
+            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
+                el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
+            });
 
             const state = { 
                 html: tempContainer.innerHTML, 
@@ -1576,14 +1581,40 @@
             }
         }
 
+        // 🌟 確保所有歷史圖片都有綁定刪除事件
         function rebindEvents() {
             document.querySelectorAll('.img-wrapper').forEach(wrapper => {
                 const img = wrapper.querySelector('img'); const delBtn = wrapper.querySelector('.img-del-btn');
                 if(img) img.onclick = function(e) { openImageModal(this.src, e); };
-                if(delBtn) delBtn.onclick = function(e) { e.stopPropagation(); if(confirm("確定刪除？")) { wrapper.remove(); saveData(); } };
+                if(delBtn) delBtn.onclick = function(e) { 
+                    e.stopPropagation(); 
+                    if(confirm("確定刪除？(雲端檔案也會同步刪除)")) { 
+                        if(img) deleteImageFromDrive(img.src);
+                        wrapper.remove(); 
+                        saveData(); 
+                    } 
+                };
             });
-            document.querySelectorAll('.receipt-thumb-wrap img, .item-thumb-box img').forEach(img => {
-                img.onclick = function(e) { openImageModal(this.src, e); };
+            
+            document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
+                const img = wrap.querySelector('img');
+                const delBtn = wrap.querySelector('div');
+                if(img) img.onclick = function(e) { openImageModal(this.src, e); };
+                if(delBtn) delBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    if(confirm("確定移除此收據圖片？(雲端檔案也會同步刪除)")) {
+                        if(img) deleteImageFromDrive(img.src);
+                        wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
+                        saveData();
+                    }
+                }
+            });
+            
+            document.querySelectorAll('.item-thumb-box:not(:empty)').forEach(box => {
+                const img = box.querySelector('img');
+                const delBtn = box.querySelector('div:not(.material-icons-round)');
+                if(img) img.onclick = function(e) { openImageModal(this.src, e); };
+                if(delBtn) delBtn.onclick = function(e) { deleteItemThumb(delBtn, e); }
             });
         }
         
