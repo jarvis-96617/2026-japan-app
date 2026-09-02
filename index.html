@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
-    <!-- 載入觸控拖曳排序套件 SortableJS -->
+    <!-- 🌟 載入觸控拖曳排序套件 SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- 🌟 載入 LZ-String 高效壓縮演算法引擎 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
@@ -240,17 +240,19 @@
         </div>
     </div>
 
+    <!-- 🌟 綠框控制列：圖示放大、文字隱藏，加入離線備份上傳/下載功能 -->
     <div class="global-controls" style="padding: 8px 15px 6px 15px;">
         <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
-            <!-- 🌟 按鈕精簡化：拔除文字、放大圖示 -->
             <div style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
-                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;"><span class="material-icons-round" style="font-size:13px;">save</span> 儲存</button>
-                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;"><span class="material-icons-round" style="font-size:13px;">undo</span> 復原</button>
-                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;"><span class="material-icons-round" style="font-size:13px;">redo</span> 重做</button>
-                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;"><span class="material-icons-round" style="font-size:13px;">refresh</span> 重載</button>
-                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;"><span class="material-icons-round" style="font-size:13px;">share</span> 分享</button>
+                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;"><span class="material-icons-round" style="font-size:15px;">save</span> 儲存</button>
+                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af; padding: 5px 8px;" title="復原"><span class="material-icons-round" style="font-size:15px;">undo</span></button>
+                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb; padding: 5px 8px;" title="重做"><span class="material-icons-round" style="font-size:15px;">redo</span></button>
+                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6; padding: 5px 8px;" title="重載"><span class="material-icons-round" style="font-size:15px;">refresh</span></button>
+                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7; padding: 5px 8px;" title="專屬分享"><span class="material-icons-round" style="font-size:15px;">share</span></button>
                 <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 5px 8px;" title="切換深色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px;">dark_mode</span></button>
                 <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b; padding: 5px 8px;" title="匯出為 PDF"><span class="material-icons-round" style="font-size:15px;">picture_as_pdf</span></button>
+                <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b; padding: 5px 8px;" title="下載實體備份檔"><span class="material-icons-round" style="font-size:15px;">download</span></button>
+                <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c; padding: 5px 8px;" title="匯入備份檔還原"><span class="material-icons-round" style="font-size:15px;">upload</span></button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
@@ -379,13 +381,13 @@
         </div>
 
         <div id="tab-budget" class="tab-content">
-            <div class="glass-card">
-                <h2 class="section-title"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
-                <div style="margin-bottom: 8px; background: transparent; padding: 0px;">
+            <div class="glass-card" style="padding: 12px 10px;">
+                <h2 class="section-title" style="margin-bottom: 4px;"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
+                <div style="margin-bottom: 6px; padding: 0px;">
+                    <div style="font-size: 12px; color: #555; margin-bottom: 4px; font-weight: bold;">建立與管理付款人清單：</div>
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
-                        <span style="font-size: 12px; color: var(--primary-color); font-weight: bold;">付款人：</span>
-                        <span id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:5px;"></span>
-                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增</button>
+                        <div id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:5px;"></div>
+                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
                     </div>
                 </div>
                 
@@ -398,7 +400,7 @@
                     <tbody id="budget-tbody"></tbody>
                 </table>
                 <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 4px;">+ 新增記帳項目</button>
-                <div id="budget-result" style="margin-top:10px; padding-top:10px; border-top:1px dashed #ccc; line-height: 1.8;"></div>
+                <div id="budget-result" style="margin-top:8px; padding-top:8px; border-top:1px dashed #ccc; line-height: 1.6;"></div>
             </div>
         </div>
 
@@ -460,6 +462,8 @@
     <input type="file" id="global-file-input" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
     <input type="file" id="receipt-file-input" accept="image/*" style="display: none;" onchange="handleReceiptUpload(event)">
     <input type="file" id="item-file-input" accept="image/*" style="display: none;" onchange="handleItemUpload(event)">
+    <!-- 🌟 新增實體備份上傳輸入框 -->
+    <input type="file" id="backup-file-input" accept=".json,.txt" style="display: none;" onchange="handleBackupUpload(event)">
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tab-itinerary', this)"><span class="material-icons-round">format_list_bulleted</span>行程</div>
@@ -505,9 +509,78 @@
             
             window.print();
             
-            if (!newSearchParams(window.location.search).get('share')) {
+            if (!new URLSearchParams(window.location.search).get('share')) {
                 cards.forEach((c, idx) => { c.style.display = originalDisplays[idx]; });
             }
+        }
+
+        // 🌟 實體備份匯出功能 (下載純淨壓縮 JSON 檔)
+        function exportBackup() {
+            try {
+                let state = captureState();
+                let payload = JSON.stringify({ 
+                    isCompressed: true, 
+                    data: LZString.compressToUTF16(JSON.stringify(state)) 
+                });
+                let blob = new Blob([payload], {type: "application/json"});
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                let dateStr = new Date().toISOString().slice(0,10).replace(/-/g, "");
+                a.download = `Keihan_Backup_${dateStr}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert("✅ 實體備份檔下載成功！\n請妥善保存於手機的「檔案」或雲端中，以便在無網路時還原。");
+            } catch (e) {
+                alert("❌ 備份下載失敗：" + e.message);
+            }
+        }
+
+        // 🌟 實體備份匯入功能
+        function triggerImportBackup() {
+            if(confirm("⚠️ 警告：匯入備份檔將會覆蓋您當前畫面上所有的資料！\n確定要繼續嗎？")) {
+                let input = document.getElementById('backup-file-input');
+                input.value = ''; // 確保重複選同一個檔案也會觸發
+                input.click();
+            }
+        }
+
+        // 🌟 處理備份檔還原解析
+        function handleBackupUpload(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let content = e.target.result;
+                    let parsed = JSON.parse(content);
+                    let state = null;
+                    if (parsed.isCompressed && parsed.data) {
+                        state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
+                    } else if (parsed.html) {
+                        state = parsed; // 相容未壓縮的純 JSON 舊檔
+                    } else {
+                        throw new Error("備份檔格式不正確");
+                    }
+                    
+                    if(state && state.html) {
+                        document.getElementById('main-container').innerHTML = state.html;
+                        if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                        if(state.payersData) payers = state.payersData;
+                        
+                        renderPayerTags();
+                        rebindEvents();
+                        finalizeLoad(); // 重新綁定事件與計算
+                        saveData(true); // 強制上傳覆蓋雲端
+                        alert("✅ 備份檔匯入成功！資料已完全還原並同步至雲端。");
+                    }
+                } catch(err) {
+                    alert("❌ 匯入失敗：檔案格式錯誤或已損毀。\n" + err.message);
+                }
+            };
+            reader.readAsText(file);
         }
 
         function deleteImageFromCloud(imgUrl) {
@@ -1458,6 +1531,7 @@
             saveData(); 
         });
 
+        // 🌟 核心存檔邏輯：套用深度淨化與壓縮演算法
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             if (!skipHistory) { recordHistory(); }
