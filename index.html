@@ -63,15 +63,15 @@
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 0px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 5px rgba(0,0,0,0.05); transition: 0.3s; }
         body.dark-mode .global-controls { background: rgba(18, 18, 18, 0.95); }
         
-        /* 🌟 按鈕防護：阻擋 iOS 反白與放大鏡 */
+        /* 🌟 按鈕防護強化：強制阻擋 iOS 反白與放大鏡 */
+        .manual-save-btn, .manual-save-btn * { 
+            -webkit-touch-callout: none !important; 
+            -webkit-user-select: none !important; 
+            user-select: none !important; 
+        }
         .manual-save-btn { 
             background: var(--primary-color); color: white; border: none; padding: 5px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap;
-            -webkit-touch-callout: none; /* 禁用長按系統選單 */
-            -webkit-user-select: none; /* 禁用文字反白 */
-            user-select: none; 
         }
-        /* 確保點擊或長按時，內部的圖示不會變成觸發目標 */
-        .manual-save-btn * { pointer-events: none; }
         .manual-save-btn:active { transform: scale(0.92); }
 
         /* 手機版專用：長按提示框 (Tooltip) */
@@ -250,11 +250,11 @@
     <div id="mobile-tooltip"></div>
     
     <script>
-        // 初始化全域防呆與計時器
+        // 🌟 初始化全域防呆與計時器 (絕對不可重複宣告)
         let isAppReady = false;
         let lastActiveTime = Date.now();
 
-        // 防呆：休眠喚醒自動同步
+        // 🌟 防呆：休眠喚醒自動同步
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === 'visible') {
                 if (Date.now() - lastActiveTime > 1800000) {
@@ -581,18 +581,20 @@
                 btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideTip(); });
                 
                 // 🌟 關鍵 1：阻擋 iOS 系統預設長按跳出放大鏡或拷貝選單
-                btn.addEventListener('contextmenu', (e) => { e.preventDefault(); });
+                btn.addEventListener('contextmenu', (e) => { 
+                    e.preventDefault(); 
+                    return false;
+                });
 
                 // PC版懸停
                 btn.addEventListener('mouseenter', showTip);
                 btn.addEventListener('mouseleave', hideTip);
             });
 
-            // 🌟 關鍵 2：點擊畫面其他任何地方，強制消除卡住的提示框
-            document.addEventListener('touchstart', (e) => {
-                if (!e.target.closest('.manual-save-btn')) {
-                    hideTip();
-                }
+            // 🌟 關鍵 2：全域偵測，只要手指離開螢幕，強制消除卡住的提示框
+            window.addEventListener('touchend', () => {
+                clearTimeout(holdTimer);
+                hideTip();
             }, {passive: true});
         }
 
@@ -748,7 +750,7 @@
             });
         }
 
-        // 🌟 終極 DOM 淨化引擎：無死角清除廢棄標籤與無用屬性
+        // 🌟 終極 DOM 淨化引擎：全域掃描清除廢棄標籤與無用屬性
         function captureState() {
             let tempMain = document.createElement('div');
             tempMain.innerHTML = document.getElementById('main-container').innerHTML;
@@ -757,18 +759,21 @@
             tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
             [tempMain, tempHero].forEach(container => {
+                // 清除鎖定與廢棄 class
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-                
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
                 
-                // 深度淨化：拔除拖曳套件與編輯過程殘留的行內樣式及空屬性
-                container.querySelectorAll('[draggable]').forEach(el => el.removeAttribute('draggable'));
-                container.querySelectorAll('.timeline-item').forEach(el => el.removeAttribute('style'));
-                container.querySelectorAll('[style=""]').forEach(el => el.removeAttribute('style'));
-                container.querySelectorAll('[class=""]').forEach(el => el.removeAttribute('class'));
+                // 全域掃描：清除所有拖曳殘留的屬性與空殼
+                container.querySelectorAll('*').forEach(el => {
+                    el.removeAttribute('draggable');
+                    if (el.classList.contains('timeline-item')) el.removeAttribute('style'); // 保險起見移除行程專屬樣式
+                    if (el.getAttribute('style') === '') el.removeAttribute('style'); // 拔除空樣式
+                    if (el.getAttribute('class') === '') el.removeAttribute('class'); // 拔除空類別
+                    if (el.getAttribute('contenteditable') === 'false') el.setAttribute('contenteditable', 'true'); // 修復可能在分享模式中被改掉的屬性
+                });
             });
 
             return { 
@@ -777,32 +782,6 @@
                 payersData: JSON.parse(JSON.stringify(payers)) 
             };
         }
-
-        // 初始化全域防呆與計時器
-        let isAppReady = false;
-        let lastActiveTime = Date.now();
-
-        // 🌟 防呆：休眠喚醒自動同步
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible') {
-                if (Date.now() - lastActiveTime > 1800000) {
-                    isAppReady = false; 
-                    const splash = document.getElementById('splash-screen');
-                    if (splash) {
-                        let msgEl = splash.querySelector('.splash-text p');
-                        if(msgEl) msgEl.innerText = '喚醒裝置，同步最新資料...';
-                        splash.style.display = 'flex';
-                        splash.style.opacity = '1';
-                    }
-                    loadData(); 
-                }
-            }
-            lastActiveTime = Date.now();
-        });
-
-        ['touchstart', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
-            document.addEventListener(evt, () => { lastActiveTime = Date.now(); }, {passive: true});
-        });
 
         function initHistory() {
             undoStack = []; redoStack = []; currentStateSnapshot = captureState();
