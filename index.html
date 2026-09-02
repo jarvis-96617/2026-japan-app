@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2026 京阪</title>
+    <!-- 啟用全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="京阪">
+    
     <link rel="apple-touch-icon" href="icon.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- 載入觸控拖曳排序套件 SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- 🌟 載入 LZ-String 高效壓縮演算法引擎 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
     <style>
         :root {
@@ -62,6 +69,7 @@
         .container { padding: 0 15px; }
         .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s ease; }
         
+        /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
         .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; -webkit-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important; }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
@@ -73,6 +81,7 @@
         body.dark-mode .timeline-item { border-bottom-color: #333; }
         .timeline-item:last-child { border-bottom: none; }
         .timeline-item.completed { opacity: 0.35; }
+        
         #tab-todo .timeline-item, #tab-shopping .timeline-item, #tab-transport .timeline-item { padding: 4px 4px; }
         .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px; transition: 0.3s;}
         body.dark-mode .todo-category-header { color: #ddd; border-bottom-color: #444; }
@@ -126,6 +135,7 @@
         /* Buttons & Labels */
         .action-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;}
         .action-row::-webkit-scrollbar { display: none; }
+        
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap; }
         .btn-nav:active { transform: scale(0.95); }
         .btn-circle { width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0; }
@@ -214,7 +224,7 @@
             var splashImg = document.getElementById('splash-bg-img');
             if (splashImg) splashImg.style.display = 'none';
         }
-        // 初始化深色模式
+        // 🌟 初始化深色模式偏好
         if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) {
             document.body.classList.add('dark-mode');
         }
@@ -241,7 +251,7 @@
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <!-- 🌟 動態即時匯率顯示區 (可點擊切換幣別) -->
+        <!-- 🌟 動態即時匯率顯示區 (點擊可切換國家幣別) -->
         <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="font-size: 10px; font-weight: bold; color: var(--primary-color); text-align: center; background: #eef2f5; padding: 4px 8px; border-radius: 8px; flex-shrink:0; margin-left: 8px; cursor: pointer; line-height: 1.2; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition:0.3s;">
             JPY 匯率<br><span style="font-size:13px; color:#e53935;" id="rate-num">載入中</span>
         </div>
@@ -432,7 +442,7 @@
                             <select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select>
                             <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
-                        <div class="flex-between" style="gap:10px; margin-top:10px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
+                        <div class="flex-between" style="gap:10px; margin-top:15px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
                     </div>
                 </div>
             </div>
@@ -474,7 +484,7 @@
         let redoStack = [];
         let currentStateSnapshot = null;
 
-        // 深色模式切換
+        // 🌟 深色模式切換
         function toggleDarkMode() {
             let isDark = document.body.classList.toggle('dark-mode');
             localStorage.setItem('travelAppDarkMode', isDark);
@@ -485,14 +495,12 @@
         // 🌟 PDF 匯出功能
         function exportToPDF() {
             alert('💡 小撇步：\n在即將跳出的列印預覽畫面中，您可以直接「用兩指往外放大」畫面，就能瞬間把行程表存成高畫質 PDF 檔喔！');
-            // 將所有天數卡片展開以確保完整列印
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
             let originalDisplays = [];
             cards.forEach(c => { originalDisplays.push(c.style.display); c.style.display = 'block'; });
             
             window.print();
             
-            // 印完恢復原狀 (如果不是在分享模式下)
             if (!new URLSearchParams(window.location.search).get('share')) {
                 cards.forEach((c, idx) => { c.style.display = originalDisplays[idx]; });
             }
@@ -506,7 +514,6 @@
             .then(res => res.json())
             .then(data => {
                 if(data && data.rates) {
-                    // API 回傳的是 1 TWD = 多少外幣。我們需要的是 1外幣 = 多少 TWD。
                     allRatesToTWD['JPY'] = 1 / (data.rates['JPY'] || 4.65);
                     allRatesToTWD['KRW'] = 1 / (data.rates['KRW'] || 41.5);
                     allRatesToTWD['THB'] = 1 / (data.rates['THB'] || 1.12);
@@ -537,7 +544,6 @@
                 currentTravelCurrency = curr;
                 localStorage.setItem('travelAppCurrency', currentTravelCurrency);
                 
-                // 動態更新下拉選單
                 updateCurrencyOptionsInTable();
                 fetchExchangeRate(true);
             }
@@ -548,14 +554,17 @@
                 let currentVal = sel.value;
                 let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR'];
                 if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
-                if(!opts.includes(currentVal)) opts.push(currentVal); // 保留舊的冷門幣別
+                if(!opts.includes(currentVal)) opts.push(currentVal); 
                 
                 sel.innerHTML = opts.map(c => `<option value="${c}" ${c===currentVal?'selected':''}>${c}</option>`).join('');
             });
         }
 
         function captureState() {
-            return { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
+            let tempContainer = document.createElement('div');
+            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
+            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag').forEach(el => el.classList.remove('sortable-ghost', 'sortable-drag'));
+            return { html: tempContainer.innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
         }
 
         function initHistory() {
@@ -1257,13 +1266,10 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    // 🌟 升級 1：將最大寬度從 1200 縮小至 600，大幅減少體積
-                    const MAX_WIDTH = 600; 
-                    let scaleSize = 1;
+                    const MAX_WIDTH = 600; let scaleSize = 1;
                     if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
                     canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
                     const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    // 🌟 升級 2：將 JPEG 壓縮率從 0.8 (80%) 調降至 0.6 (60%)
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
                     callback(dataUrl);
                 }
@@ -1371,34 +1377,53 @@
             saveData(); 
         });
 
+        // 🌟 核心升級：存檔時執行 DOM 淨化與 LZ-String 無損壓縮
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
 
             if (!skipHistory) { recordHistory(); }
-            const state = { html: document.getElementById('main-container').innerHTML, heroHtml: document.getElementById('hero-container').innerHTML, payersData: payers };
-            const payload = JSON.stringify(state);
-            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
+            
+            let tempContainer = document.createElement('div');
+            tempContainer.innerHTML = document.getElementById('main-container').innerHTML;
+            tempContainer.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+            tempContainer.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+            
+            // 🧹 執行 DOM 淨化：自動刪除廢棄標籤，極致瘦身
+            tempContainer.querySelectorAll('.sortable-ghost, .sortable-drag').forEach(el => el.classList.remove('sortable-ghost', 'sortable-drag'));
+
+            const state = { 
+                html: tempContainer.innerHTML, 
+                heroHtml: document.getElementById('hero-container').innerHTML, 
+                payersData: payers
+            };
+            
+            // 🚀 執行 LZ-String 超高密度演算法壓縮
+            const jsonString = JSON.stringify(state);
+            const compressedData = LZString.compressToUTF16(jsonString);
+            const finalPayload = JSON.stringify({ isCompressed: true, data: compressedData });
+
+            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', finalPayload);
             localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+            
             if(!API_URL.startsWith("https://script.google.com")) {
                 setStatus('cloud_off', '本機模式(未綁雲端)', true);
                 if(isManual) alert("❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)"); return;
             }
-            setStatus('sync', '雲端同步中...'); clearTimeout(syncTimeout);
+            setStatus('sync', '雲端同步壓縮檔中...'); clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
-                fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
+                fetch(API_URL, { method: 'POST', body: finalPayload }).then(res => res.json()).then(data => {
                     if(data.status === "success") { 
-                        setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 儲存成功！資料已同步至 Google 雲端。");
+                        setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 儲存成功！高壓縮檔案已同步至 Google 雲端。");
                     }
                 }).catch(e => {
                     setStatus('cloud_off', '連線失敗(已存本機)', true);
-                    if(isManual) alert("❌ 同步失敗！\n可能是圖片檔案過大超出了 Google 接收極限，請嘗試刪除幾張發票照片。");
+                    if(isManual) alert("❌ 同步失敗！請檢查網路連線。");
                 });
             }, isManual ? 0 : 1500); 
         }
 
         function loadData() {
             let isLoaded = false;
-            
             const fallbackTimeout = setTimeout(() => {
                 if(!isLoaded) {
                     isLoaded = true;
@@ -1415,18 +1440,26 @@
                 if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '本機模式(未綁雲端)', true); }
                 return;
             }
-            fetch(API_URL).then(res => res.json()).then(state => {
+            fetch(API_URL).then(res => res.json()).then(rawData => {
                 if(isLoaded) return;
                 isLoaded = true;
                 clearTimeout(fallbackTimeout);
+                
+                // 🚀 自動辨識與解壓縮引擎
+                let state = rawData;
+                if (rawData && rawData.isCompressed) {
+                    try {
+                        state = JSON.parse(LZString.decompressFromUTF16(rawData.data));
+                    } catch(e) { console.error("解壓縮失敗", e); }
+                }
+
                 if (state && state.html) {
                     document.getElementById('main-container').innerHTML = state.html;
                     if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
                     if(state.payersData) payers = state.payersData;
                     renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
                 } else {
-                    // 相容舊存檔寫法
-                    addBudgetRow('住宿訂金', payers[0], 'JPY', '60580'); setStatus('cloud_done', '建立新雲端存檔');
+                    addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); setStatus('cloud_done', '建立新雲端存檔');
                 }
                 finalizeLoad();
             }).catch(e => { 
@@ -1440,12 +1473,22 @@
         function loadFromLocal() {
             const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
             if (saved) {
-                const state = JSON.parse(saved);
-                if(state.html) document.getElementById('main-container').innerHTML = state.html;
-                if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
-                if(state.payersData) payers = state.payersData;
+                // 🚀 自動辨識與解壓縮引擎
+                let state = null;
+                try {
+                    let parsed = JSON.parse(saved);
+                    if (parsed.isCompressed) {
+                        state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
+                    } else {
+                        state = parsed;
+                    }
+                } catch(e) {}
+                
+                if(state && state.html) document.getElementById('main-container').innerHTML = state.html;
+                if(state && state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                if(state && state.payersData) payers = state.payersData;
                 renderPayerTags(); rebindEvents();
-            } else { addBudgetRow('住宿訂金', payers[0], 'JPY', '60580'); }
+            } else { addBudgetRow('住宿訂金', payers[0], 'JPY', '60,580'); }
             finalizeLoad();
         }
 
@@ -1525,7 +1568,6 @@
             } catch(error) {
                 console.error("載入解析錯誤: ", error);
             } finally {
-                // 讀取完畢後，抓取匯率
                 fetchExchangeRate();
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
