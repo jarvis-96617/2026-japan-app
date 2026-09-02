@@ -242,14 +242,15 @@
 
     <div class="global-controls" style="padding: 8px 15px 6px 15px;">
         <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
+            <!-- 🌟 按鈕精簡化：拔除文字、放大圖示 -->
             <div style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
                 <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;"><span class="material-icons-round" style="font-size:13px;">save</span> 儲存</button>
                 <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;"><span class="material-icons-round" style="font-size:13px;">undo</span> 復原</button>
                 <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;"><span class="material-icons-round" style="font-size:13px;">redo</span> 重做</button>
                 <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;"><span class="material-icons-round" style="font-size:13px;">refresh</span> 重載</button>
                 <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;"><span class="material-icons-round" style="font-size:13px;">share</span> 分享</button>
-                <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151;"><span class="material-icons-round" id="dark-mode-icon" style="font-size:13px;">dark_mode</span> 切換</button>
-                <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b;"><span class="material-icons-round" style="font-size:13px;">picture_as_pdf</span> 匯出</button>
+                <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 5px 8px;" title="切換深色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px;">dark_mode</span></button>
+                <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b; padding: 5px 8px;" title="匯出為 PDF"><span class="material-icons-round" style="font-size:15px;">picture_as_pdf</span></button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
@@ -384,7 +385,7 @@
                     <div style="display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
                         <span style="font-size: 12px; color: var(--primary-color); font-weight: bold;">付款人：</span>
                         <span id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:5px;"></span>
-                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); padding: 2px 8px; border-radius: 12px; box-shadow: none;">+ 新增</button>
+                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增</button>
                     </div>
                 </div>
                 
@@ -397,7 +398,7 @@
                     <tbody id="budget-tbody"></tbody>
                 </table>
                 <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 4px;">+ 新增記帳項目</button>
-                <div id="budget-result" style="margin-top:8px; padding-top:8px; border-top:1px dashed #ccc; line-height: 1.6;"></div>
+                <div id="budget-result" style="margin-top:10px; padding-top:10px; border-top:1px dashed #ccc; line-height: 1.8;"></div>
             </div>
         </div>
 
@@ -504,7 +505,7 @@
             
             window.print();
             
-            if (!new URLSearchParams(window.location.search).get('share')) {
+            if (!newSearchParams(window.location.search).get('share')) {
                 cards.forEach((c, idx) => { c.style.display = originalDisplays[idx]; });
             }
         }
@@ -573,7 +574,7 @@
             });
         }
 
-        // 🌟 終極 DOM 淨化：存檔前徹底清除所有無用樣式與屬性
+        // 🌟 終極 DOM 淨化引擎：無死角清除廢棄標籤與無用屬性
         function captureState() {
             let tempMain = document.createElement('div');
             tempMain.innerHTML = document.getElementById('main-container').innerHTML;
@@ -582,14 +583,19 @@
             tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
             [tempMain, tempHero].forEach(container => {
+                // 清除鎖定相關廢棄 class
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 
+                // 清除 Sortable 拖曳殘留 class
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
+                
+                // 清除無用內聯屬性與空殼屬性，極致壓縮
                 container.querySelectorAll('[draggable]').forEach(el => el.removeAttribute('draggable'));
                 container.querySelectorAll('.timeline-item').forEach(el => el.removeAttribute('style'));
+                container.querySelectorAll('[style=""]').forEach(el => el.removeAttribute('style'));
                 container.querySelectorAll('[class=""]').forEach(el => el.removeAttribute('class'));
             });
 
@@ -1452,14 +1458,15 @@
             saveData(); 
         });
 
-        // 🌟 核心存檔邏輯：套用深度淨化與壓縮演算法
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             if (!skipHistory) { recordHistory(); }
             
+            // 🌟 統一使用深度淨化過的核心狀態，不留一絲垃圾標籤
+            const state = captureState(); 
             const payload = JSON.stringify({ 
                 isCompressed: true, 
-                data: LZString.compressToUTF16(JSON.stringify(captureState())) 
+                data: LZString.compressToUTF16(JSON.stringify(state)) 
             });
 
             localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
