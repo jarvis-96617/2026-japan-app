@@ -62,7 +62,16 @@
         /* Global Controls */
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 0px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 5px rgba(0,0,0,0.05); transition: 0.3s; }
         body.dark-mode .global-controls { background: rgba(18, 18, 18, 0.95); }
-        .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 5px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; -webkit-touch-callout: none; user-select: none; }
+        
+        /* 🌟 按鈕防護：阻擋 iOS 反白與放大鏡 */
+        .manual-save-btn { 
+            background: var(--primary-color); color: white; border: none; padding: 5px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap;
+            -webkit-touch-callout: none; /* 禁用長按系統選單 */
+            -webkit-user-select: none; /* 禁用文字反白 */
+            user-select: none; 
+        }
+        /* 確保點擊或長按時，內部的圖示不會變成觸發目標 */
+        .manual-save-btn * { pointer-events: none; }
         .manual-save-btn:active { transform: scale(0.92); }
 
         /* 手機版專用：長按提示框 (Tooltip) */
@@ -245,10 +254,9 @@
         let isAppReady = false;
         let lastActiveTime = Date.now();
 
-        // 🌟 防呆：休眠喚醒自動同步 (防舊電腦覆蓋雲端)
+        // 防呆：休眠喚醒自動同步
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === 'visible') {
-                // 超過 30 分鐘 (1800000 毫秒) 沒動靜，視為休眠喚醒
                 if (Date.now() - lastActiveTime > 1800000) {
                     isAppReady = false; 
                     const splash = document.getElementById('splash-screen');
@@ -264,7 +272,6 @@
             lastActiveTime = Date.now();
         });
 
-        // 監聽使用者操作更新活動時間
         ['touchstart', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
             document.addEventListener(evt, () => { lastActiveTime = Date.now(); }, {passive: true});
         });
@@ -289,7 +296,7 @@
         </div>
     </div>
 
-    <!-- 🌟 頂部控制列：純圖示化，並加上 data-tip 支援手機長按提示 -->
+    <!-- 頂部控制列：純圖示化，並加上 data-tip 支援手機長按提示 -->
     <div class="global-controls" style="padding: 8px 15px 6px 15px;">
         <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
             <div style="display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
@@ -543,10 +550,16 @@
         let redoStack = [];
         let currentStateSnapshot = null;
 
-        // 🌟 專為手機設計的「長按顯示說明 (Mobile Tooltip)」機制
-        const mobileTooltip = document.getElementById('mobile-tooltip');
+        // 🌟 專為手機設計的「防干擾長按顯示說明 (Mobile Tooltip)」機制
         function initMobileTooltips() {
             let holdTimer = null;
+            const mobileTooltip = document.getElementById('mobile-tooltip');
+            
+            const hideTip = () => {
+                mobileTooltip.style.opacity = '0';
+                setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200);
+            };
+
             document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
                 const showTip = () => {
                     let rect = btn.getBoundingClientRect();
@@ -557,17 +570,30 @@
                     mobileTooltip.style.transform = 'translateX(-50%)';
                     setTimeout(() => mobileTooltip.style.opacity = '1', 10);
                 };
-                const hideTip = () => {
-                    mobileTooltip.style.opacity = '0';
-                    setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200);
-                };
-                btn.addEventListener('touchstart', () => { clearTimeout(holdTimer); holdTimer = setTimeout(showTip, 300); }, {passive: true});
+
+                btn.addEventListener('touchstart', (e) => {
+                    clearTimeout(holdTimer);
+                    holdTimer = setTimeout(showTip, 400); 
+                }, {passive: true});
+
                 btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideTip(); });
                 btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideTip(); });
                 btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideTip(); });
-                btn.addEventListener('mouseenter', showTip); // 支援電腦版
+                
+                // 🌟 關鍵 1：阻擋 iOS 系統預設長按跳出放大鏡或拷貝選單
+                btn.addEventListener('contextmenu', (e) => { e.preventDefault(); });
+
+                // PC版懸停
+                btn.addEventListener('mouseenter', showTip);
                 btn.addEventListener('mouseleave', hideTip);
             });
+
+            // 🌟 關鍵 2：點擊畫面其他任何地方，強制消除卡住的提示框
+            document.addEventListener('touchstart', (e) => {
+                if (!e.target.closest('.manual-save-btn')) {
+                    hideTip();
+                }
+            }, {passive: true});
         }
 
         function toggleDarkMode() {
@@ -731,11 +757,9 @@
             tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
             [tempMain, tempHero].forEach(container => {
-                // 清除鎖定相關廢棄 class
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 
-                // 清除 Sortable 拖曳殘留 class
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
@@ -753,6 +777,32 @@
                 payersData: JSON.parse(JSON.stringify(payers)) 
             };
         }
+
+        // 初始化全域防呆與計時器
+        let isAppReady = false;
+        let lastActiveTime = Date.now();
+
+        // 🌟 防呆：休眠喚醒自動同步
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible') {
+                if (Date.now() - lastActiveTime > 1800000) {
+                    isAppReady = false; 
+                    const splash = document.getElementById('splash-screen');
+                    if (splash) {
+                        let msgEl = splash.querySelector('.splash-text p');
+                        if(msgEl) msgEl.innerText = '喚醒裝置，同步最新資料...';
+                        splash.style.display = 'flex';
+                        splash.style.opacity = '1';
+                    }
+                    loadData(); 
+                }
+            }
+            lastActiveTime = Date.now();
+        });
+
+        ['touchstart', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, () => { lastActiveTime = Date.now(); }, {passive: true});
+        });
 
         function initHistory() {
             undoStack = []; redoStack = []; currentStateSnapshot = captureState();
@@ -1610,7 +1660,6 @@
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             
-            // 🌟 防呆鎖：如果 App 還沒載入完畢（或正在休眠喚醒同步），禁止覆寫雲端
             if (!isAppReady) {
                 console.warn("系統同步中，阻擋舊資料覆寫");
                 return;
@@ -1789,9 +1838,10 @@
                 console.error("載入解析錯誤: ", error);
             } finally {
                 fetchExchangeRate();
+                
+                // 🌟 啟動專屬手機的無干擾長按提示引擎
                 initMobileTooltips();
                 
-                // 🌟 所有資料渲染完畢後，解開存檔鎖定
                 isAppReady = true;
                 lastActiveTime = Date.now();
                 
