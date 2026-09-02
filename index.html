@@ -128,7 +128,6 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
         body.dark-mode #itinerary-days-container .timeline-item::before { color: #555; }
 
-        /* Time Column */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
         .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); cursor: text; margin-bottom: 3px; line-height: 1; }
         .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; transition: 0.3s;}
@@ -151,7 +150,6 @@
         body.dark-mode select, body.dark-mode input { background: #2a2a2a; color: #e0e0e0; border: 1px solid #444;}
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
-        /* 橫向滑動天數分頁樣式 */
         .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 45px; z-index: 15; background: var(--bg-color); transition: 0.3s; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -159,7 +157,6 @@
         .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; }
         .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
 
-        /* Buttons & Labels */
         .action-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;}
         .action-row::-webkit-scrollbar { display: none; }
         
@@ -179,18 +176,18 @@
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.3s;}
         body.dark-mode .link-item { background: #222; }
 
-        /* 🌟 Currency & Budget: 全新黃金比例欄寬 */
+        /* 🌟 Currency & Budget: 黃金比例欄寬 */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        #budget-table th:nth-child(1) { width: 25%; } /* 項目 */
-        #budget-table th:nth-child(2) { width: 16%; } /* 墊款人 (縮小) */
-        #budget-table th:nth-child(3) { width: 15%; } /* 分攤 (縮小) */
-        #budget-table th:nth-child(4) { width: 31%; } /* 金額+幣別 (放大) */
-        #budget-table th:nth-child(5) { width: 13%; } /* 操作 */
+        #budget-table th:nth-child(1) { width: 25%; } 
+        #budget-table th:nth-child(2) { width: 16%; } 
+        #budget-table th:nth-child(3) { width: 15%; } 
+        #budget-table th:nth-child(4) { width: 31%; } 
+        #budget-table th:nth-child(5) { width: 13%; } 
 
         .amount-input { width: 100%; box-sizing: border-box; font-size: 12px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0;}
         .curr-select, .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
@@ -198,7 +195,6 @@
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
-        /* Receipt Box & Image Gallery */
         .receipt-box { width: 20px; height: 20px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; flex-shrink: 0;}
         body.dark-mode .receipt-box { background: #222; border-color: #555; }
         .receipt-thumb-wrap { position: relative; width: 20px; height: 20px; margin: 0 auto; flex-shrink: 0;}
@@ -210,7 +206,6 @@
         .img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 5; }
 
-        /* Bottom Nav & Modals */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;}
         body.dark-mode .bottom-nav { background: rgba(30,30,30,0.85); border-top-color: #444; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);}
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; }
@@ -249,6 +244,7 @@
     <div id="mobile-tooltip"></div>
     
     <script>
+        // 🌟 初始化全域防呆與計時器 
         let isAppReady = false;
         let lastActiveTime = Date.now();
 
@@ -447,7 +443,6 @@
                     輸入金額會自動套用會計格式。最右側框框可點擊上傳發票/收據照片。
                 </div>
 
-                <!-- 🌟 全新精細微調的分帳專用表格排版 -->
                 <table id="budget-table">
                     <tr><th>項目</th><th>墊款人</th><th>分攤</th><th>金額</th><th>操作</th></tr>
                     <tbody id="budget-tbody"></tbody>
@@ -547,6 +542,9 @@
         let currentStateSnapshot = null;
 
         function initMobileTooltips() {
+            if (window._tooltipsInitialized) return;
+            window._tooltipsInitialized = true;
+
             let holdTimer = null;
             const mobileTooltip = document.getElementById('mobile-tooltip');
             
@@ -584,9 +582,10 @@
                 btn.addEventListener('mouseleave', hideTip);
             });
 
-            window.addEventListener('touchend', () => {
-                clearTimeout(holdTimer);
-                hideTip();
+            window.addEventListener('touchstart', (e) => {
+                if (!e.target.closest('.manual-save-btn')) {
+                    hideTip();
+                }
             }, {passive: true});
         }
 
@@ -740,7 +739,7 @@
             });
         }
 
-        // 🌟 終極 DOM 淨化引擎：無死角清除廢棄標籤與無用屬性
+        // 🌟 終極 DOM 淨化引擎：全域掃描清除廢棄標籤與無用屬性
         function captureState() {
             let tempMain = document.createElement('div');
             tempMain.innerHTML = document.getElementById('main-container').innerHTML;
@@ -751,7 +750,6 @@
             [tempMain, tempHero].forEach(container => {
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-                
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
@@ -771,30 +769,6 @@
                 payersData: JSON.parse(JSON.stringify(payers)) 
             };
         }
-
-        let isAppReady = false;
-        let lastActiveTime = Date.now();
-
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible') {
-                if (Date.now() - lastActiveTime > 1800000) {
-                    isAppReady = false; 
-                    const splash = document.getElementById('splash-screen');
-                    if (splash) {
-                        let msgEl = splash.querySelector('.splash-text p');
-                        if(msgEl) msgEl.innerText = '喚醒裝置，同步最新資料...';
-                        splash.style.display = 'flex';
-                        splash.style.opacity = '1';
-                    }
-                    loadData(); 
-                }
-            }
-            lastActiveTime = Date.now();
-        });
-
-        ['touchstart', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
-            document.addEventListener(evt, () => { lastActiveTime = Date.now(); }, {passive: true});
-        });
 
         function initHistory() {
             undoStack = []; redoStack = []; currentStateSnapshot = captureState();
@@ -1408,7 +1382,6 @@
                     </select>
                 </td>
                 <td style="white-space:nowrap;">
-                    <!-- 🌟 微調此處：調整幣別寬度為 35%，金額為 60% -->
                     <select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();" style="width:35%; display:inline-block; padding:0; text-align-last:left;">
                         ${currencyOpts}
                     </select>
@@ -1435,6 +1408,7 @@
             }
         }
 
+        // 🌟 分帳核心計算邏輯
         function calcBudget() {
             const rows = document.querySelectorAll('#budget-tbody .budget-row');
             let totalsPaid = {}; 
@@ -1461,7 +1435,7 @@
 
                 let rowRate = parseFloat(r.getAttribute('data-rate'));
                 if (isNaN(rowRate) || !rowRate) {
-                    rowRate = exchangeRatesToTWD[rowCurr] || 1; 
+                    rowRate = allRatesToTWD[rowCurr] || 1; 
                     r.setAttribute('data-rate', rowRate);
                 }
                 if (rowCurr === 'TWD') rowRate = 1; 
@@ -1714,6 +1688,7 @@
             saveData(); 
         });
 
+        // 🌟 核心存檔邏輯
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             
@@ -1724,11 +1699,21 @@
 
             if (!skipHistory) { recordHistory(); }
             
-            const state = captureState(); 
-            const payload = JSON.stringify({ 
-                isCompressed: true, 
-                data: LZString.compressToUTF16(JSON.stringify(state)) 
-            });
+            let payload;
+            try {
+                const state = captureState(); 
+                if (typeof LZString !== 'undefined') {
+                    payload = JSON.stringify({ 
+                        isCompressed: true, 
+                        data: LZString.compressToUTF16(JSON.stringify(state)) 
+                    });
+                } else {
+                    payload = JSON.stringify(state); 
+                }
+            } catch(e) {
+                console.error("存檔壓縮失敗", e);
+                return;
+            }
 
             localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
             localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
@@ -1750,31 +1735,47 @@
             }, isManual ? 0 : 1500); 
         }
 
+        // 🌟 防死機安全載入邏輯
         function loadData() {
             let isLoaded = false;
+            
+            // 安全解鎖機制：強制 10 秒後如果還卡住，直接解除載入畫面
             const fallbackTimeout = setTimeout(() => {
                 if(!isLoaded) {
                     isLoaded = true;
+                    console.log("網路逾時，強制轉入本機模式");
                     loadFromLocal();
                     setStatus('cloud_off', '網路逾時(讀取本機)', true);
                 }
             }, 10000);
 
+            const forceUnlockTimer = setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if(splash && splash.style.display !== 'none') {
+                    console.log("強制解鎖防死機");
+                    isAppReady = true;
+                    splash.style.opacity = '0'; 
+                    setTimeout(() => splash.style.display = 'none', 300);
+                }
+            }, 12000);
+
             const template = document.getElementById('default-template');
             if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
             const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal');
             if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
+            
             if(!API_URL.startsWith("https://script.google.com")) {
                 if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '本機模式(未綁雲端)', true); }
                 return;
             }
+            
             fetch(API_URL).then(res => res.json()).then(rawData => {
                 if(isLoaded) return;
                 isLoaded = true;
                 clearTimeout(fallbackTimeout);
                 
                 let state = rawData;
-                if (rawData && rawData.isCompressed) {
+                if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') {
                     try {
                         state = JSON.parse(LZString.decompressFromUTF16(rawData.data));
                     } catch(e) { console.error("解壓縮失敗", e); }
@@ -1790,10 +1791,15 @@
                 }
                 finalizeLoad();
             }).catch(e => { 
-                if(isLoaded) return;
-                isLoaded = true;
-                clearTimeout(fallbackTimeout);
-                loadFromLocal(); setStatus('cloud_off', '離線模式(讀取本機)', true); 
+                console.error("雲端讀取錯誤: ", e);
+                if(!isLoaded) {
+                    isLoaded = true;
+                    clearTimeout(fallbackTimeout);
+                    loadFromLocal(); setStatus('cloud_off', '離線模式(讀取本機)', true); 
+                } else {
+                    // 若在 then 內部報錯，也必須強制走完解鎖流程
+                    finalizeLoad();
+                }
             });
         }
 
@@ -1803,18 +1809,22 @@
                 let state = null;
                 try {
                     let parsed = JSON.parse(saved);
-                    if (parsed.isCompressed) {
+                    if (parsed.isCompressed && typeof LZString !== 'undefined') {
                         state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
                     } else {
                         state = parsed;
                     }
                 } catch(e) {}
                 
-                if(state && state.html) document.getElementById('main-container').innerHTML = state.html;
-                if(state && state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
-                if(state && state.payersData) payers = state.payersData;
-                renderPayerTags(); rebindEvents();
-            } else { addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); }
+                if(state && state.html) {
+                    document.getElementById('main-container').innerHTML = state.html;
+                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                    if(state.payersData) payers = state.payersData;
+                    renderPayerTags(); rebindEvents();
+                }
+            } else { 
+                addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); 
+            }
             finalizeLoad();
         }
 
@@ -1835,13 +1845,13 @@
                             mergedTd.style.whiteSpace = 'nowrap';
                             
                             if (currEl) {
-                                currEl.style.width = '35%'; // 🌟 配合新比例
+                                currEl.style.width = '35%'; 
                                 currEl.style.display = 'inline-block';
                                 currEl.style.textAlignLast = 'left';
                                 mergedTd.appendChild(currEl);
                             }
                             if (amtEl) {
-                                amtEl.style.width = '60%'; // 🌟 配合新比例
+                                amtEl.style.width = '60%'; 
                                 amtEl.style.display = 'inline-block';
                                 amtEl.style.textAlign = 'right';
                                 mergedTd.appendChild(amtEl);
@@ -1852,7 +1862,6 @@
                             tr.removeChild(tds[3]); 
                         }
                     } else {
-                        // 強制更新現有舊行的比例
                         let currEl = tr.querySelector('.curr-select');
                         let amtEl = tr.querySelector('.amount-input');
                         if (currEl) currEl.style.width = '35%';
@@ -1937,6 +1946,7 @@
                 fetchExchangeRate();
                 initMobileTooltips();
                 
+                // 🌟 所有資料渲染完畢後，安全解開存檔鎖定
                 isAppReady = true;
                 lastActiveTime = Date.now();
                 
