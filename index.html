@@ -62,8 +62,26 @@
         /* Global Controls */
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 0px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 5px rgba(0,0,0,0.05); transition: 0.3s; }
         body.dark-mode .global-controls { background: rgba(18, 18, 18, 0.95); }
-        .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 5px 6px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; }
-        .manual-save-btn:active { transform: scale(0.95); }
+        .manual-save-btn { background: var(--primary-color); color: white; border: none; padding: 5px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; -webkit-touch-callout: none; user-select: none; }
+        .manual-save-btn:active { transform: scale(0.92); }
+
+        /* 手機版專用：長按提示框 (Tooltip) */
+        #mobile-tooltip {
+            display: none;
+            position: fixed;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        body.dark-mode #mobile-tooltip { background: rgba(255, 255, 255, 0.95); color: #121212; }
 
         /* Container & Cards */
         .container { padding: 0 15px; }
@@ -219,6 +237,9 @@
         </div>
     </div>
     
+    <!-- 🌟 動態產生的手機版懸浮提示框 -->
+    <div id="mobile-tooltip"></div>
+    
     <script>
         if (window.location.search.includes('share=')) {
             var splashImg = document.getElementById('splash-bg-img');
@@ -240,19 +261,19 @@
         </div>
     </div>
 
-    <!-- 🌟 綠框控制列：圖示放大、文字隱藏，加入離線備份上傳/下載功能 -->
+    <!-- 🌟 頂部控制列：純圖示化，並加上 data-tip 支援手機長按提示 -->
     <div class="global-controls" style="padding: 8px 15px 6px 15px;">
         <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
-            <div style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
-                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;"><span class="material-icons-round" style="font-size:15px;">save</span> 儲存</button>
-                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af; padding: 5px 8px;" title="復原"><span class="material-icons-round" style="font-size:15px;">undo</span></button>
-                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb; padding: 5px 8px;" title="重做"><span class="material-icons-round" style="font-size:15px;">redo</span></button>
-                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6; padding: 5px 8px;" title="重載"><span class="material-icons-round" style="font-size:15px;">refresh</span></button>
-                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7; padding: 5px 8px;" title="專屬分享"><span class="material-icons-round" style="font-size:15px;">share</span></button>
-                <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 5px 8px;" title="切換深色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px;">dark_mode</span></button>
-                <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b; padding: 5px 8px;" title="匯出為 PDF"><span class="material-icons-round" style="font-size:15px;">picture_as_pdf</span></button>
-                <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b; padding: 5px 8px;" title="下載實體備份檔"><span class="material-icons-round" style="font-size:15px;">download</span></button>
-                <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c; padding: 5px 8px;" title="匯入備份檔還原"><span class="material-icons-round" style="font-size:15px;">upload</span></button>
+            <div style="display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
+                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a; padding: 6px 10px;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:15px;">save</span></button>
+                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af; padding: 6px 10px;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:15px;">undo</span></button>
+                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb; padding: 6px 10px;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:15px;">redo</span></button>
+                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6; padding: 6px 10px;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:15px;">refresh</span></button>
+                <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7; padding: 6px 10px;" data-tip="產生專屬分享網址"><span class="material-icons-round" style="font-size:15px;">share</span></button>
+                <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 6px 10px;" data-tip="切換深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px;">dark_mode</span></button>
+                <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b; padding: 6px 10px;" data-tip="匯出列印為 PDF 檔"><span class="material-icons-round" style="font-size:15px;">picture_as_pdf</span></button>
+                <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b; padding: 6px 10px;" data-tip="下載離線實體備份檔"><span class="material-icons-round" style="font-size:15px;">download</span></button>
+                <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c; padding: 6px 10px;" data-tip="從手機匯入備份檔還原"><span class="material-icons-round" style="font-size:15px;">upload</span></button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
@@ -494,6 +515,33 @@
         let redoStack = [];
         let currentStateSnapshot = null;
 
+        // 🌟 專為手機設計的「長按顯示說明 (Mobile Tooltip)」機制
+        const mobileTooltip = document.getElementById('mobile-tooltip');
+        function initMobileTooltips() {
+            let holdTimer = null;
+            document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
+                const showTip = () => {
+                    let rect = btn.getBoundingClientRect();
+                    mobileTooltip.innerText = btn.getAttribute('data-tip');
+                    mobileTooltip.style.display = 'block';
+                    mobileTooltip.style.left = (rect.left + (rect.width / 2)) + 'px';
+                    mobileTooltip.style.top = (rect.bottom + 8) + 'px';
+                    mobileTooltip.style.transform = 'translateX(-50%)';
+                    setTimeout(() => mobileTooltip.style.opacity = '1', 10);
+                };
+                const hideTip = () => {
+                    mobileTooltip.style.opacity = '0';
+                    setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200);
+                };
+                btn.addEventListener('touchstart', () => { clearTimeout(holdTimer); holdTimer = setTimeout(showTip, 300); }, {passive: true});
+                btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('mouseenter', showTip); // 支援電腦版
+                btn.addEventListener('mouseleave', hideTip);
+            });
+        }
+
         function toggleDarkMode() {
             let isDark = document.body.classList.toggle('dark-mode');
             localStorage.setItem('travelAppDarkMode', isDark);
@@ -547,7 +595,6 @@
             }
         }
 
-        // 🌟 處理備份檔還原解析
         function handleBackupUpload(event) {
             let file = event.target.files[0];
             if (!file) return;
@@ -560,7 +607,7 @@
                     if (parsed.isCompressed && parsed.data) {
                         state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
                     } else if (parsed.html) {
-                        state = parsed; // 相容未壓縮的純 JSON 舊檔
+                        state = parsed; 
                     } else {
                         throw new Error("備份檔格式不正確");
                     }
@@ -572,8 +619,8 @@
                         
                         renderPayerTags();
                         rebindEvents();
-                        finalizeLoad(); // 重新綁定事件與計算
-                        saveData(true); // 強制上傳覆蓋雲端
+                        finalizeLoad(); 
+                        saveData(true); 
                         alert("✅ 備份檔匯入成功！資料已完全還原並同步至雲端。");
                     }
                 } catch(err) {
@@ -656,16 +703,14 @@
             tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
             [tempMain, tempHero].forEach(container => {
-                // 清除鎖定相關廢棄 class
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 
-                // 清除 Sortable 拖曳殘留 class
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
                 
-                // 清除無用內聯屬性與空殼屬性，極致壓縮
+                // 深度淨化：拔除拖曳套件與編輯過程殘留的行內樣式及空屬性
                 container.querySelectorAll('[draggable]').forEach(el => el.removeAttribute('draggable'));
                 container.querySelectorAll('.timeline-item').forEach(el => el.removeAttribute('style'));
                 container.querySelectorAll('[style=""]').forEach(el => el.removeAttribute('style'));
@@ -1506,7 +1551,7 @@
             if(statusEl) { statusEl.innerHTML = `<span class="material-icons-round" style="font-size:14px; color: ${isError ? 'var(--danger-color)' : '#4CAF50'};">${icon}</span> <span>${text}</span>`; }
         }
 
-        function forceManualSave() { setStatus('sync', '手動上傳中...'); saveData(true); }
+        function forceManualSave() { setStatus('sync', '手Upload中...'); saveData(true); }
 
         document.addEventListener('change', function(e) {
             if (e.target.tagName === 'SELECT') {
@@ -1708,6 +1753,8 @@
                 console.error("載入解析錯誤: ", error);
             } finally {
                 fetchExchangeRate();
+                // 🌟 啟動專屬手機的長按提示引擎
+                initMobileTooltips();
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
                     if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
