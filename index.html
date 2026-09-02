@@ -32,7 +32,6 @@
             --danger-color: #e57373;
         }
 
-        /* 🌙 深色模式色彩變數 */
         body.dark-mode {
             --bg-color: #121212;
             --primary-color: #7ba3d8; 
@@ -63,7 +62,6 @@
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 0px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 5px rgba(0,0,0,0.05); transition: 0.3s; }
         body.dark-mode .global-controls { background: rgba(18, 18, 18, 0.95); }
         
-        /* 🌟 按鈕防護強化：強制阻擋 iOS 反白與放大鏡 */
         .manual-save-btn, .manual-save-btn * { 
             -webkit-touch-callout: none !important; 
             -webkit-user-select: none !important; 
@@ -74,36 +72,20 @@
         }
         .manual-save-btn:active { transform: scale(0.92); }
 
-        /* 手機版專用：長按提示框 (Tooltip) */
         #mobile-tooltip {
-            display: none;
-            position: fixed;
-            background: rgba(0, 0, 0, 0.85);
-            color: #fff;
-            font-size: 12px;
-            padding: 6px 10px;
-            border-radius: 6px;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.2s; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         body.dark-mode #mobile-tooltip { background: rgba(255, 255, 255, 0.95); color: #121212; }
 
-        /* Container & Cards */
         .container { padding: 0 15px; }
         .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s ease; }
         
-        /* Typography */
         .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
         .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; -webkit-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important; }
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; }
         body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* Lists & Items */
         .timeline-item { display: flex; gap: 8px; margin-bottom: 0px; position: relative; transition: opacity 0.3s ease, border-color 0.3s; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; flex-wrap: nowrap; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         body.dark-mode .timeline-item { border-bottom-color: #333; }
         .timeline-item:last-child { border-bottom: none; }
@@ -118,7 +100,6 @@
         .completed .custom-checkbox { background: var(--primary-color); }
         .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 13px; }
         
-        /* 拖曳視覺效果 */
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; }
         body.dark-mode .sortable-ghost { background-color: #333 !important; }
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; }
@@ -243,10 +224,30 @@
     
     <div id="mobile-tooltip"></div>
     
+    <!-- 🌟 唯一的、絕對安全的 JavaScript 執行引擎區塊 -->
     <script>
-        // 🌟 初始化全域防呆與計時器 
+        // 早期阻擋閃爍的腳本
+        if (window.location.search.includes('share=')) {
+            var splashImg = document.getElementById('splash-bg-img');
+            if (splashImg) splashImg.style.display = 'none';
+        }
+        if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) {
+            document.body.classList.add('dark-mode');
+        }
+
+        // 🌟 全域防呆變數 (不可重複宣告)
         let isAppReady = false;
         let lastActiveTime = Date.now();
+        const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
+        let payers = ['本人', '家人']; 
+        let currentReceiptBox = null;
+        let currentItemThumbBox = null;
+        let syncTimeout = null;
+        let allRatesToTWD = { TWD: 1 };
+        let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
+        let undoStack = [];
+        let redoStack = [];
+        let currentStateSnapshot = null;
 
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === 'visible') {
@@ -268,14 +269,6 @@
         ['touchstart', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
             document.addEventListener(evt, () => { lastActiveTime = Date.now(); }, {passive: true});
         });
-
-        if (window.location.search.includes('share=')) {
-            var splashImg = document.getElementById('splash-bg-img');
-            if (splashImg) splashImg.style.display = 'none';
-        }
-        if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) {
-            document.body.classList.add('dark-mode');
-        }
     </script>
 
     <div style="position: relative;">
@@ -526,21 +519,8 @@
         <img id="modalImg" src="">
     </div>
 
+    <!-- 🌟 主核心程式邏輯（完全整合，絕對安全無衝突） -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
-        
-        let payers = ['本人', '家人']; 
-        let currentReceiptBox = null;
-        let currentItemThumbBox = null;
-        let syncTimeout = null;
-        
-        let allRatesToTWD = { TWD: 1 };
-        let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
-        
-        let undoStack = [];
-        let redoStack = [];
-        let currentStateSnapshot = null;
-
         function initMobileTooltips() {
             if (window._tooltipsInitialized) return;
             window._tooltipsInitialized = true;
@@ -612,6 +592,10 @@
         function exportBackup() {
             try {
                 let state = captureState();
+                
+                // 確保 LZString 存在才壓縮
+                if (typeof LZString === 'undefined') throw new Error("壓縮引擎尚未載入完成");
+                
                 let payload = JSON.stringify({ 
                     isCompressed: true, 
                     data: LZString.compressToUTF16(JSON.stringify(state)) 
@@ -650,6 +634,7 @@
                     let parsed = JSON.parse(content);
                     let state = null;
                     if (parsed.isCompressed && parsed.data) {
+                        if (typeof LZString === 'undefined') throw new Error("解壓縮引擎尚未載入完成");
                         state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
                     } else if (parsed.html) {
                         state = parsed; 
@@ -750,10 +735,12 @@
             [tempMain, tempHero].forEach(container => {
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+                
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
                 
+                // 深度淨化：拔除拖曳套件與編輯過程殘留的行內樣式及空屬性
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
                     if (el.classList.contains('timeline-item')) el.removeAttribute('style'); 
@@ -1408,7 +1395,6 @@
             }
         }
 
-        // 🌟 分帳核心計算邏輯
         function calcBudget() {
             const rows = document.querySelectorAll('#budget-tbody .budget-row');
             let totalsPaid = {}; 
@@ -1688,7 +1674,7 @@
             saveData(); 
         });
 
-        // 🌟 核心存檔邏輯
+        // 🌟 核心存檔邏輯 (加入 CDN Fail-Safe 安全保護)
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             
@@ -1697,19 +1683,20 @@
                 return;
             }
 
+            if (typeof LZString === 'undefined') {
+                alert("⚠️ 嚴重警告：壓縮引擎發生異常！\n為了保護您的資料不被覆寫損毀，系統已鎖定存檔功能。請檢查網路或關閉廣告阻擋器後重新整理。");
+                return;
+            }
+
             if (!skipHistory) { recordHistory(); }
             
             let payload;
             try {
                 const state = captureState(); 
-                if (typeof LZString !== 'undefined') {
-                    payload = JSON.stringify({ 
-                        isCompressed: true, 
-                        data: LZString.compressToUTF16(JSON.stringify(state)) 
-                    });
-                } else {
-                    payload = JSON.stringify(state); 
-                }
+                payload = JSON.stringify({ 
+                    isCompressed: true, 
+                    data: LZString.compressToUTF16(JSON.stringify(state)) 
+                });
             } catch(e) {
                 console.error("存檔壓縮失敗", e);
                 return;
@@ -1735,11 +1722,11 @@
             }, isManual ? 0 : 1500); 
         }
 
-        // 🌟 防死機安全載入邏輯
+        // 🌟 防死機安全載入邏輯 (強制單一執行序，確保不卡死)
         function loadData() {
             let isLoaded = false;
             
-            // 安全解鎖機制：強制 10 秒後如果還卡住，直接解除載入畫面
+            // 安全解鎖機制：強制 10 秒後如果還卡住，轉入本機模式
             const fallbackTimeout = setTimeout(() => {
                 if(!isLoaded) {
                     isLoaded = true;
@@ -1749,15 +1736,24 @@
                 }
             }, 10000);
 
+            // 絕對防護盾：不管發生什麼致命錯誤，12秒後強行摧毀載入畫面
             const forceUnlockTimer = setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash && splash.style.display !== 'none') {
-                    console.log("強制解鎖防死機");
+                    console.log("強制解鎖防死機盾啟動");
                     isAppReady = true;
                     splash.style.opacity = '0'; 
                     setTimeout(() => splash.style.display = 'none', 300);
                 }
             }, 12000);
+
+            // 驗證 LZ-String 是否被防火牆擋住
+            if (typeof LZString === 'undefined') {
+                alert("⚠️ 錯誤：無法載入核心壓縮引擎！\n請關閉廣告阻擋程式(AdBlock) 或 切換網路後再重新整理，以免資料遺失。");
+                const splashMsg = document.querySelector('.splash-text p');
+                if(splashMsg) splashMsg.innerText = '載入失敗，請重整頁面';
+                return; // 致命錯誤，停止執行保護資料
+            }
 
             const template = document.getElementById('default-template');
             if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
@@ -1775,7 +1771,7 @@
                 clearTimeout(fallbackTimeout);
                 
                 let state = rawData;
-                if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') {
+                if (rawData && rawData.isCompressed) {
                     try {
                         state = JSON.parse(LZString.decompressFromUTF16(rawData.data));
                     } catch(e) { console.error("解壓縮失敗", e); }
@@ -1797,7 +1793,6 @@
                     clearTimeout(fallbackTimeout);
                     loadFromLocal(); setStatus('cloud_off', '離線模式(讀取本機)', true); 
                 } else {
-                    // 若在 then 內部報錯，也必須強制走完解鎖流程
                     finalizeLoad();
                 }
             });
