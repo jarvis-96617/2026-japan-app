@@ -18,6 +18,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- 🌟 載入 LZ-String 高效壓縮演算法引擎 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    
+    <!-- 🌟 載入 Viewer.js (專業圖片雙指縮放套件) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
     <style>
         :root {
@@ -154,7 +158,6 @@
         body.dark-mode select, body.dark-mode input { background: #2a2a2a; color: #e0e0e0; border: 1px solid #444;}
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
-        /* 橫向滑動天數分頁樣式 */
         .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 45px; z-index: 15; background: var(--bg-color); transition: 0.3s; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -181,7 +184,7 @@
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.3s;}
         body.dark-mode .link-item { background: #222; }
 
-        /* Currency & Budget */
+        /* 🌟 Currency & Budget: 黃金比例欄寬 */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
@@ -200,6 +203,7 @@
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
+        /* Receipt Box & Image Gallery */
         .receipt-box { width: 20px; height: 20px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; flex-shrink: 0;}
         body.dark-mode .receipt-box { background: #222; border-color: #555; }
         .receipt-thumb-wrap { position: relative; width: 20px; height: 20px; margin: 0 auto; flex-shrink: 0;}
@@ -211,17 +215,16 @@
         .img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 5; }
 
+        /* Bottom Nav & Modals */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;}
         body.dark-mode .bottom-nav { background: rgba(30,30,30,0.85); border-top-color: #444; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);}
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; }
         .nav-item.active { color: var(--primary-color); font-weight: 700; transform: translateY(-2px); }
         .nav-item .material-icons-round { font-size: 24px; margin-bottom: 2px; }
+        
         .tab-content { display: none; animation: fadeIn 0.3s; position: relative; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
-        .modal img { max-width: 95%; max-height: 90%; border-radius: 8px; }
-        .modal-close { position: absolute; top: max(20px, env(safe-area-inset-top)); right: 20px; color: white; font-size: 30px; cursor: pointer; padding: 10px; }
         .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
 
         @media print {
@@ -249,28 +252,132 @@
     <div id="mobile-tooltip"></div>
     
     <script>
+        // 🌟 初始化全域變數 (絕對不可重複宣告)
         let isAppReady = false;
         let lastActiveTime = Date.now();
+        let lastCloudDataHash = null;
+        let isSavingToCloud = false;
+        let pendingSaveAction = false;
+        let syncTimeout = null;
+        
+        let payers = ['本人', '家人']; 
+        let currentReceiptBox = null;
+        let currentItemThumbBox = null;
+        let allRatesToTWD = { TWD: 1 };
+        let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
+        let undoStack = [];
+        let redoStack = [];
+        let currentStateSnapshot = null;
+        const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible') {
-                if (Date.now() - lastActiveTime > 1800000) {
-                    isAppReady = false; 
-                    const splash = document.getElementById('splash-screen');
-                    if (splash) {
-                        let msgEl = splash.querySelector('.splash-text p');
-                        if(msgEl) msgEl.innerText = '喚醒裝置，同步最新資料...';
-                        splash.style.display = 'flex';
-                        splash.style.opacity = '1';
-                    }
-                    loadData(); 
+        // 🌟 手機版無干擾長按提示引擎
+        function initMobileTooltips() {
+            if (window._tooltipsInitialized) return;
+            window._tooltipsInitialized = true;
+
+            let holdTimer = null;
+            const mobileTooltip = document.getElementById('mobile-tooltip');
+            
+            const hideTip = () => {
+                mobileTooltip.style.opacity = '0';
+                setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200);
+            };
+
+            document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
+                const showTip = () => {
+                    let rect = btn.getBoundingClientRect();
+                    mobileTooltip.innerText = btn.getAttribute('data-tip');
+                    mobileTooltip.style.display = 'block';
+                    mobileTooltip.style.left = (rect.left + (rect.width / 2)) + 'px';
+                    mobileTooltip.style.top = (rect.bottom + 8) + 'px';
+                    mobileTooltip.style.transform = 'translateX(-50%)';
+                    setTimeout(() => mobileTooltip.style.opacity = '1', 10);
+                };
+
+                btn.addEventListener('touchstart', (e) => {
+                    clearTimeout(holdTimer);
+                    holdTimer = setTimeout(showTip, 400); 
+                }, {passive: true});
+
+                btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideTip(); });
+                
+                btn.addEventListener('contextmenu', (e) => { 
+                    e.preventDefault(); 
+                    return false;
+                });
+
+                btn.addEventListener('mouseenter', showTip);
+                btn.addEventListener('mouseleave', hideTip);
+            });
+
+            window.addEventListener('touchstart', (e) => {
+                if (!e.target.closest('.manual-save-btn')) {
+                    hideTip();
                 }
-            }
+            }, {passive: true});
+        }
+
+        // 🌟 雲端同步衝突防護引擎：喚醒時查勤 (Hash 比對)
+        function checkCloudFreshness() {
+            if (!isAppReady || isSavingToCloud || pendingSaveAction) return;
+            if (new URLSearchParams(window.location.search).get('share')) return;
+            if (!lastCloudDataHash) return; 
+            if (typeof LZString === 'undefined') return;
+
+            setStatus('sync', '檢查最新進度...');
+            
+            fetch(API_URL + "?t=" + Date.now())
+            .then(res => res.json())
+            .then(rawData => {
+                if (isSavingToCloud || pendingSaveAction) {
+                    setStatus('cloud_done', '已就緒'); return;
+                }
+                if (rawData && rawData.isCompressed && rawData.data) {
+                    if (rawData.data !== lastCloudDataHash) {
+                        console.warn("偵測到其他裝置已更新資料，強制覆寫本機防衝突！");
+                        isAppReady = false; 
+                        
+                        const splash = document.getElementById('splash-screen');
+                        if (splash) {
+                            let msgEl = splash.querySelector('.splash-text p');
+                            if(msgEl) msgEl.innerText = '載入最新雲端資料...';
+                            splash.style.display = 'flex';
+                            splash.style.opacity = '1';
+                        }
+                        
+                        lastCloudDataHash = rawData.data;
+                        let state = null;
+                        try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
+                        
+                        if(state && state.html) {
+                            document.getElementById('main-container').innerHTML = state.html;
+                            if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                            if(state.payersData) payers = state.payersData;
+                            renderPayerTags(); rebindEvents();
+                        }
+                        finalizeLoad();
+                    } else {
+                        setStatus('cloud_done', '已就緒');
+                    }
+                }
+            }).catch(e => setStatus('cloud_done', '已就緒'));
+        }
+
+        // 全域事件監聽 (防呆喚醒機制)
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible') { checkCloudFreshness(); }
             lastActiveTime = Date.now();
         });
+        
+        window.addEventListener("focus", () => { checkCloudFreshness(); });
 
-        ['touchstart', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
-            document.addEventListener(evt, () => { lastActiveTime = Date.now(); }, {passive: true});
+        ['touchstart', 'mousemove', 'keydown', 'scroll', 'click'].forEach(evt => {
+            document.addEventListener(evt, () => { 
+                if (Date.now() - lastActiveTime > 180000) { checkCloudFreshness(); }
+                lastActiveTime = Date.now(); 
+            }, {passive: true});
         });
 
         if (window.location.search.includes('share=')) {
@@ -293,7 +400,8 @@
         </div>
     </div>
 
-    <div class="global-controls" style="padding: 8px 15px 6px 15px;">
+    <!-- 🌟 頂端選單空間優化：縮小按鈕間距(gap:4px)、縮減按鈕內留白(padding:6px)、加上隱形防爆框捲軸 -->
+    <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
             <div class="hide-scrollbar" style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
                 <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a; padding: 6px 6px;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:15px;">save</span></button>
@@ -525,72 +633,22 @@
         <div class="nav-item" onclick="switchTab('tab-todo', this)"><span class="material-icons-round">checklist</span>待辦</div>
     </nav>
 
-    <div class="modal" id="imageModal" onclick="this.style.display='none'">
-        <span class="modal-close">&times;</span>
-        <img id="modalImg" src="">
-    </div>
-
+    <!-- 🌟 主核心程式邏輯（完全整合，絕對安全無衝突） -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
-        
-        let payers = ['本人', '家人']; 
-        let currentReceiptBox = null;
-        let currentItemThumbBox = null;
-        let syncTimeout = null;
-        
-        let allRatesToTWD = { TWD: 1 };
-        let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
-        
-        let undoStack = [];
-        let redoStack = [];
-        let currentStateSnapshot = null;
-
-        function initMobileTooltips() {
-            if (window._tooltipsInitialized) return;
-            window._tooltipsInitialized = true;
-
-            let holdTimer = null;
-            const mobileTooltip = document.getElementById('mobile-tooltip');
-            
-            const hideTip = () => {
-                mobileTooltip.style.opacity = '0';
-                setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200);
-            };
-
-            document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
-                const showTip = () => {
-                    let rect = btn.getBoundingClientRect();
-                    mobileTooltip.innerText = btn.getAttribute('data-tip');
-                    mobileTooltip.style.display = 'block';
-                    mobileTooltip.style.left = (rect.left + (rect.width / 2)) + 'px';
-                    mobileTooltip.style.top = (rect.bottom + 8) + 'px';
-                    mobileTooltip.style.transform = 'translateX(-50%)';
-                    setTimeout(() => mobileTooltip.style.opacity = '1', 10);
-                };
-
-                btn.addEventListener('touchstart', (e) => {
-                    clearTimeout(holdTimer);
-                    holdTimer = setTimeout(showTip, 400); 
-                }, {passive: true});
-
-                btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideTip(); });
-                btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideTip(); });
-                btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideTip(); });
-                
-                btn.addEventListener('contextmenu', (e) => { 
-                    e.preventDefault(); 
-                    return false;
-                });
-
-                btn.addEventListener('mouseenter', showTip);
-                btn.addEventListener('mouseleave', hideTip);
-            });
-
-            window.addEventListener('touchstart', (e) => {
-                if (!e.target.closest('.manual-save-btn')) {
-                    hideTip();
+        // 🌟 專業圖片放大套件呼叫函式 (Viewer.js)
+        function openImageModal(imgElement, event) {
+            event.stopPropagation();
+            const viewer = new Viewer(imgElement, {
+                inline: false,
+                toolbar: false,
+                navbar: false,
+                title: false,
+                button: true,
+                hidden: function () {
+                    viewer.destroy(); // 關閉後銷毀，釋放記憶體
                 }
-            }, {passive: true});
+            });
+            viewer.show();
         }
 
         function toggleDarkMode() {
@@ -616,6 +674,8 @@
         function exportBackup() {
             try {
                 let state = captureState();
+                
+                // 確保 LZString 存在才壓縮
                 if (typeof LZString === 'undefined') throw new Error("壓縮引擎尚未載入完成");
                 
                 let payload = JSON.stringify({ 
@@ -808,7 +868,6 @@
             renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
         }
 
-        // 🌟 升級：透過 Modern Clipboard API 無痛複製
         function generateShareLink() {
             let input = prompt('請輸入你想分享給朋友的「天數數字」\n(例如想分享第2天與第3天，請輸入 2,3)：');
             if (!input) return;
@@ -822,66 +881,43 @@
             
             let currentUrl = window.location.href.split('?')[0].split('#')[0];
             let shareUrl = currentUrl + '?share=' + days.join(',');
-            let successMsg = '✅ 專屬分享網址已成功複製！\n您可以直接去 LINE 或對話框「貼上」給朋友。\n\n當朋友開啟此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁。';
+            let successMsg = '✅ 專屬分享網址已成功產生！\n您可以直接去 LINE 或對話框「貼上」給朋友。';
             
-            // 嘗試使用現代化 API 寫入剪貼簿
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert(successMsg);
-                }).catch(err => {
-                    prompt('系統無法自動複製，請長按全選以下網址並拷貝：', shareUrl);
-                });
+                navigator.clipboard.writeText(shareUrl).then(() => { alert(successMsg); })
+                .catch(err => { prompt('系統無法自動複製，請長按全選以下網址並拷貝：', shareUrl); });
             } else {
-                // 完美降級：如果瀏覽器太嚴格，直接跳框讓使用者拷貝
                 prompt('請長按全選以下網址並拷貝 (拷貝後按確定)：\n\n' + successMsg, shareUrl);
             }
         }
 
-        // 🌟 修正：確保分享模式下的天數分頁按鈕能正常運作
         function applyShareMode() {
             let href = window.location.href;
             let shareMatch = href.match(/[?&]share=([0-9,，、]+)/);
-            let shareParam = shareMatch ? shareMatch[1] : null;
-            if (!shareParam) return false;
+            if (!shareMatch) return false;
             
-            shareParam = shareParam.replace(/，/g, ',').replace(/、/g, ',');
-            let allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
+            let allowedIndexes = shareMatch[1].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
             
-            let bottomNav = document.querySelector('.bottom-nav');
-            if (bottomNav) bottomNav.style.display = 'none';
-            let globalControls = document.querySelector('.global-controls');
-            if (globalControls) globalControls.style.display = 'none';
+            let hideEls = ['.bottom-nav', '.global-controls', '.add-btn', '.delete-btn', '.img-del-btn'];
+            hideEls.forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = 'none'));
             
             let dayTabsContainer = document.getElementById('day-tabs-container');
-            if (dayTabsContainer) {
-                dayTabsContainer.style.top = '0px'; 
-            }
-            
-            document.querySelectorAll('.add-btn, .delete-btn, .img-del-btn').forEach(el => el.style.display = 'none');
+            if (dayTabsContainer) dayTabsContainer.style.top = '0px'; 
             
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
             let itTab = document.getElementById('tab-itinerary');
-            if (itTab) {
-                itTab.style.display = 'block';
-                itTab.style.paddingBottom = '40px'; 
-            }
+            if (itTab) { itTab.style.display = 'block'; itTab.style.paddingBottom = '40px'; }
             
-            // 🌟 移除此處強制把所有卡片變成 display:block 的邏輯，交給 switchDayCard 去控制
-            
-            document.querySelectorAll('.editable').forEach(el => {
-                el.setAttribute('contenteditable', 'false');
-                el.style.border = 'none';
+            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
+            cards.forEach((card, idx) => {
+                if (allowedIndexes.includes(idx)) { card.style.display = 'block'; card.style.marginBottom = '20px'; } 
+                else { card.style.display = 'none'; }
             });
-            
+
+            document.querySelectorAll('.editable').forEach(el => { el.setAttribute('contenteditable', 'false'); el.style.border = 'none'; });
             let style = document.createElement('style');
-            style.innerHTML = `
-                .timeline-item::before { display: none !important; }
-                .timeline-item { padding-left: 8px !important; }
-                .custom-checkbox, .item-thumb-box, .transport-icon { pointer-events: none !important; }
-                .hero .editable { pointer-events: none !important; }
-            `;
+            style.innerHTML = `.timeline-item::before { display: none !important; } .timeline-item { padding-left: 8px !important; } .custom-checkbox, .item-thumb-box, .transport-icon { pointer-events: none !important; } .hero .editable { pointer-events: none !important; }`;
             document.head.appendChild(style);
-            
             return true;
         }
 
@@ -889,11 +925,8 @@
             event.stopPropagation();
             let modes = ['directions_transit', 'directions_walk', 'directions_car'];
             let current = iconEl.innerText.trim();
-            let nextIndex = (modes.indexOf(current) + 1) % modes.length;
-            iconEl.innerText = modes[nextIndex];
-            let card = iconEl.closest('.day-card');
-            if(card) recalculateDayTime(card); 
-            saveData();
+            iconEl.innerText = modes[(modes.indexOf(current) + 1) % modes.length];
+            let card = iconEl.closest('.day-card'); if(card) recalculateDayTime(card); saveData();
         }
 
         function addLinkToNote(btn, event) {
@@ -901,11 +934,9 @@
             let url = prompt('請輸入參考網址 (需包含 http/https)：', 'https://');
             if (url && url.startsWith('http')) {
                 let text = prompt('請輸入連結顯示名稱：', '參考連結');
-                if (!text) text = '參考連結';
                 let noteEl = btn.closest('.content-box').querySelector('.item-note');
                 if(noteEl && noteEl.innerText.trim() === '備註：') { noteEl.innerHTML = ''; }
-                let linkHtml = ` <a contenteditable="false" href="${url}" class="note-link"><span class="material-icons-round" style="font-size:12px;">link</span>${text}</a> &nbsp;`;
-                if(noteEl) noteEl.innerHTML += linkHtml;
+                if(noteEl) noteEl.innerHTML += ` <a contenteditable="false" href="${url}" class="note-link"><span class="material-icons-round" style="font-size:12px;">link</span>${text||'參考連結'}</a> &nbsp;`;
                 saveData();
             }
         }
@@ -913,107 +944,62 @@
         function recalculateDayTime(dayCardElement) {
             let items = dayCardElement.querySelectorAll('.timeline-item');
             if (items.length === 0) return;
-
-            let prevEndTimeMins = null;
-            let prevTravelMins = null;
-            let prevTimeCol = null;
+            let prevEndTimeMins = null; let prevTravelMins = null; let prevTimeCol = null;
 
             items.forEach((item, index) => {
-                let timeCol = item.querySelector('.time-column');
-                if (!timeCol) return; 
+                let timeCol = item.querySelector('.time-column'); if (!timeCol) return; 
+                let startEl = item.querySelector('.start-time'); let durationEl = item.querySelector('.duration');
+                let endEl = item.querySelector('.end-time'); let travelEl = item.querySelector('.travel-time');
 
-                let startEl = item.querySelector('.start-time');
-                let durationEl = item.querySelector('.duration');
-                let endEl = item.querySelector('.end-time');
-                let travelEl = item.querySelector('.travel-time');
-
-                let oldAuto = timeCol.querySelector('.auto-start');
-                let oldGap = timeCol.querySelector('.gap-text');
-                if (oldAuto) oldAuto.remove();
-                if (oldGap) oldGap.remove();
-
+                let oldAuto = timeCol.querySelector('.auto-start'); let oldGap = timeCol.querySelector('.gap-text');
+                if (oldAuto) oldAuto.remove(); if (oldGap) oldGap.remove();
                 if (!startEl || !durationEl || !endEl) return;
 
                 let startMins = 0;
                 let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
-                if (timeMatch) {
-                    startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
-                }
-
+                if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
                 let duration = parseInt(durationEl.innerText.trim()) || 0;
                 let endMins = startMins + duration;
-                let endHours = Math.floor(endMins / 60) % 24;
-                let displayEndMins = endMins % 60;
-                endEl.innerText = `${String(endHours).padStart(2, '0')}:${String(displayEndMins).padStart(2, '0')}`;
+                endEl.innerText = `${String(Math.floor(endMins / 60) % 24).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
 
                 if (index > 0 && prevTimeCol) {
-                    let expectedStartMins = prevEndTimeMins + (prevTravelMins || 0);
-                    let expHours = Math.floor(expectedStartMins / 60) % 24;
-                    let expMins = expectedStartMins % 60;
+                    let expMins = prevEndTimeMins + (prevTravelMins || 0);
+                    let gap = startMins - expMins; if (gap < -300) gap += 24 * 60; 
                     
-                    let gap = startMins - expectedStartMins;
-                    if (gap < -300) gap += 24 * 60; 
-
-                    let autoStartEl = document.createElement('div');
-                    autoStartEl.className = 'auto-start';
-                    autoStartEl.innerText = `預計 ${String(expHours).padStart(2, '0')}:${String(expMins).padStart(2, '0')}`;
-
-                    let gapEl = document.createElement('div');
-                    gapEl.className = 'gap-text';
-                    
-                    if (gap < 0) {
-                        gapEl.style.color = '#e57373';
-                        gapEl.innerText = `重疊 ${Math.abs(gap)} 分`;
-                    } else {
-                        gapEl.innerText = `隔 ${gap} 分`;
-                    }
-
-                    prevTimeCol.appendChild(autoStartEl);
-                    prevTimeCol.appendChild(gapEl);
+                    let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start';
+                    autoStartEl.innerText = `預計 ${String(Math.floor(expMins / 60) % 24).padStart(2, '0')}:${String(expMins % 60).padStart(2, '0')}`;
+                    let gapEl = document.createElement('div'); gapEl.className = 'gap-text';
+                    if (gap < 0) { gapEl.style.color = '#e57373'; gapEl.innerText = `重疊 ${Math.abs(gap)} 分`; } 
+                    else { gapEl.innerText = `隔 ${gap} 分`; }
+                    prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
                 }
-
-                prevEndTimeMins = endMins;
-                prevTravelMins = travelEl ? (parseInt(travelEl.innerText.trim()) || 0) : 0;
-                prevTimeCol = timeCol;
+                prevEndTimeMins = endMins; prevTravelMins = travelEl ? (parseInt(travelEl.innerText.trim()) || 0) : 0; prevTimeCol = timeCol;
             });
         }
 
         function adjustStickyTabs() {
-            let gc = document.querySelector('.global-controls');
-            let tabs = document.getElementById('day-tabs-container');
-            if (tabs) {
-                if (gc && gc.style.display !== 'none') {
-                    tabs.style.top = gc.offsetHeight + 'px';
-                } else {
-                    tabs.style.top = '0px';
-                }
-            }
+            let gc = document.querySelector('.global-controls'); let tabs = document.getElementById('day-tabs-container');
+            if (tabs) tabs.style.top = (gc && gc.style.display !== 'none') ? gc.offsetHeight + 'px' : '0px';
         }
         window.addEventListener('resize', adjustStickyTabs);
 
         function initSortable() {
             if (typeof Sortable === 'undefined') return;
             const sortableOptions = {
-                animation: 150, delay: 250, delayOnTouchOnly: true,
-                draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img', 
-                preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+                animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
                 onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); }
             };
-            document.querySelectorAll('.day-card').forEach(card => { if (!card.sortable) { card.sortable = Sortable.create(card, sortableOptions); } });
-            const transportList = document.getElementById('transport-text-list'); if (transportList && !transportList.sortable) { transportList.sortable = Sortable.create(transportList, sortableOptions); }
-            const shoppingList = document.getElementById('shopping-list'); if (shoppingList && !shoppingList.sortable) { shoppingList.sortable = Sortable.create(shoppingList, sortableOptions); }
-            const bookingList = document.getElementById('booking-list'); if (bookingList && !bookingList.sortable) { bookingList.sortable = Sortable.create(bookingList, sortableOptions); }
-            document.querySelectorAll('.person-todo-list').forEach(list => { if (!list.sortable) { list.sortable = Sortable.create(list, sortableOptions); } });
+            document.querySelectorAll('.day-card').forEach(card => { if (!card.sortable) card.sortable = Sortable.create(card, sortableOptions); });
+            const lists = ['transport-text-list', 'shopping-list', 'booking-list'];
+            lists.forEach(id => { let el = document.getElementById(id); if(el && !el.sortable) el.sortable = Sortable.create(el, sortableOptions); });
+            document.querySelectorAll('.person-todo-list').forEach(list => { if (!list.sortable) list.sortable = Sortable.create(list, sortableOptions); });
         }
 
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            element.classList.add('active');
-            window.scrollTo(0,0);
-            if(tabId === 'tab-budget') calcBudget();
-            if(tabId === 'tab-itinerary') adjustStickyTabs();
+            document.getElementById(tabId).classList.add('active'); element.classList.add('active'); window.scrollTo(0,0);
+            if(tabId === 'tab-budget') calcBudget(); if(tabId === 'tab-itinerary') adjustStickyTabs();
         }
 
         function toggleComplete(element, event) {
@@ -1025,479 +1011,249 @@
             event.stopPropagation();
             if(confirm("確定要刪除這個項目嗎？")) {
                 let item = btnElement.closest('.timeline-item, .link-item, .todo-category-header');
-                
-                let img = item.querySelector('img');
-                if (img) deleteImageFromCloud(img.src);
-                
-                let card = btnElement.closest('.day-card');
-                item.remove();
-                if(card) recalculateDayTime(card); 
-                saveData();
+                let img = item.querySelector('img'); if (img) deleteImageFromCloud(img.src);
+                let card = btnElement.closest('.day-card'); item.remove();
+                if(card) recalculateDayTime(card); saveData();
             }
         }
 
         function autoNavigate(btn, event) {
-            event.preventDefault();
-            let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card');
-            if (!currentItem) return;
-
-            let titleEl = currentItem.querySelector('.item-name-target');
-            let title = titleEl ? titleEl.innerText.trim() : '';
+            event.preventDefault(); let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card'); if (!currentItem) return;
+            let titleEl = currentItem.querySelector('.item-name-target'); let title = titleEl ? titleEl.innerText.trim() : '';
             if (!title) { alert('請先輸入地點名稱！'); return; }
-
-            let origin = ''; let dest = title;
-            let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+            let origin = ''; let dest = title; let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
             if (match) { origin = match[1].trim(); dest = match[2].trim(); } 
             else {
                 let prevItem = currentItem.previousElementSibling;
                 while(prevItem && !prevItem.classList.contains('timeline-item')) { prevItem = prevItem.previousElementSibling; }
-                if (prevItem) {
-                    let originEl = prevItem.querySelector('.item-name-target');
-                    if(originEl) {
-                        let prevTitle = originEl.innerText.trim();
-                        let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
-                        origin = prevMatch ? prevMatch[2].trim() : prevTitle;
-                    }
+                if (prevItem && prevItem.querySelector('.item-name-target')) {
+                    let prevTitle = prevItem.querySelector('.item-name-target').innerText.trim();
+                    let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+                    origin = prevMatch ? prevMatch[2].trim() : prevTitle;
                 }
             }
-            let mode = 'transit'; 
-            let iconEl = currentItem.querySelector('.transport-icon');
-            if (iconEl) {
-                let iconText = iconEl.innerText.trim();
-                if (iconText === 'directions_walk') mode = 'walking';
-                if (iconText === 'directions_car') mode = 'driving';
-            }
+            let mode = 'transit'; let iconEl = currentItem.querySelector('.transport-icon');
+            if (iconEl) { let t = iconEl.innerText.trim(); if (t === 'directions_walk') mode = 'walking'; if (t === 'directions_car') mode = 'driving'; }
             let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
-            if (origin && origin !== '輸入行程名稱') { mapUrl += `&origin=${encodeURIComponent(origin)}`; }
-            
+            if (origin && origin !== '輸入行程名稱') mapUrl += `&origin=${encodeURIComponent(origin)}`;
             window.location.href = mapUrl;
         }
 
         function updateDayTabs() {
-            let container = document.getElementById('day-tabs-container');
-            if (!container) return; 
-            
-            let href = window.location.href;
-            let shareMatch = href.match(/[?&]share=([0-9,，、]+)/);
-            let allowedIndexes = null;
-            if (shareMatch) {
-                let shareParam = shareMatch[1].replace(/，/g, ',').replace(/、/g, ',');
-                allowedIndexes = shareParam.split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
-            }
-
+            let container = document.getElementById('day-tabs-container'); if (!container) return; 
+            let shareMatch = window.location.href.match(/[?&]share=([0-9,，、]+)/);
+            let allowedIndexes = shareMatch ? shareMatch[1].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d)) : null;
             let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            let html = ''; 
-            let activeIndex = -1;
-            
+            let html = ''; let activeIndex = -1;
             cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; });
-
-            if (allowedIndexes && !allowedIndexes.includes(activeIndex)) {
-                activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
-            }
+            if (allowedIndexes && !allowedIndexes.includes(activeIndex)) activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
 
             cards.forEach((card, index) => {
                 if (allowedIndexes && !allowedIndexes.includes(index)) return; 
-
-                let titleEl = card.querySelector('.section-title');
-                let title = titleEl ? titleEl.innerText : '';
-                let dateMatch = title.match(/\d{1,2}\/\d{1,2}/);
-                let dateStr = dateMatch ? dateMatch[0] : '日期';
-                let isActive = (index === activeIndex) ? 'active' : '';
-                
-                html += `<div class="day-tab ${isActive}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`;
+                let title = card.querySelector('.section-title') ? card.querySelector('.section-title').innerText : '';
+                let dateStr = title.match(/\d{1,2}\/\d{1,2}/) ? title.match(/\d{1,2}\/\d{1,2}/)[0] : '日期';
+                html += `<div class="day-tab ${index === activeIndex ? 'active' : ''}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`;
             });
             container.innerHTML = html;
-            
             if (cards.length > 0) { 
-                if (activeIndex === -1 || activeIndex >= cards.length) {
-                    activeIndex = (allowedIndexes && allowedIndexes.length > 0 && allowedIndexes[0] < cards.length) ? allowedIndexes[0] : 0;
-                }
+                if (activeIndex === -1 || activeIndex >= cards.length) activeIndex = allowedIndexes ? allowedIndexes[0] : 0;
                 switchDayCard(activeIndex); 
             }
             setTimeout(adjustStickyTabs, 50);
         }
 
         function switchDayCard(targetIndex) {
-            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            cards.forEach((card, idx) => {
+            document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => {
                 let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`);
-                if (idx === targetIndex) {
-                    card.style.display = 'block';
-                    if(tab) {
-                        tab.classList.add('active');
-                        tab.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-                    }
-                } else {
-                    card.style.display = 'none';
-                    if(tab) tab.classList.remove('active');
-                }
-            });
-            saveData(); 
+                if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } 
+                else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); }
+            }); saveData(); 
         }
 
         function addNewDayCard() {
-            let container = document.getElementById('itinerary-days-container');
-            let dayCount = container.querySelectorAll('.day-card').length + 1;
+            let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1;
             let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; 
             div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`;
-            container.appendChild(div);
-            updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); 
+            container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); 
         }
 
-        function deleteDayCard(btn, event) {
-            event.stopPropagation();
-            if(confirm("確定刪除這天所有行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); }
-        }
+        function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天所有行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
 
         function addItineraryItem(btnElement) {
-            const newItem = document.createElement('div');
-            newItem.className = 'timeline-item';
-            newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `
-                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                <div class="time-column">
-                    <div class="start-time editable" contenteditable="true">12:00</div>
-                    <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div>
-                    <div class="end-time">13:00</div>
-                </div>
-                <div class="content-box">
-                    <div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;">
-                        <div style="flex-grow: 1; min-width: 0;">
-                            <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
-                            <div class="item-note editable" contenteditable="true">備註：</div>
-                        </div>
-                        <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;"><span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span></div>
-                    </div>
-                    <div class="action-row">
-                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                        <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
-                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
-                    </div>
-                </div>
-                <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-            `;
-            btnElement.parentNode.insertBefore(newItem, btnElement);
-            let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card);
-            saveData();
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div><div class="end-time">13:00</div></div><div class="content-box"><div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;"><div style="flex-grow: 1; min-width: 0;"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;"><span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span></div></div><div class="action-row"><button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button><button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button><div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
         }
 
         function addTransportText(btn) {
-            const newItem = document.createElement('div');
-            newItem.className = 'timeline-item';
-            newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新交通指南</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
 
-        function deleteHotelCard(btn, event) {
-            event.stopPropagation();
-            if(confirm("確定要刪除這個住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); }
-        }
+        function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定要刪除這個住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
 
         function addHotelCard() {
-            let container = document.getElementById('hotel-cards-container');
-            let div = document.createElement('div');
-            div.className = 'glass-card hotel-card';
+            let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
             div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><span class="delete-btn" onclick="deleteHotelCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>`;
             container.appendChild(div); saveData();
         }
 
         function addGeneralItemWithNote(btnElement) {
-            let wrapper = document.getElementById('shopping-list');
-            let target = wrapper ? wrapper : btnElement.parentNode;
-            const newItem = document.createElement('div');
-            newItem.className = 'timeline-item';
-            newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            let wrapper = document.getElementById('shopping-list'); let target = wrapper ? wrapper : btnElement.parentNode;
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
-            if (wrapper) wrapper.appendChild(newItem); else target.insertBefore(newItem, btnElement);
-            saveData();
+            if (wrapper) wrapper.appendChild(newItem); else target.insertBefore(newItem, btnElement); saveData();
         }
 
         function openLinkFromText(btn, event) {
-            event.preventDefault(); event.stopPropagation();
-            let parentBox = btn.closest('.content-box');
-            let text = parentBox.innerText; 
-            let urlMatch = text.match(/https?:\/\/[^\s\)]+/);
-            if (urlMatch) {
-                window.location.href = urlMatch[0];
-            } else {
+            event.preventDefault(); event.stopPropagation(); let text = btn.closest('.content-box').innerText; let urlMatch = text.match(/https?:\/\/[^\s\)]+/);
+            if (urlMatch) { window.location.href = urlMatch[0]; } 
+            else {
                 let manualUrl = prompt('未偵測到網址，請直接貼上連結 (需包含 http)：', 'https://');
-                if (manualUrl && manualUrl.startsWith('http')) {
-                    let noteEl = parentBox.querySelector('.item-note');
-                    if(noteEl && noteEl.innerText.trim() === '備註/貼上連結：') {
-                        noteEl.innerText = manualUrl;
-                        saveData();
-                    }
-                    window.location.href = manualUrl;
-                }
+                if (manualUrl && manualUrl.startsWith('http')) { let noteEl = btn.closest('.content-box').querySelector('.item-note'); if(noteEl && noteEl.innerText.trim() === '備註/貼上連結：') { noteEl.innerText = manualUrl; saveData(); } window.location.href = manualUrl; }
             }
         }
 
         function addLinkItem(btnElement, containerId) {
-            let url = prompt('請輸入要前往的網址 (含 https://)：', 'https://');
-            let text = prompt('請輸入顯示的名稱：', '新連結');
+            let url = prompt('請輸入要前往的網址 (含 https://)：', 'https://'); let text = prompt('請輸入顯示的名稱：', '新連結');
             if(url && text) {
-                const div = document.createElement('div');
-                div.className = 'link-item flex-between';
+                const div = document.createElement('div'); div.className = 'link-item flex-between';
                 div.innerHTML = `<a href="${url}" class="note-link" style="flex-grow:1; color:var(--primary-color); font-weight:bold; text-decoration:none;">${text}</a><span class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>`;
                 document.getElementById(containerId).appendChild(div); saveData();
             }
         }
 
         function predictLuggageType(titleElement) {
-            const text = titleElement.innerText;
-            const timelineItem = titleElement.closest('.timeline-item');
-            const select = timelineItem.querySelector('.luggage-select');
-            if (!select) return;
+            const text = titleElement.innerText; const select = titleElement.closest('.timeline-item').querySelector('.luggage-select'); if (!select) return;
             if (select.value === '背包') {
-                const smallBagKeywords = ['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'];
-                const checkedKeywords = ['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'];
                 let predicted = null;
-                if (smallBagKeywords.some(kw => text.includes(kw))) predicted = '小包包';
-                else if (checkedKeywords.some(kw => text.includes(kw))) predicted = '託運';
-                if (predicted) {
-                    select.value = predicted;
-                    Array.from(select.options).forEach(opt => {
-                        if(opt.value === predicted) opt.setAttribute('selected', 'selected');
-                        else opt.removeAttribute('selected');
-                    });
-                }
+                if (['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'].some(kw => text.includes(kw))) predicted = '小包包';
+                else if (['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'].some(kw => text.includes(kw))) predicted = '託運';
+                if (predicted) { select.value = predicted; Array.from(select.options).forEach(opt => { if(opt.value === predicted) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); }
             }
         }
 
         function addTodoCategory(btnElement) {
-            const newCat = document.createElement('div');
-            newCat.className = 'todo-category-header flex-between';
+            const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
             newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span><span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span></div>`;
             btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
         }
 
         function addTodoItemHere(btnElement) {
-            const newItem = document.createElement('div');
-            newItem.className = 'timeline-item';
-            newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
-            const header = btnElement.closest('.todo-category-header');
-            header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
+            const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
         function addTodoItemToContainer(containerId) {
-            const newItem = document.createElement('div');
-            newItem.className = 'timeline-item';
-            newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             if (containerId === 'booking-list') {
-                newItem.innerHTML = `
-                    <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                    <div class="content-box">
-                        <div class="item-title editable" contenteditable="true">輸入預訂項目</div>
-                        <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
-                        <div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div>
-                    </div>
-                    <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-                `;
+                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
             } else {
                 newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
-            }
-            document.getElementById(containerId).appendChild(newItem); saveData();
+            } document.getElementById(containerId).appendChild(newItem); saveData();
         }
 
         function deleteTodoPerson() {
-            let select = document.getElementById('todo-person-select');
-            let personName = select.value;
+            let select = document.getElementById('todo-person-select'); let personName = select.value;
             if (personName === '預設範本') { alert('「預設範本」為系統基礎清單，無法被刪除喔！'); return; }
             if (confirm(`確定要刪除人員「${personName}」的所有待辦清單嗎？\n(此操作會一併移除該人員的所有項目)`)) {
                 Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); });
-                let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`);
-                if (targetList) targetList.remove();
+                let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove();
                 select.value = '預設範本'; switchTodoPerson('預設範本');
             }
         }
 
         function renderPayerTags() {
-            let html = '';
-            payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; });
+            let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; });
             document.getElementById('payer-tags-container').innerHTML = html;
         }
 
         function updatePayerDropdowns() {
             let options = payers.map(p => `<option value="${p}">${p}</option>`).join('');
             document.querySelectorAll('.payer-select').forEach(sel => {
-                let currentVal = sel.value || sel.getAttribute('data-saved-val');
-                sel.innerHTML = options;
-                if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } 
-                else if (payers.length > 0) { sel.value = payers[0]; }
+                let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options;
+                if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; }
             });
         }
 
-        function addPayer() {
-            let name = prompt('請輸入新的付款人名稱：');
-            if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); }
-        }
+        function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
+        function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
 
-        function deletePayer(idx) {
-            if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; }
-            if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); }
-        }
-
-        function triggerReceiptUpload(boxElement) {
-            currentReceiptBox = boxElement;
-            const input = document.getElementById('receipt-file-input');
-            input.value = ''; input.click();
-        }
-
-        function triggerItemUpload(boxElement) {
-            if(boxElement.querySelector('img')) return; 
-            currentItemThumbBox = boxElement;
-            const input = document.getElementById('item-file-input');
-            input.value = ''; input.click();
-        }
+        function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
+        function triggerItemUpload(boxElement) { if(boxElement.querySelector('img')) return; currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
 
         function addBudgetRow(item = '新項目', payerName = payers[0], split = '平分', currency = currentTravelCurrency, amount = '0') {
-            const tbody = document.getElementById('budget-tbody');
-            const tr = document.createElement('tr');
-            tr.className = 'budget-row';
-            
-            let currentRate = allRatesToTWD[currency] || 1;
-            tr.setAttribute('data-rate', currentRate);
-
+            const tbody = document.getElementById('budget-tbody'); const tr = document.createElement('tr'); tr.className = 'budget-row';
+            let currentRate = allRatesToTWD[currency] || 1; tr.setAttribute('data-rate', currentRate);
             let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
-            let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR'];
-            if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
+            let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR']; if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
             let currencyOpts = opts.map(c => `<option value="${c}" ${c===currency?'selected':''}>${c}</option>`).join('');
-            
             let formattedAmt = Number(String(amount).replace(/,/g, '') || 0).toLocaleString('en-US');
             
             tr.innerHTML = `
                 <td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td>
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td>
-                <td>
-                    <select class="split-select" onchange="saveData(); calcBudget();">
-                        <option value="平分" ${split==='平分'?'selected':''}>平分</option>
-                        <option value="個人" ${split==='個人'?'selected':''}>個人</option>
-                    </select>
-                </td>
-                <td style="white-space:nowrap;">
-                    <select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();" style="width:35%; display:inline-block; padding:0; text-align-last:left;">
-                        ${currencyOpts}
-                    </select>
-                    <input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();" style="width:60%; display:inline-block; text-align:right; padding:0;">
-                </td>
-                <td style="text-align:center;">
-                    <div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; white-space: nowrap;">
-                        <div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>
-                        <span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span>
-                    </div>
-                </td>
+                <td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${split==='平分'?'selected':''}>平分</option><option value="個人" ${split==='個人'?'selected':''}>個人</option></select></td>
+                <td style="white-space:nowrap;"><select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();" style="width:35%; display:inline-block; padding:0; text-align-last:left;">${currencyOpts}</select><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();" style="width:60%; display:inline-block; text-align:right; padding:0;"></td>
+                <td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>
             `;
             tbody.appendChild(tr); calcBudget(); saveData();
         }
 
-        function deleteBudgetRow(btn) {
-            if(confirm('確定刪除此記帳項目嗎？')) {
-                let tr = btn.closest('tr');
-                let img = tr.querySelector('.receipt-thumb-wrap img');
-                if (img) deleteImageFromCloud(img.src);
-                tr.remove();
-                calcBudget();
-                saveData();
-            }
-        }
+        function deleteBudgetRow(btn) { if(confirm('確定刪除此記帳項目嗎？')) { let tr = btn.closest('tr'); let img = tr.querySelector('.receipt-thumb-wrap img'); if (img) deleteImageFromCloud(img.src); tr.remove(); calcBudget(); saveData(); } }
 
         function calcBudget() {
             const rows = document.querySelectorAll('#budget-tbody .budget-row');
-            let totalsPaid = {}; 
-            let totalsOwed = {};
-            let grandTotal = 0;
-            
+            let totalsPaid = {}; let totalsOwed = {}; let grandTotal = 0;
             payers.forEach(p => { totalsPaid[p] = 0; totalsOwed[p] = 0; });
             
             rows.forEach(r => {
                 let payer = r.querySelector('.payer-select')?.value;
                 let splitType = r.querySelector('.split-select')?.value || '個人';
                 let rowCurr = r.querySelector('.curr-select')?.value;
-                let amountInputEl = r.querySelector('.amount-input');
-                if(!amountInputEl) return;
+                let amountInputEl = r.querySelector('.amount-input'); if(!amountInputEl) return;
                 
-                let valStr = amountInputEl.value.replace(/,/g, '');
-                let amount = parseFloat(valStr) || 0;
-                
-                if (document.activeElement !== amountInputEl) {
-                    let formatted = amount.toLocaleString('en-US');
-                    amountInputEl.value = formatted;
-                    amountInputEl.setAttribute('value', formatted); 
-                }
+                let valStr = amountInputEl.value.replace(/,/g, ''); let amount = parseFloat(valStr) || 0;
+                if (document.activeElement !== amountInputEl) { let formatted = amount.toLocaleString('en-US'); amountInputEl.value = formatted; amountInputEl.setAttribute('value', formatted); }
 
                 let rowRate = parseFloat(r.getAttribute('data-rate'));
-                if (isNaN(rowRate) || !rowRate) {
-                    rowRate = allRatesToTWD[rowCurr] || 1; 
-                    r.setAttribute('data-rate', rowRate);
-                }
+                if (isNaN(rowRate) || !rowRate) { rowRate = allRatesToTWD[rowCurr] || 1; r.setAttribute('data-rate', rowRate); }
                 if (rowCurr === 'TWD') rowRate = 1; 
                 
                 let amtInTWD = amount * rowRate;
-                
-                if(payer) {
-                    if(totalsPaid[payer] === undefined) { totalsPaid[payer] = 0; totalsOwed[payer] = 0; }
-                    totalsPaid[payer] += amtInTWD;
-                }
+                if(payer) { if(totalsPaid[payer] === undefined) { totalsPaid[payer] = 0; totalsOwed[payer] = 0; } totalsPaid[payer] += amtInTWD; }
                 grandTotal += amtInTWD;
                 
-                if (splitType === '平分') {
-                    let splitAmount = amtInTWD / payers.length;
-                    payers.forEach(p => {
-                        totalsOwed[p] += splitAmount;
-                    });
-                } else {
-                    if(payer) {
-                        totalsOwed[payer] += amtInTWD;
-                    }
-                }
+                if (splitType === '平分') { let splitAmount = amtInTWD / payers.length; payers.forEach(p => { totalsOwed[p] += splitAmount; }); } 
+                else { if(payer) { totalsOwed[payer] += amtInTWD; } }
             });
             
-            let balances = {};
-            let debtors = [];
-            let creditors = [];
-            
+            let balances = {}; let debtors = []; let creditors = [];
             payers.forEach(p => {
                 balances[p] = totalsPaid[p] - totalsOwed[p];
                 if (balances[p] < -0.5) debtors.push({ name: p, amount: Math.abs(balances[p]) });
                 else if (balances[p] > 0.5) creditors.push({ name: p, amount: balances[p] });
             });
             
-            let transfers = [];
-            let i = 0, j = 0;
+            let transfers = []; let i = 0, j = 0;
             while (i < debtors.length && j < creditors.length) {
-                let debtor = debtors[i];
-                let creditor = creditors[j];
+                let debtor = debtors[i]; let creditor = creditors[j];
                 let amount = Math.min(debtor.amount, creditor.amount);
-                
                 transfers.push(`${debtor.name} <span class="material-icons-round" style="font-size:12px; vertical-align:middle; color:#888;">arrow_forward</span> ${creditor.name}：NT$${Math.round(amount).toLocaleString('en-US')}`);
-                
-                debtor.amount -= amount;
-                creditor.amount -= amount;
-                
-                if (debtor.amount < 0.5) i++;
-                if (creditor.amount < 0.5) j++;
+                debtor.amount -= amount; creditor.amount -= amount;
+                if (debtor.amount < 0.5) i++; if (creditor.amount < 0.5) j++;
             }
             
             let resHTML = `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px; border-bottom:1px dashed #ccc; padding-bottom:8px; margin-bottom:8px;"><span> 旅程總花費：</span><span>NT$${Math.round(grandTotal).toLocaleString('en-US')}</span></div>`;
-            
             resHTML += '<div style="font-size:12px; font-weight:bold; margin-bottom:6px; color:#555;"> 各自應付總額 (含個人與共同)：</div>';
-            for(let p in totalsOwed) { 
-                resHTML += `<div class="flex-between" style="font-size:13px; margin-bottom:4px; color:#444;"><span> ${p}</span><span>NT$${Math.round(totalsOwed[p]).toLocaleString('en-US')}</span></div>`; 
-            }
-            
+            for(let p in totalsOwed) { resHTML += `<div class="flex-between" style="font-size:13px; margin-bottom:4px; color:#444;"><span> ${p}</span><span>NT$${Math.round(totalsOwed[p]).toLocaleString('en-US')}</span></div>`; }
             resHTML += `<div style="font-size:13px; font-weight:bold; margin-top:12px; margin-bottom:6px; color:#d32f2f; background:#ffebee; padding:4px 8px; border-radius:4px; display:inline-block;"> 💰 結算：誰該給誰錢？</div>`;
-            if (transfers.length > 0) {
-                transfers.forEach(t => {
-                    resHTML += `<div style="font-size:14px; font-weight:bold; margin-bottom:6px; padding-left:4px;">${t}</div>`;
-                });
-            } else {
-                resHTML += `<div style="font-size:13px; color:#777; padding-left:4px;">目前帳目平衡，無需給錢。</div>`;
-            }
+            if (transfers.length > 0) { transfers.forEach(t => { resHTML += `<div style="font-size:14px; font-weight:bold; margin-bottom:6px; padding-left:4px;">${t}</div>`; }); } 
+            else { resHTML += `<div style="font-size:13px; color:#777; padding-left:4px;">目前帳目平衡，無需給錢。</div>`; }
             
-            let resEl = document.getElementById('budget-result');
-            if(resEl) resEl.innerHTML = resHTML;
+            let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
         }
 
         function switchTodoPerson(personName) {
@@ -1583,7 +1339,7 @@
                     uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
                         currentReceiptBox.outerHTML = `
                             <div class="receipt-thumb-wrap">
-                                <img src="${driveUrl}" onclick="openImageModal(this.src, event)">
+                                <img src="${driveUrl}" onclick="openImageModal(this, event)">
                                 <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
                             </div>`; 
                         saveData();
@@ -1610,7 +1366,7 @@
                     uploadImageToDrive(compressedDataUrl, file.name, function(driveUrl) {
                         currentItemThumbBox.style.border = 'none';
                         currentItemThumbBox.innerHTML = `
-                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openImageModal(this.src, event)">
+                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1);" onclick="openImageModal(this, event)">
                             <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
                         `;
                         saveData();
@@ -1634,7 +1390,7 @@
 
         function addImageToGallery(src, containerId) {
             const wrapper = document.createElement('div'); wrapper.className = 'img-wrapper';
-            const img = document.createElement('img'); img.src = src; img.onclick = function(e) { openImageModal(this.src, e); };
+            const img = document.createElement('img'); img.src = src; img.onclick = function(e) { openImageModal(this, e); };
             const delBtn = document.createElement('div'); delBtn.className = 'img-del-btn'; delBtn.innerHTML = '&times;';
             delBtn.onclick = function(e) { 
                 e.stopPropagation(); 
@@ -1645,11 +1401,6 @@
                 } 
             };
             wrapper.appendChild(img); wrapper.appendChild(delBtn); document.getElementById(containerId).appendChild(wrapper);
-        }
-
-        function openImageModal(src, event) {
-            event.stopPropagation();
-            document.getElementById('modalImg').src = src; document.getElementById('imageModal').style.display = 'flex';
         }
 
         function setStatus(icon, text, isError = false) {
@@ -1690,21 +1441,26 @@
                 return;
             }
 
+            if (typeof LZString === 'undefined') {
+                alert("⚠️ 嚴重警告：壓縮引擎發生異常！\n為了保護您的資料不被覆寫損毀，系統已鎖定存檔功能。請檢查網路或關閉廣告阻擋器後重新整理。");
+                return;
+            }
+
             if (!skipHistory) { recordHistory(); }
             
             let payload;
+            pendingSaveAction = true;
             try {
                 const state = captureState(); 
-                if (typeof LZString !== 'undefined') {
-                    payload = JSON.stringify({ 
-                        isCompressed: true, 
-                        data: LZString.compressToUTF16(JSON.stringify(state)) 
-                    });
-                } else {
-                    payload = JSON.stringify(state); 
-                }
+                const compressedData = LZString.compressToUTF16(JSON.stringify(state));
+                lastCloudDataHash = compressedData; 
+                payload = JSON.stringify({ 
+                    isCompressed: true, 
+                    data: compressedData 
+                });
             } catch(e) {
                 console.error("存檔壓縮失敗", e);
+                pendingSaveAction = false;
                 return;
             }
 
@@ -1713,15 +1469,21 @@
             
             if(!API_URL.startsWith("https://script.google.com")) {
                 setStatus('cloud_off', '本機模式(未綁雲端)', true);
-                if(isManual) alert("❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)"); return;
+                if(isManual) alert("❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)"); 
+                pendingSaveAction = false;
+                return;
             }
             setStatus('sync', '雲端同步壓縮檔中...'); clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
+                pendingSaveAction = false;
+                isSavingToCloud = true;
                 fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
+                    isSavingToCloud = false;
                     if(data.status === "success") { 
                         setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 儲存成功！高壓縮檔案已同步至 Google 雲端。");
                     }
                 }).catch(e => {
+                    isSavingToCloud = false;
                     setStatus('cloud_off', '連線失敗(已存本機)', true);
                     if(isManual) alert("❌ 同步失敗！請檢查網路連線。");
                 });
@@ -1743,12 +1505,19 @@
             const forceUnlockTimer = setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash && splash.style.display !== 'none') {
-                    console.log("強制解鎖防死機");
+                    console.log("強制解鎖防死機盾啟動");
                     isAppReady = true;
                     splash.style.opacity = '0'; 
                     setTimeout(() => splash.style.display = 'none', 300);
                 }
             }, 12000);
+
+            if (typeof LZString === 'undefined') {
+                alert("⚠️ 錯誤：無法載入核心壓縮引擎！\n請關閉廣告阻擋程式(AdBlock) 或 切換網路後再重新整理，以免資料遺失。");
+                const splashMsg = document.querySelector('.splash-text p');
+                if(splashMsg) splashMsg.innerText = '載入失敗，請重整頁面';
+                return; 
+            }
 
             const template = document.getElementById('default-template');
             if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
@@ -1766,8 +1535,9 @@
                 clearTimeout(fallbackTimeout);
                 
                 let state = rawData;
-                if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') {
+                if (rawData && rawData.isCompressed) {
                     try {
+                        lastCloudDataHash = rawData.data; 
                         state = JSON.parse(LZString.decompressFromUTF16(rawData.data));
                     } catch(e) { console.error("解壓縮失敗", e); }
                 }
@@ -1800,6 +1570,7 @@
                 try {
                     let parsed = JSON.parse(saved);
                     if (parsed.isCompressed && typeof LZString !== 'undefined') {
+                        lastCloudDataHash = parsed.data;
                         state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
                     } else {
                         state = parsed;
@@ -1948,7 +1719,7 @@
         function rebindEvents() {
             document.querySelectorAll('.img-wrapper').forEach(wrapper => {
                 const img = wrapper.querySelector('img'); const delBtn = wrapper.querySelector('.img-del-btn');
-                if(img) img.onclick = function(e) { openImageModal(this.src, e); };
+                if(img) img.onclick = function(e) { openImageModal(this, e); };
                 if(delBtn) delBtn.onclick = function(e) { 
                     e.stopPropagation(); 
                     if(confirm("確定刪除？")) { 
@@ -1964,13 +1735,13 @@
                 if(img && !delBtn) {
                     wrap.outerHTML = `
                         <div class="receipt-thumb-wrap">
-                            <img src="${img.src}" onclick="openImageModal(this.src, event)">
+                            <img src="${img.src}" onclick="openImageModal(this, event)">
                             <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
                         </div>`;
                 }
             });
             document.querySelectorAll('.item-thumb-box img').forEach(img => {
-                img.onclick = function(e) { openImageModal(this.src, e); };
+                img.onclick = function(e) { openImageModal(this, e); };
             });
         }
         
