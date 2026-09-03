@@ -63,11 +63,11 @@
         .global-controls { display: flex; justify-content: space-between; align-items: center; padding: 8px 15px 6px 15px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 0px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 5px rgba(0,0,0,0.05); transition: 0.3s; }
         body.dark-mode .global-controls { background: rgba(18, 18, 18, 0.95); }
         
-        /* 🌟 防爆框：隱藏按鈕區的水平捲軸，保留滑動能力 */
+        /* 防爆框：隱藏按鈕區的水平捲軸，保留滑動能力 */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 🌟 按鈕防護強化：強制阻擋 iOS 反白與放大鏡 */
+        /* 按鈕防護強化：強制阻擋 iOS 反白與放大鏡 */
         .manual-save-btn, .manual-save-btn * { 
             -webkit-touch-callout: none !important; 
             -webkit-user-select: none !important; 
@@ -154,6 +154,7 @@
         body.dark-mode select, body.dark-mode input { background: #2a2a2a; color: #e0e0e0; border: 1px solid #444;}
         .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
         
+        /* 橫向滑動天數分頁樣式 */
         .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 45px; z-index: 15; background: var(--bg-color); transition: 0.3s; }
         .day-tabs-wrapper::-webkit-scrollbar { display: none; }
         .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -180,7 +181,7 @@
         .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.3s;}
         body.dark-mode .link-item { background: #222; }
 
-        /* 🌟 Currency & Budget: 黃金比例欄寬 */
+        /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
@@ -248,7 +249,6 @@
     <div id="mobile-tooltip"></div>
     
     <script>
-        // 🌟 初始化全域防呆與計時器 
         let isAppReady = false;
         let lastActiveTime = Date.now();
 
@@ -293,8 +293,7 @@
         </div>
     </div>
 
-    <!-- 🌟 頂端選單空間優化：縮小按鈕間距(gap:4px)、縮減按鈕內留白(padding:6px)、加上隱形防爆框捲軸 -->
-    <div class="global-controls">
+    <div class="global-controls" style="padding: 8px 15px 6px 15px;">
         <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
             <div class="hide-scrollbar" style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
                 <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a; padding: 6px 6px;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:15px;">save</span></button>
@@ -482,7 +481,7 @@
                         <span class="material-icons-round delete-btn" style="padding:0; font-size: 20px; cursor: pointer;" onclick="deleteTodoPerson()">delete_outline</span>
                     </div>
                 </div>
-                <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷建立新人員清單</button>
+                <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷貝建立新人員清單</button>
                 
                 <div id="person-todo-container">
                     <div class="person-todo-list" data-person="預設範本" style="display: block;">
@@ -747,7 +746,7 @@
             });
         }
 
-        // 🌟 終極 DOM 淨化引擎：無死角清除廢棄標籤與無用屬性
+        // 🌟 終極 DOM 淨化引擎
         function captureState() {
             let tempMain = document.createElement('div');
             tempMain.innerHTML = document.getElementById('main-container').innerHTML;
@@ -758,7 +757,6 @@
             [tempMain, tempHero].forEach(container => {
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-                
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
                     el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
                 });
@@ -810,6 +808,7 @@
             renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
         }
 
+        // 🌟 升級：透過 Modern Clipboard API 無痛複製
         function generateShareLink() {
             let input = prompt('請輸入你想分享給朋友的「天數數字」\n(例如想分享第2天與第3天，請輸入 2,3)：');
             if (!input) return;
@@ -823,27 +822,22 @@
             
             let currentUrl = window.location.href.split('?')[0].split('#')[0];
             let shareUrl = currentUrl + '?share=' + days.join(',');
+            let successMsg = '✅ 專屬分享網址已成功複製！\n您可以直接去 LINE 或對話框「貼上」給朋友。\n\n當朋友開啟此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁。';
             
-            let textArea = document.createElement("textarea");
-            textArea.value = shareUrl;
-            textArea.style.position = "fixed"; 
-            textArea.style.top = "-9999px";
-            document.body.appendChild(textArea);
-            
-            textArea.focus();
-            textArea.select();
-            textArea.setSelectionRange(0, 99999); 
-            
-            try {
-                document.execCommand('copy');
-                alert('✅ 專屬分享網址已成功複製！\n您可以直接去 LINE 或對話框「貼上」給朋友。\n\n當朋友開啟此連結時，將只能「純檢視」您指定的第 ' + days.join(', ') + ' 天行程，無法修改或看到其他分頁。');
-            } catch (err) {
-                prompt('系統無法自動複製，請自行拷貝以下網址：', shareUrl);
+            // 嘗試使用現代化 API 寫入剪貼簿
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    alert(successMsg);
+                }).catch(err => {
+                    prompt('系統無法自動複製，請長按全選以下網址並拷貝：', shareUrl);
+                });
+            } else {
+                // 完美降級：如果瀏覽器太嚴格，直接跳框讓使用者拷貝
+                prompt('請長按全選以下網址並拷貝 (拷貝後按確定)：\n\n' + successMsg, shareUrl);
             }
-            
-            document.body.removeChild(textArea);
         }
 
+        // 🌟 修正：確保分享模式下的天數分頁按鈕能正常運作
         function applyShareMode() {
             let href = window.location.href;
             let shareMatch = href.match(/[?&]share=([0-9,，、]+)/);
@@ -872,16 +866,8 @@
                 itTab.style.paddingBottom = '40px'; 
             }
             
-            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            cards.forEach((card, idx) => {
-                if (allowedIndexes.includes(idx)) {
-                    card.style.display = 'block';
-                    card.style.marginBottom = '20px';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
+            // 🌟 移除此處強制把所有卡片變成 display:block 的邏輯，交給 switchDayCard 去控制
+            
             document.querySelectorAll('.editable').forEach(el => {
                 el.setAttribute('contenteditable', 'false');
                 el.style.border = 'none';
@@ -1696,7 +1682,6 @@
             saveData(); 
         });
 
-        // 🌟 核心存檔邏輯
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             
@@ -1743,11 +1728,9 @@
             }, isManual ? 0 : 1500); 
         }
 
-        // 🌟 防死機安全載入邏輯
         function loadData() {
             let isLoaded = false;
             
-            // 安全解鎖機制：強制 10 秒後如果還卡住，直接解除載入畫面
             const fallbackTimeout = setTimeout(() => {
                 if(!isLoaded) {
                     isLoaded = true;
@@ -1837,7 +1820,6 @@
 
         function finalizeLoad() {
             try {
-                // 🌟 相容舊版資料與升級寬度
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => {
                     if(!tr.querySelector('.split-select')) {
                         let tds = tr.querySelectorAll('td');
@@ -1953,7 +1935,6 @@
                 fetchExchangeRate();
                 initMobileTooltips();
                 
-                // 🌟 所有資料渲染完畢後，安全解開存檔鎖定
                 isAppReady = true;
                 lastActiveTime = Date.now();
                 
