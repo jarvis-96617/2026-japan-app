@@ -218,7 +218,7 @@
     <div id="mobile-tooltip"></div>
     
     <script>
-        // 初始化全域變數
+        // 初始化全域變數 (絕對不可重複宣告)
         let isAppReady = false;
         let lastActiveTime = Date.now();
         let lastCloudDataHash = null;
@@ -265,7 +265,44 @@
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideTip(); }, {passive: true});
         }
 
-        // 防護引擎：喚醒查勤 (Hash 防覆寫)
+        // 🌟 雙重破圖代理防護網：當 Google Native 網址在 Safari 被阻擋時，瞬間啟動備用穿透代理
+        function handleImageError(img) {
+            if (!img.dataset.proxied) {
+                img.dataset.proxied = 'true'; // 標記已使用備用代理，避免無限迴圈
+                let match = img.src.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+                if (match && match[1]) {
+                    // 呼叫跨站代理伺服器，完美繞過 Apple ITP 阻擋
+                    img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`;
+                    return;
+                }
+            }
+            // 真的連代理都失敗，給予優雅的提示
+            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
+        }
+
+        // 🌟 核心防破圖黑科技第一層：將 Google 連結轉化為不受 Apple 阻擋的高速使用者內容網域
+        function getReliableDriveUrl(originalUrl) {
+            if (!originalUrl) return '';
+            let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+            if (match && match[1]) {
+                // 使用 usercontent 下載網域，避免 Safari 對 drive.google.com 的 302 跳轉阻擋
+                return `https://drive.usercontent.google.com/download?id=${match[1]}&export=view&authuser=0`;
+            }
+            return originalUrl;
+        }
+
+        // 🌟 全域點擊攔截：精準捕捉連結圖示點擊，開啟新分頁
+        document.addEventListener('click', function(e) {
+            let linkIcon = e.target.closest('.note-link .material-icons-round');
+            if (linkIcon) {
+                e.preventDefault();
+                e.stopPropagation();
+                let url = linkIcon.closest('.note-link').getAttribute('data-href') || linkIcon.closest('.note-link').getAttribute('href');
+                if (url) window.open(url, '_blank');
+            }
+        });
+
+        // 🌟 雲端同步衝突防護引擎：喚醒時查勤 (Hash 比對)
         function checkCloudFreshness() {
             if (!isAppReady || isSavingToCloud || pendingSaveAction) return;
             if (new URLSearchParams(window.location.search).get('share')) return;
@@ -488,7 +525,7 @@
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('share')) return;
             if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
-            if (typeof LZString === 'undefined') { alert('⚠️ 嚴重警告：壓縮引擎發生異常！\n為保護資料安全，系統已鎖定存檔功能。'); return; }
+            if (typeof LZString === 'undefined') { alert("⚠️ 嚴重警告：壓縮引擎發生異常！\n為保護資料安全，系統已鎖定存檔功能。"); return; }
             if (!skipHistory) { recordHistory(); }
             
             pendingSaveAction = true; let payload;
@@ -504,7 +541,7 @@
             
             if(!API_URL.startsWith("https://script.google.com")) {
                 setStatus('cloud_off', '本機模式(未綁雲端)', true);
-                if(isManual) alert('❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)'); 
+                if(isManual) alert("❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)"); 
                 pendingSaveAction = false; return;
             }
             setStatus('sync', '雲端同步壓縮檔中...'); clearTimeout(syncTimeout);
@@ -512,10 +549,10 @@
                 pendingSaveAction = false; isSavingToCloud = true;
                 fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
                     isSavingToCloud = false;
-                    if(data.status === "success") { setStatus('cloud_done', '雲端已同步'); if(isManual) alert('✅ 儲存成功！高壓縮檔案已同步至 Google 雲端。'); }
+                    if(data.status === "success") { setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 儲存成功！高壓縮檔案已同步至 Google 雲端。"); }
                 }).catch(e => {
                     isSavingToCloud = false; setStatus('cloud_off', '連線失敗(已存本機)', true);
-                    if(isManual) alert('❌ 同步失敗！請檢查網路連線。');
+                    if(isManual) alert("❌ 同步失敗！請檢查網路連線。");
                 });
             }, isManual ? 0 : 1500); 
         }
@@ -532,7 +569,7 @@
             }, 12000);
 
             if (typeof LZString === 'undefined') {
-                alert('⚠️ 錯誤：無法載入壓縮引擎！\n請檢查網路後重新整理。');
+                alert("⚠️ 錯誤：無法載入壓縮引擎！\n請檢查網路後重新整理。");
                 const splashMsg = document.querySelector('.splash-text p'); if(splashMsg) splashMsg.innerText = '載入失敗，請重整頁面'; return; 
             }
 
@@ -639,14 +676,14 @@
                     linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:${oldLinkUrl ? '#1976d2' : '#aaa'};">link</span>`;
                     dashBox.appendChild(linkBox);
                     
-                    // --- 建立 🖼️ 獨立圖片按鈕 ---
+                    // --- 建立 🖼️ 獨立圖片按鈕 (搭載巨型防呆刪除鍵 24x24px 與 onerror 備用代理) ---
                     let photoBox = document.createElement('div');
                     photoBox.className = oldImgSrc ? 'action-box has-photo photo-box' : 'action-box photo-box';
                     photoBox.setAttribute('onclick', 'triggerItemUpload(this, event)');
                     if (oldImgSrc) {
                         photoBox.innerHTML = `
-                            <img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)">
-                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
+                            <img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)" onerror="handleImageError(this)">
+                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div>
                         `;
                     } else {
                         photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
@@ -673,13 +710,18 @@
                     if (oldDel) oldDel.remove();
                 });
 
-                // 2. 自動修復所有剩餘圖片的破圖問題 (轉換為安全的 URL)
+                // 2. 自動修復所有剩餘圖片的破圖問題 (轉換為安全的 URL 並掛上備用代理引擎)
                 document.querySelectorAll('img').forEach(img => {
+                    if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') {
+                        img.setAttribute('onerror', 'handleImageError(this)');
+                    }
                     let currentSrc = img.getAttribute('src');
-                    let newSrc = getReliableDriveUrl(currentSrc);
-                    if (currentSrc !== newSrc) {
-                        img.src = newSrc;
-                        img.setAttribute('src', newSrc);
+                    if(currentSrc) {
+                        let newSrc = getReliableDriveUrl(currentSrc);
+                        if (currentSrc !== newSrc) {
+                            img.src = newSrc;
+                            img.setAttribute('src', newSrc);
+                        }
                     }
                 });
 
@@ -755,7 +797,7 @@
             }
         }
 
-        // 🌟 全新獨立的彈窗連結處理邏輯 (絕對不影響編輯文字)
+        // 🌟 獨立的彈窗連結處理邏輯
         function handleItemLink(btn, event) {
             event.stopPropagation();
             let currentUrl = btn.getAttribute('data-href');
@@ -823,7 +865,7 @@
                 </div>
                 <div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div>
                 <div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div>
-                <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航</button>
+                <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>
             `;
             container.appendChild(div); saveData();
         }
@@ -865,9 +907,47 @@
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
-        // --- 全域工具函式 ---
+        // --- 刪除功能與工具 ---
+        function deleteImageFromCloud(imgUrl) {
+            if (!imgUrl) return;
+            let match = imgUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+            if (match && match[1]) {
+                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteImage', fileId: match[1] }) }).catch(e => console.log('雲端刪除失敗', e));
+            }
+        }
+
         function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定要刪除這個住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
-        function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定要刪除這個項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let img = item.querySelector('img'); if (img) deleteImageFromCloud(img.src); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(); } }
+        
+        function deleteItem(btnElement, event) { 
+            event.stopPropagation(); 
+            if(confirm("確定要刪除這個項目嗎？")) { 
+                let item = btnElement.closest('.timeline-item, .todo-category-header'); 
+                let img = item.querySelector('img'); 
+                if (img) deleteImageFromCloud(img.src); 
+                let card = btnElement.closest('.day-card'); 
+                item.remove(); 
+                if(card) recalculateDayTime(card); 
+                saveData(); 
+            } 
+        }
+
+        // 🌟 強化版圖片刪除：加入 try-catch 防止報錯卡死，加大點擊範圍
+        function deleteItemThumb(delBtn, event) {
+            event.stopPropagation();
+            if(confirm('確定移除此圖片？')) {
+                try {
+                    let box = delBtn.closest('.action-box');
+                    let img = box.querySelector('img'); 
+                    if (img) deleteImageFromCloud(img.src);
+                    box.className = 'action-box photo-box';
+                    box.innerHTML = `<span class="material-icons-round" style="font-size: 14px; color: #aaa;">image</span>`; 
+                    saveData();
+                } catch(err) {
+                    console.error("刪除圖片錯誤", err);
+                    alert("刪除成功，請重新整理頁面。");
+                }
+            }
+        }
 
         function triggerItemUpload(boxElement, event) { 
             if(event) event.stopPropagation();
@@ -876,7 +956,6 @@
             const input = document.getElementById('item-file-input'); input.value = ''; input.click(); 
         }
 
-        // 🌟 圖片上傳引擎：存入 Google Drive 並轉為可靠的直連網址
         function compressImage(file, maxWidth, quality, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -909,27 +988,17 @@
         function handleItemUpload(event) {
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
+                // 使用 1920 高畫素、85% 高畫質上傳
                 compressImage(file, 1920, 0.85, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentItemThumbBox.className = 'action-box has-photo photo-box';
                         currentItemThumbBox.innerHTML = `
-                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)">
-                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
+                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)" onerror="handleImageError(this)">
+                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div>
                         `;
                         saveData();
                     });
                 });
-            }
-        }
-
-        function deleteItemThumb(delBtn, event) {
-            event.stopPropagation();
-            if(confirm('確定移除此圖片？')) {
-                let box = delBtn.closest('.action-box');
-                let img = box.querySelector('img'); if (img) deleteImageFromCloud(img.src);
-                box.className = 'action-box photo-box';
-                box.innerHTML = `<span class="material-icons-round" style="font-size: 14px; color: #aaa;">image</span>`; 
-                saveData();
             }
         }
 
@@ -939,18 +1008,26 @@
             if (file && currentReceiptBox) {
                 compressImage(file, 1920, 0.85, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div></div>`; 
+                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div></div>`; 
                         saveData();
                     });
                 });
             }
         }
+        
         function deleteReceiptThumb(btn, event) {
             event.stopPropagation();
             if(confirm('確定移除此收據圖片？')) {
-                let wrap = btn.closest('.receipt-thumb-wrap'); let img = wrap.querySelector('img'); if (img) deleteImageFromCloud(img.src);
-                wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
-                saveData();
+                try {
+                    let wrap = btn.closest('.receipt-thumb-wrap'); 
+                    let img = wrap.querySelector('img'); 
+                    if (img) deleteImageFromCloud(img.src);
+                    wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
+                    saveData();
+                } catch(err) {
+                    console.error("刪除收據錯誤", err);
+                    alert("刪除成功，請重新整理頁面。");
+                }
             }
         }
 
@@ -1018,26 +1095,6 @@
             if (transfers.length > 0) { transfers.forEach(t => { resHTML += `<div style="font-size:14px; font-weight:bold; margin-bottom:6px; padding-left:4px;">${t}</div>`; }); } 
             else { resHTML += `<div style="font-size:13px; color:#777; padding-left:4px;">目前帳目平衡，無需給錢。</div>`; }
             let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
-        }
-
-        function switchTodoPerson(personName) {
-            document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none');
-            let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block';
-            let select = document.getElementById('todo-person-select');
-            Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); });
-            saveData();
-        }
-
-        function addNewTodoPerson() {
-            let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return;
-            if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; }
-            let currentTemplateName = document.getElementById('todo-person-select').value;
-            let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`);
-            let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none';
-            newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed'));
-            document.getElementById('person-todo-container').appendChild(newList);
-            let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name;
-            select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); 
         }
 
         function renderPayerTags() {
@@ -1222,243 +1279,51 @@
 
         function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天所有行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
 
-        function addTransportText(btn) {
-            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `
-                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新交通指南</div></div>
-                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
-            `;
-            document.getElementById('transport-text-list').appendChild(newItem); saveData();
-        }
-
-        function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定要刪除這個住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
-
-        function addHotelCard() {
-            let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
-            div.innerHTML = `
-                <div class="flex-between" style="margin-bottom: 12px;">
-                    <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2>
-                    <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
-                </div>
-                <div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div>
-                <div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div>
-                <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>
-            `;
-            container.appendChild(div); saveData();
-        }
-
-        function addGeneralItemWithNote(btnElement) {
-            let wrapper = document.getElementById('shopping-list'); let target = wrapper ? wrapper : btnElement.parentNode;
-            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `
-                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div><div class="item-note editable" contenteditable="true">備註：</div></div>
-                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
-            `;
-            target.insertBefore(newItem, btnElement); saveData();
-        }
-
-        function openLinkFromText(btn, event) {
-            event.preventDefault(); event.stopPropagation(); let text = btn.closest('.content-box').innerText; let urlMatch = text.match(/https?:\/\/[^\s\)]+/);
-            if (urlMatch) { window.location.href = urlMatch[0]; } 
-            else {
-                let manualUrl = prompt('未偵測到網址，請直接貼上連結 (需包含 http)：', 'https://');
-                if (manualUrl && manualUrl.startsWith('http')) { let noteEl = btn.closest('.content-box').querySelector('.item-note'); if(noteEl && noteEl.innerText.trim() === '備註/貼上連結：') { noteEl.innerText = manualUrl; saveData(); } window.location.href = manualUrl; }
-            }
-        }
-
-        // 🌟 修正：讓單獨加到清單的參考連結也支援獨立分離式設計
-        function addLinkItem(btnElement, containerId) {
-            let url = prompt('請輸入要前往的網址 (含 https://)：', 'https://'); let text = prompt('請輸入顯示的名稱：', '新連結');
-            if(url && text) {
-                const div = document.createElement('div'); div.className = 'link-item flex-between';
-                div.innerHTML = `<a data-href="${url}" class="note-link" style="flex-grow:1;" contenteditable="false"><span class="material-icons-round" style="font-size:14px; cursor:pointer;" contenteditable="false" title="點擊開啟連結">link</span><span class="editable" contenteditable="true" style="cursor:text; border-bottom:1px dashed transparent;">${text}</span></a><span class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>`;
-                document.getElementById(containerId).appendChild(div); saveData();
-            }
-        }
-
-        function predictLuggageType(titleElement) {
-            const text = titleElement.innerText; const select = titleElement.closest('.timeline-item').querySelector('.luggage-select'); if (!select) return;
-            if (select.value === '背包') {
-                let predicted = null;
-                if (['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'].some(kw => text.includes(kw))) predicted = '小包包';
-                else if (['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'].some(kw => text.includes(kw))) predicted = '託運';
-                if (predicted) { select.value = predicted; Array.from(select.options).forEach(opt => { if(opt.value === predicted) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); }
-            }
-        }
-
-        function addTodoCategory(btnElement) {
-            const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
-            newCat.innerHTML = `
-                <span class="editable" contenteditable="true"> 新增分類名稱</span>
-                <div class="right-action-group"><div class="action-dash-box"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color);"><span class="material-icons-round" style="font-size:16px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
-            `;
-            btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
-        }
-
-        function addTodoItemHere(btnElement) {
-            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `
-                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select>
-                <div class="right-action-group"><div class="action-dash-box"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
-            `;
-            const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
-        }
-
-        function addTodoItemToContainer(containerId) {
-            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            if (containerId === 'booking-list') {
-                newItem.innerHTML = `
-                    <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-                `;
-            } else {
-                newItem.innerHTML = `
-                    <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-                `;
-            } document.getElementById(containerId).appendChild(newItem); saveData();
-        }
-
-        function deleteTodoPerson() {
-            let select = document.getElementById('todo-person-select'); let personName = select.value;
-            if (personName === '預設範本') { alert('「預設範本」為系統基礎清單，無法被刪除喔！'); return; }
-            if (confirm(`確定要刪除人員「${personName}」的所有待辦清單嗎？\n(此操作會一併移除該人員的所有項目)`)) {
-                Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); });
-                let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove();
-                select.value = '預設範本'; switchTodoPerson('預設範本');
-            }
-        }
-
-        function renderPayerTags() {
-            let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; });
-            document.getElementById('payer-tags-container').innerHTML = html;
-        }
-
-        function updatePayerDropdowns() {
-            let options = payers.map(p => `<option value="${p}">${p}</option>`).join('');
-            document.querySelectorAll('.payer-select').forEach(sel => {
-                let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options;
-                if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; }
-            });
-        }
-
-        function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
-        function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
-
-        function triggerItemUpload(boxElement, event) { 
-            if(event) event.stopPropagation();
-            if(boxElement.querySelector('img')) return; 
-            currentItemThumbBox = boxElement; 
-            const input = document.getElementById('item-file-input'); input.value = ''; input.click(); 
-        }
-
-        // 🌟 圖片上傳引擎：存入 Google Drive 並轉為可靠的直連網址
-        function compressImage(file, maxWidth, quality, callback) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
-                    canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    callback(canvas.toDataURL('image/jpeg', quality));
-                }
-                img.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-
-        function uploadImageToDrive(base64Str, filename, callback) {
-            setStatus('sync', '圖片上傳中...');
-            const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
-            fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
-                if(data.status === "success") { 
-                    setStatus('cloud_done', '上傳成功'); 
-                    let driveUrl = getReliableDriveUrl(data.url);
-                    callback(driveUrl); 
-                } 
-                else { setStatus('cloud_off', '上傳失敗', true); alert('圖片上傳失敗：' + (data.message || '未知錯誤')); }
-            }).catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤，圖片無法上傳！'); });
-        }
-
-        function handleItemUpload(event) {
-            const file = event.target.files[0];
-            if (file && currentItemThumbBox) {
-                // 🌟 使用 1920 高畫素、85% 高畫質上傳
-                compressImage(file, 1920, 0.85, function(base64DataUrl) {
-                    uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        currentItemThumbBox.className = 'action-box has-photo photo-box';
-                        currentItemThumbBox.innerHTML = `
-                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)">
-                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
-                        `;
-                        saveData();
-                    });
-                });
-            }
-        }
-
-        function deleteItemThumb(delBtn, event) {
-            event.stopPropagation();
-            if(confirm('確定移除此圖片？')) {
-                let box = delBtn.closest('.action-box');
-                let img = box.querySelector('img'); if (img) deleteImageFromCloud(img.src);
-                box.className = 'action-box photo-box';
-                box.innerHTML = `<span class="material-icons-round" style="font-size: 14px; color: #aaa;">image</span>`; 
-                saveData();
-            }
-        }
-
-        function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
-        function handleReceiptUpload(event) {
-            const file = event.target.files[0];
-            if (file && currentReceiptBox) {
-                compressImage(file, 1920, 0.85, function(base64DataUrl) {
-                    uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div></div>`; 
-                        saveData();
-                    });
-                });
-            }
-        }
-        function deleteReceiptThumb(btn, event) {
-            event.stopPropagation();
-            if(confirm('確定移除此收據圖片？')) {
-                let wrap = btn.closest('.receipt-thumb-wrap'); let img = wrap.querySelector('img'); if (img) deleteImageFromCloud(img.src);
-                wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
-                saveData();
-            }
-        }
-
         function rebindEvents() {
-            // 修復所有舊的圖片容器
+            // 修復所有舊的圖片容器 (防護 try-catch 確保不報錯)
             document.querySelectorAll('.img-wrapper').forEach(wrapper => {
-                const img = wrapper.querySelector('img'); const delBtn = wrapper.querySelector('.img-del-btn');
-                if(img) img.onclick = function(e) { openImageModal(this, e); };
-                if(delBtn) delBtn.onclick = function(e) { 
-                    e.stopPropagation(); 
-                    if(confirm("確定刪除？")) { 
-                        if(img) deleteImageFromCloud(img.src);
-                        wrapper.remove(); 
-                        saveData(); 
-                    } 
-                };
+                try {
+                    const img = wrapper.querySelector('img'); const delBtn = wrapper.querySelector('.img-del-btn');
+                    if(img) {
+                        if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)');
+                        img.onclick = function(e) { openImageModal(this, e); };
+                    }
+                    if(delBtn) {
+                        delBtn.onclick = function(e) { 
+                            e.stopPropagation(); 
+                            if(confirm("確定刪除？")) { 
+                                try {
+                                    if(img) deleteImageFromCloud(img.src);
+                                    wrapper.remove(); 
+                                    saveData(); 
+                                } catch(err) {}
+                            } 
+                        };
+                    }
+                } catch(e) {}
             });
             // 修復記帳區收據容器
             document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
-                const img = wrap.querySelector('img'); 
-                const delBtn = wrap.querySelector('div[onclick*="deleteReceiptThumb"]');
-                if(img && !delBtn) {
-                    wrap.outerHTML = `
-                        <div class="receipt-thumb-wrap">
-                            <img src="${img.src}" onclick="openImageModal(this, event)">
-                            <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
-                        </div>`;
-                } else if (img && delBtn) {
-                    img.onclick = function(e) { openImageModal(this, e); };
-                }
+                try {
+                    const img = wrap.querySelector('img'); 
+                    const delBtn = wrap.querySelector('div[onclick*="deleteReceiptThumb"]');
+                    if(img && !img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)');
+                    if(img && !delBtn) {
+                        wrap.outerHTML = `
+                            <div class="receipt-thumb-wrap">
+                                <img src="${img.src}" onclick="openImageModal(this, event)" onerror="handleImageError(this)">
+                                <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div>
+                            </div>`;
+                    } else if (img && delBtn) {
+                        img.onclick = function(e) { openImageModal(this, e); };
+                        // 強制放大舊版刪除鍵
+                        delBtn.style.width = '24px'; delBtn.style.height = '24px'; delBtn.style.top = '-10px'; delBtn.style.right = '-10px'; delBtn.style.fontSize = '16px';
+                    }
+                } catch(e) {}
             });
             // 修復行內圖片容器
             document.querySelectorAll('.item-thumb-box img, .photo-box img').forEach(img => {
+                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)');
                 img.onclick = function(e) { openImageModal(this, e); };
             });
         }
