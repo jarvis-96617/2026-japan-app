@@ -234,6 +234,7 @@
         let undoStack = [];
         let redoStack = [];
         let currentStateSnapshot = null;
+        // 你的專屬 Google Apps Script 網址
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
         function initMobileTooltips() {
@@ -267,7 +268,7 @@
         // 防護引擎：喚醒查勤 (Hash 防覆寫)
         function checkCloudFreshness() {
             if (!isAppReady || isSavingToCloud || pendingSaveAction) return;
-            if (newSearchParams(window.location.search).get('share')) return;
+            if (new URLSearchParams(window.location.search).get('share')) return;
             if (!lastCloudDataHash) return; 
             if (typeof LZString === 'undefined') return;
 
@@ -753,6 +754,37 @@
                     if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
                 }, 100); 
             }
+        }
+
+        // 🌟 確保舊版大圖庫與收據的點擊與刪除功能正常運作 (找回遺失的綁定！)
+        function rebindEvents() {
+            // 1. 修復舊版圖片庫 (thumbnail-container) 的點擊與刪除功能
+            document.querySelectorAll('.img-wrapper').forEach(wrapper => {
+                const img = wrapper.querySelector('img'); 
+                const delBtn = wrapper.querySelector('.img-del-btn');
+                if(img) img.onclick = function(e) { openImageModal(this, e); };
+                if(delBtn) {
+                    delBtn.onclick = function(e) { 
+                        e.stopPropagation(); 
+                        if(confirm("確定刪除這張圖片嗎？")) { 
+                            if(img) deleteImageFromCloud(img.src);
+                            wrapper.remove(); 
+                            saveData(); 
+                        } 
+                    };
+                }
+            });
+
+            // 2. 修復舊版收據 (receipt-thumb-wrap) 的點擊與刪除功能
+            document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
+                const img = wrap.querySelector('img'); 
+                const delBtn = wrap.querySelector('div[onclick*="deleteReceiptThumb"]');
+                if(img && !delBtn) {
+                    wrap.outerHTML = `<div class="receipt-thumb-wrap"><img src="${img.src}" onclick="openImageModal(this, event)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div></div>`;
+                } else if (img && delBtn) {
+                    img.onclick = function(e) { openImageModal(this, e); };
+                }
+            });
         }
 
         // 🌟 全新獨立的彈窗連結處理邏輯 (絕對不影響編輯文字)
