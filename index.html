@@ -121,7 +121,6 @@
         .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid #ccc; font-size: 12px; margin-bottom: 2px; color: #666; width: 100%; word-break: break-word; line-height: 1.4; transition: 0.3s;}
         body.dark-mode .item-note { color: #aaa; border-left-color: #555; }
         
-        /* 🌟 分離式連結設計 */
         .note-link { display: inline-flex; align-items: center; gap: 4px; background: #e3f2fd; color: #1976d2; padding: 2px 6px 2px 4px; border-radius: 12px; text-decoration: none; font-size: 12px; margin-top: 4px; margin-right: 4px; border: 1px solid #bbdefb; transition: 0.3s;}
         body.dark-mode .note-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; color: #90caf9;}
         .note-link .material-icons-round { cursor: pointer; padding: 3px; border-radius: 50%; background: rgba(25, 118, 210, 0.15); transition: 0.2s;}
@@ -152,27 +151,30 @@
         body.dark-mode .transport-icon { background: #1e1e1e; border-color: var(--primary-color);}
         .transport-icon:active { transform: scale(0.85); }
 
-        .delete-btn { color: var(--danger-color); cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 4px; margin-top: 0px; flex-shrink: 0;}
         .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px; transition: 0.3s;}
         body.dark-mode .add-btn { background: rgba(74, 111, 165, 0.2); color: #90caf9;}
-        .link-item { display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.3s;}
-        body.dark-mode .link-item { background: #222; }
 
+        /* 行內操作模組 (Inline Action Group) */
+        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; }
+        .action-dash-box { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; padding: 4px; border: 1px dashed #ccc; border-radius: 6px; background: #fafafa; white-space: nowrap; }
+        body.dark-mode .action-dash-box { background: #222; border-color: #555; }
+        
+        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; }
+        body.dark-mode .action-box { background: #333; border-color: #444; }
+        .action-box:active { transform: scale(0.9); }
+        .action-box.has-link { background: #e3f2fd; border-color: #1976d2; }
+        body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
+        .action-box.has-photo { border: none; background: transparent; }
+
+        /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
-        
-        #budget-table th:nth-child(1) { width: 25%; } 
-        #budget-table th:nth-child(2) { width: 16%; } 
-        #budget-table th:nth-child(3) { width: 15%; } 
-        #budget-table th:nth-child(4) { width: 31%; } 
-        #budget-table th:nth-child(5) { width: 13%; } 
-
+        #budget-table th:nth-child(1) { width: 25%; } #budget-table th:nth-child(2) { width: 16%; } #budget-table th:nth-child(3) { width: 15%; } #budget-table th:nth-child(4) { width: 31%; } #budget-table th:nth-child(5) { width: 13%; } 
         .amount-input { width: 100%; box-sizing: border-box; font-size: 12px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0;}
         .curr-select, .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
-        
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
@@ -180,13 +182,7 @@
         body.dark-mode .receipt-box { background: #222; border-color: #555; }
         .receipt-thumb-wrap { position: relative; width: 20px; height: 20px; margin: 0 auto; flex-shrink: 0;}
         .receipt-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .upload-area { border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 12px; cursor: pointer; margin-top: 15px; background: rgba(255,255,255,0.5); transition: 0.3s;}
-        body.dark-mode .upload-area { background: rgba(30,30,30,0.5); border-color: #555;}
-        .thumbnail-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
-        .img-wrapper { position: relative; width: 70px; height: 70px; }
-        .img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .img-del-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 5; }
-
+        
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;}
         body.dark-mode .bottom-nav { background: rgba(30,30,30,0.85); border-top-color: #444; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);}
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; }
@@ -196,10 +192,9 @@
         .tab-content { display: none; animation: fadeIn 0.3s; position: relative; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .cat-action-icon { display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; cursor: pointer; }
 
         @media print {
-            .global-controls, .bottom-nav, .add-btn, .delete-btn, .hero, .day-tabs-wrapper, .item-thumb-box, .transport-icon, .btn-circle, .btn-nav, .img-del-btn, .cat-action-icon, .action-row { display: none !important; }
+            .global-controls, .bottom-nav, .add-btn, .delete-btn, .hero, .day-tabs-wrapper, .item-thumb-box, .transport-icon, .btn-circle, .btn-nav, .img-del-btn, .cat-action-icon, .action-row, .right-action-group { display: none !important; }
             body { background: white !important; color: black !important; padding-bottom: 0 !important; }
             body.dark-mode { filter: invert(1) hue-rotate(180deg); } 
             .container { padding: 0 !important; }
@@ -223,7 +218,7 @@
     <div id="mobile-tooltip"></div>
     
     <script>
-        // 🌟 初始化全域變數
+        // 初始化全域變數
         let isAppReady = false;
         let lastActiveTime = Date.now();
         let lastCloudDataHash = null;
@@ -239,6 +234,7 @@
         let undoStack = [];
         let redoStack = [];
         let currentStateSnapshot = null;
+        // 你的專屬 Google Apps Script 網址
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
         function initMobileTooltips() {
@@ -246,10 +242,7 @@
             window._tooltipsInitialized = true;
             let holdTimer = null;
             const mobileTooltip = document.getElementById('mobile-tooltip');
-            const hideTip = () => {
-                mobileTooltip.style.opacity = '0';
-                setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200);
-            };
+            const hideTip = () => { mobileTooltip.style.opacity = '0'; setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200); };
 
             document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
                 const showTip = () => {
@@ -261,7 +254,6 @@
                     mobileTooltip.style.transform = 'translateX(-50%)';
                     setTimeout(() => mobileTooltip.style.opacity = '1', 10);
                 };
-
                 btn.addEventListener('touchstart', (e) => { clearTimeout(holdTimer); holdTimer = setTimeout(showTip, 400); }, {passive: true});
                 btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideTip(); });
                 btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideTip(); });
@@ -270,22 +262,10 @@
                 btn.addEventListener('mouseenter', showTip);
                 btn.addEventListener('mouseleave', hideTip);
             });
-
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideTip(); }, {passive: true});
         }
 
-        // 🌟 全域點擊攔截：精準捕捉連結圖示點擊，開啟新分頁
-        document.addEventListener('click', function(e) {
-            let linkIcon = e.target.closest('.note-link .material-icons-round');
-            if (linkIcon) {
-                e.preventDefault();
-                e.stopPropagation();
-                let url = linkIcon.closest('.note-link').getAttribute('data-href') || linkIcon.closest('.note-link').getAttribute('href');
-                if (url) window.open(url, '_blank');
-            }
-        });
-
-        // 🌟 雲端同步衝突防護引擎：喚醒時查勤 (Hash 比對)
+        // 防護引擎：喚醒查勤 (Hash 防覆寫)
         function checkCloudFreshness() {
             if (!isAppReady || isSavingToCloud || pendingSaveAction) return;
             if (new URLSearchParams(window.location.search).get('share')) return;
@@ -293,7 +273,6 @@
             if (typeof LZString === 'undefined') return;
 
             setStatus('sync', '檢查最新進度...');
-            
             fetch(API_URL + "?t=" + Date.now()).then(res => res.json()).then(rawData => {
                 if (isSavingToCloud || pendingSaveAction) { setStatus('cloud_done', '已就緒'); return; }
                 if (rawData && rawData.isCompressed && rawData.data) {
@@ -306,11 +285,9 @@
                             if(msgEl) msgEl.innerText = '載入最新雲端資料...';
                             splash.style.display = 'flex'; splash.style.opacity = '1';
                         }
-                        
                         lastCloudDataHash = rawData.data;
                         let state = null;
                         try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
-                        
                         if(state && state.html) {
                             document.getElementById('main-container').innerHTML = state.html;
                             if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
@@ -327,9 +304,7 @@
             if (document.visibilityState === 'visible') checkCloudFreshness();
             lastActiveTime = Date.now();
         });
-        
         window.addEventListener("focus", () => { checkCloudFreshness(); });
-
         ['touchstart', 'mousemove', 'keydown', 'scroll', 'click'].forEach(evt => {
             document.addEventListener(evt, () => { 
                 if (Date.now() - lastActiveTime > 180000) checkCloudFreshness();
@@ -351,13 +326,12 @@
             <h1 class="editable" contenteditable="true">2026 京阪六天五夜</h1>
             <p class="editable" contenteditable="true" style="max-width: 75%;">09/25 - 09/30 | 2人同行 | 京都 & 大阪</p>
         </div>
-        
         <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="position: absolute; right: 15px; bottom: 15px; z-index: 10; font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.9); text-align: right; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; border: 1px solid rgba(255,255,255,0.2);">
             <span id="curr-label">JPY</span> 匯率 <span style="font-size:14px; color:#ffca28; margin-left:2px;" id="rate-num">載入中</span>
         </div>
     </div>
 
-    <!-- 頂端選單 -->
+    <!-- 控制列 -->
     <div class="global-controls">
         <div style="display:flex; flex-direction:column; gap:4px; flex-grow:1; min-width:0; overflow:hidden;">
             <div class="hide-scrollbar" style="display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 2px;">
@@ -377,126 +351,32 @@
         </div>
     </div>
 
-    <div class="container" id="main-container">
-    </div>
+    <div class="container" id="main-container"></div>
 
     <template id="default-template">
         <div id="tab-itinerary" class="tab-content active">
             <div id="day-tabs-container" class="day-tabs-wrapper"></div>
-            
-            <div id="itinerary-days-container">
-                <div class="glass-card day-card">
-                    <div class="flex-between" style="margin-bottom: 8px;">
-                        <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day 1 - 09/25 抵達京都</h2>
-                        <span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span>
-                    </div>
-                    
-                    <div class="timeline-item" onclick="toggleComplete(this, event)">
-                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                        <div class="time-column">
-                            <div class="start-time editable" contenteditable="true">15:40</div>
-                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div>
-                            <div class="end-time">16:40</div>
-                        </div>
-                        <div class="content-box">
-                            <div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;">
-                                <div style="flex-grow: 1; min-width: 0;">
-                                    <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">關西國際機場</span></div>
-                                    <div class="item-note editable" contenteditable="true">備註：通關與兌換票券</div>
-                                </div>
-                                <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;"><span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span></div>
-                            </div>
-                            <div class="action-row">
-                                <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
-                                <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">76</span> 分鐘</div>
-                            </div>
-                        </div>
-                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-                    </div>
-                    
-                    <div class="timeline-item" onclick="toggleComplete(this, event)">
-                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                        <div class="time-column">
-                            <div class="start-time editable" contenteditable="true">18:00</div>
-                            <div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">20</span> 分</div>
-                            <div class="end-time">18:20</div>
-                        </div>
-                        <div class="content-box">
-                            <div style="display: flex; gap: 8px; align-items: flex-start; width: 100%;">
-                                <div style="flex-grow: 1; min-width: 0;">
-                                    <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">京都車站</span></div>
-                                    <div class="item-note editable" contenteditable="true">備註：轉乘烏丸線</div>
-                                </div>
-                                <div class="item-thumb-box" onclick="triggerItemUpload(this)" style="width: 36px; height: 36px; flex-shrink: 0; border: 1px dashed #ccc; border-radius: 6px; display: flex; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative;"><span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span></div>
-                            </div>
-                            <div class="action-row">
-                                <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                                <button class="btn-nav btn-circle" onclick="addLinkToNote(this, event)"><span class="material-icons-round" style="font-size:18px;">add_link</span></button>
-                                <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_walk</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
-                            </div>
-                        </div>
-                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-                    </div>
-
-                    <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
-                </div>
-            </div>
+            <div id="itinerary-days-container"></div>
             <button class="add-btn" onclick="addNewDayCard()" style="background: var(--primary-color); color: white;">+ 新增天數區塊</button>
         </div>
-
         <div id="tab-transport" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">directions_transit</span> 交通票券與指南</h2>
-                <div id="transport-text-list" style="margin-top: 15px;">
-                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">機場至京都：JR 特急 Haruka</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
-                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">市區交通：Apple Pay ICOCA</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
-                </div>
+                <div id="transport-text-list" style="margin-top: 15px;"></div>
                 <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 5px;">+ 新增交通指南</button>
-                <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
-                <div id="transport-links"></div>
-                <button class="add-btn" onclick="addLinkItem(this, 'transport-links')">+ 新增參考連結</button>
-                <div class="upload-area" onclick="triggerUpload('gallery-transport')">
-                    <span class="material-icons-round" style="font-size: 28px; color: var(--primary-color);">add_photo_alternate</span>
-                    <p style="font-size: 13px; color: #666;">點擊上傳交通票券/截圖</p>
-                </div>
-                <div class="thumbnail-container" id="gallery-transport"></div>
             </div>
         </div>
-
         <div id="tab-hotel" class="tab-content">
-            <div id="hotel-cards-container">
-                <div class="glass-card hotel-card">
-                    <div class="flex-between" style="margin-bottom: 12px;">
-                        <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 京都住宿 (09/25 - 09/28)</h2>
-                        <span class="delete-btn" onclick="deleteHotelCard(this, event)"><span class="material-icons-round">delete_outline</span></span>
-                    </div>
-                    <div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">四条河原町温泉 空庭テラス京都</div>
-                    <div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：IN1649836333<br>入住時間：15:00~24:00<br>退房時間：~11:00<br>房型：高級雙人房</div>
-                    <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>
-                </div>
-            </div>
+            <div id="hotel-cards-container"></div>
             <button class="add-btn" onclick="addHotelCard()" style="background: var(--primary-color); color: white;">+ 新增住宿區塊</button>
-            <div class="glass-card">
-                <h2 class="section-title"><span class="material-icons-round">link</span> 住宿憑證</h2>
-                <div class="upload-area" onclick="triggerUpload('gallery-hotel')"><span class="material-icons-round" style="font-size: 28px; color: var(--primary-color);">add_photo_alternate</span><p style="font-size: 13px; color: #666;">點擊上傳住宿確認信</p></div>
-                <div class="thumbnail-container" id="gallery-hotel"></div>
-            </div>
         </div>
-
         <div id="tab-shopping" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">shopping_bag</span> 採買清單</h2>
-                <div id="shopping-list">
-                    <div class="timeline-item" onclick="toggleComplete(this, event)"><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">免稅藥妝</div><div class="item-note editable" contenteditable="true">備註：感冒藥、維他命</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div></div>
-                </div>
+                <div id="shopping-list"></div>
                 <button class="add-btn" onclick="addGeneralItemWithNote(this)">+ 新增清單項目</button>
-                <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
-                <div class="upload-area" onclick="triggerUpload('gallery-shopping')"><span class="material-icons-round" style="font-size: 28px; color: var(--primary-color);">add_photo_alternate</span><p style="font-size: 13px; color: #666;">點擊上傳代購商品圖</p></div>
-                <div class="thumbnail-container" id="gallery-shopping"></div>
             </div>
         </div>
-
         <div id="tab-budget" class="tab-content">
             <div class="glass-card" style="padding: 12px 10px;">
                 <h2 class="section-title" style="margin-bottom: 4px;"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
@@ -507,11 +387,9 @@
                         <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
                     </div>
                 </div>
-                
                 <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: var(--glass-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--glass-border);">
                     輸入金額會自動套用會計格式。最右側框框可點擊上傳發票/收據照片。
                 </div>
-
                 <table id="budget-table">
                     <tr><th>項目</th><th>墊款人</th><th>分攤</th><th>金額</th><th>操作</th></tr>
                     <tbody id="budget-tbody"></tbody>
@@ -520,24 +398,12 @@
                 <div id="budget-result" style="margin-top:8px; padding-top:8px; border-top:1px dashed #ccc; line-height: 1.6;"></div>
             </div>
         </div>
-
         <div id="tab-todo" class="tab-content">
             <div class="glass-card">
                 <h2 class="section-title"><span class="material-icons-round">book_online</span> 預訂類</h2>
-                <div id="booking-list">
-                    <div class="timeline-item" onclick="toggleComplete(this, event)">
-                        <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                        <div class="content-box">
-                            <div class="item-title editable" contenteditable="true">日本網路 eSIM (機場開通)</div>
-                            <div class="item-note editable" contenteditable="true">備註/貼上連結：</div>
-                            <div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div>
-                        </div>
-                        <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-                    </div>
-                </div>
+                <div id="booking-list"></div>
                 <button class="add-btn" onclick="addTodoItemToContainer('booking-list')">+ 新增預訂項目</button>
             </div>
-
             <div class="glass-card">
                 <div class="flex-between" style="margin-bottom: 10px;">
                     <h2 class="section-title" style="margin-bottom: 0;"><span class="material-icons-round">luggage</span> 事前準備類</h2>
@@ -547,27 +413,13 @@
                     </div>
                 </div>
                 <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷貝建立新人員清單</button>
-                
                 <div id="person-todo-container">
                     <div class="person-todo-list" data-person="預設範本" style="display: block;">
                         <div class="todo-category-header flex-between">
                             <span class="editable" contenteditable="true"> 確認行李重量</span>
                             <div style="display:flex; gap:8px;">
                                 <span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span>
-                                <span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span>
                             </div>
-                        </div>
-                        <div class="timeline-item" onclick="toggleComplete(this, event)">
-                            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                            <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">去、回 XX 航空託運 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="背包">背包</option><option value="小包包">小包包</option><option value="託運" selected>託運</option></select>
-                            <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
-                        </div>
-                        <div class="timeline-item" onclick="toggleComplete(this, event)">
-                            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                            <div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">隨身行李 XX 公斤</div></div>
-                            <select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select>
-                            <div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
                         </div>
                         <div class="flex-between" style="gap:10px; margin-top:15px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
                     </div>
@@ -590,329 +442,659 @@
         <div class="nav-item" onclick="switchTab('tab-todo', this)"><span class="material-icons-round">checklist</span>待辦</div>
     </nav>
 
-    <!-- 🌟 主核心程式邏輯（完全整合，絕對安全無衝突） -->
     <script>
-        // 🌟 專業圖片放大套件呼叫函式 (Viewer.js)
+        // 🌟 專業圖片放大套件 (Viewer.js)
         function openImageModal(imgElement, event) {
             event.stopPropagation();
             const viewer = new Viewer(imgElement, {
-                inline: false,
-                toolbar: false,
-                navbar: false,
-                title: false,
-                button: true,
-                hidden: function () {
-                    viewer.destroy(); // 關閉後銷毀，釋放記憶體
-                }
+                inline: false, toolbar: false, navbar: false, title: false, button: true,
+                hidden: function () { viewer.destroy(); }
             });
             viewer.show();
         }
 
-        // 🌟 核心防破圖黑科技：將 Google 連結轉化為不受 Apple 阻擋的高速直連 API (lh3)
+        // 🌟 核心防破圖黑科技：將 Google 連結轉化為不受 Apple 阻擋的高速直連 API (export=view)
         function getReliableDriveUrl(originalUrl) {
             if (!originalUrl) return '';
             let match = originalUrl.match(/(?:id=|\/d\/)([^&/?]+)/);
             if (match && match[1]) {
-                return `https://lh3.googleusercontent.com/d/${match[1]}`;
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
             }
             return originalUrl;
         }
 
-        function toggleDarkMode() {
-            let isDark = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('travelAppDarkMode', isDark);
-            let icon = document.getElementById('dark-mode-icon');
-            if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode';
-        }
-        
-        function exportToPDF() {
-            alert('💡 小撇步：\n在即將跳出的列印預覽畫面中，您可以直接「用兩指往外放大」畫面，就能瞬間把行程表存成高畫質 PDF 檔喔！');
-            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            let originalDisplays = [];
-            cards.forEach(c => { originalDisplays.push(c.style.display); c.style.display = 'block'; });
-            
-            window.print();
-            
-            if (!new URLSearchParams(window.location.search).get('share')) {
-                cards.forEach((c, idx) => { c.style.display = originalDisplays[idx]; });
-            }
-        }
-
-        function exportBackup() {
-            try {
-                let state = captureState();
-                
-                // 確保 LZString 存在才壓縮
-                if (typeof LZString === 'undefined') throw new Error("壓縮引擎尚未載入完成");
-                
-                let payload = JSON.stringify({ 
-                    isCompressed: true, 
-                    data: LZString.compressToUTF16(JSON.stringify(state)) 
-                });
-                let blob = new Blob([payload], {type: "application/json"});
-                let url = URL.createObjectURL(blob);
-                let a = document.createElement("a");
-                a.href = url;
-                let dateStr = new Date().toISOString().slice(0,10).replace(/-/g, "");
-                a.download = `Keihan_Backup_${dateStr}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                alert("✅ 實體備份檔下載成功！\n請妥善保存於手機的「檔案」或雲端中，以便在無網路時還原。");
-            } catch (e) {
-                alert("❌ 備份下載失敗：" + e.message);
-            }
-        }
-
-        function triggerImportBackup() {
-            if(confirm("⚠️ 警告：匯入備份檔將會覆蓋您當前畫面上所有的資料！\n確定要繼續嗎？")) {
-                let input = document.getElementById('backup-file-input');
-                input.value = ''; 
-                input.click();
-            }
-        }
-
-        function handleBackupUpload(event) {
-            let file = event.target.files[0];
-            if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    let content = e.target.result;
-                    let parsed = JSON.parse(content);
-                    let state = null;
-                    if (parsed.isCompressed && parsed.data) {
-                        if (typeof LZString === 'undefined') throw new Error("解壓縮引擎尚未載入完成");
-                        state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
-                    } else if (parsed.html) {
-                        state = parsed; 
-                    } else {
-                        throw new Error("備份檔格式不正確");
-                    }
-                    
-                    if(state && state.html) {
-                        document.getElementById('main-container').innerHTML = state.html;
-                        if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
-                        if(state.payersData) payers = state.payersData;
-                        
-                        renderPayerTags();
-                        rebindEvents();
-                        finalizeLoad(); 
-                        saveData(true); 
-                        alert("✅ 備份檔匯入成功！資料已完全還原並同步至雲端。");
-                    }
-                } catch(err) {
-                    alert("❌ 匯入失敗：檔案格式錯誤或已損毀。\n" + err.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function deleteImageFromCloud(imgUrl) {
-            if (!imgUrl || !imgUrl.includes('id=')) return;
-            let match = imgUrl.match(/id=([^&]+)/);
-            if (match && match[1]) {
-                fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'deleteImage', fileId: match[1] })
-                }).catch(e => console.log('雲端圖片刪除指令發送失敗', e));
-            }
-        }
-
-        function fetchExchangeRate(manual = false) {
-            if(manual) setStatus('sync', '更新匯率中...');
-            
-            fetch('https://open.er-api.com/v6/latest/TWD')
-            .then(res => res.json())
-            .then(data => {
-                if(data && data.rates) {
-                    allRatesToTWD['JPY'] = 1 / (data.rates['JPY'] || 4.65);
-                    allRatesToTWD['KRW'] = 1 / (data.rates['KRW'] || 41.5);
-                    allRatesToTWD['THB'] = 1 / (data.rates['THB'] || 1.12);
-                    allRatesToTWD['USD'] = 1 / (data.rates['USD'] || 0.031);
-                    allRatesToTWD['EUR'] = 1 / (data.rates['EUR'] || 0.029);
-                    
-                    updateRateDisplay();
-                    calcBudget();
-                    if(manual) setStatus('cloud_done', '匯率已更新');
-                }
-            })
-            .catch(e => {
-                if(manual) setStatus('cloud_off', '匯率取得失敗', true);
-                updateRateDisplay();
-            });
-        }
-        
-        function updateRateDisplay() {
-            let rate = allRatesToTWD[currentTravelCurrency] || 0;
-            document.getElementById('curr-label').innerText = currentTravelCurrency;
-            document.getElementById('rate-num').innerText = rate.toFixed(4);
-        }
-
-        function changeTravelCurrency() {
-            let curr = prompt('請輸入旅遊當地幣別代碼\n(例如 JPY日圓, KRW韓元, THB泰銖, USD美金)：', currentTravelCurrency);
-            if(curr) {
-                curr = curr.toUpperCase().trim();
-                currentTravelCurrency = curr;
-                localStorage.setItem('travelAppCurrency', currentTravelCurrency);
-                
-                updateCurrencyOptionsInTable();
-                fetchExchangeRate(true);
-            }
-        }
-
-        function updateCurrencyOptionsInTable() {
-            document.querySelectorAll('.curr-select').forEach(sel => {
-                let currentVal = sel.value;
-                let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR'];
-                if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
-                if(!opts.includes(currentVal)) opts.push(currentVal); 
-                
-                sel.innerHTML = opts.map(c => `<option value="${c}" ${c===currentVal?'selected':''}>${c}</option>`).join('');
-            });
-        }
-
         // 🌟 終極 DOM 淨化引擎
         function captureState() {
-            let tempMain = document.createElement('div');
-            tempMain.innerHTML = document.getElementById('main-container').innerHTML;
-            
-            let tempHero = document.createElement('div');
-            tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
+            let tempMain = document.createElement('div'); tempMain.innerHTML = document.getElementById('main-container').innerHTML;
+            let tempHero = document.createElement('div'); tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
             [tempMain, tempHero].forEach(container => {
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
-                container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => {
-                    el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback');
-                });
+                container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
                     if (el.classList.contains('timeline-item')) el.removeAttribute('style'); 
                     if (el.getAttribute('style') === '') el.removeAttribute('style'); 
                     if (el.getAttribute('class') === '') el.removeAttribute('class'); 
-                    // 🌟 修正：只把原本有 .editable 的標籤，在分享模式可能被改掉的情況下修復回來，不能全域亂改
-                    if (el.classList.contains('editable') && el.getAttribute('contenteditable') === 'false') {
-                        el.setAttribute('contenteditable', 'true'); 
-                    }
+                    if (el.classList.contains('editable') && el.getAttribute('contenteditable') === 'false') { el.setAttribute('contenteditable', 'true'); }
                 });
             });
 
-            return { 
-                html: tempMain.innerHTML, 
-                heroHtml: tempHero.innerHTML, 
-                payersData: JSON.parse(JSON.stringify(payers)) 
-            };
+            return { html: tempMain.innerHTML, heroHtml: tempHero.innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
         }
 
-        function initHistory() {
-            undoStack = []; redoStack = []; currentStateSnapshot = captureState();
-        }
+        function saveData(isManual = false, skipHistory = false) {
+            if (new URLSearchParams(window.location.search).get('share')) return;
+            if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
+            if (typeof LZString === 'undefined') { alert('⚠️ 嚴重警告：壓縮引擎發生異常！\n為保護資料安全，系統已鎖定存檔功能。'); return; }
+            if (!skipHistory) { recordHistory(); }
+            
+            pendingSaveAction = true; let payload;
+            try {
+                const state = captureState(); 
+                const compressedData = LZString.compressToUTF16(JSON.stringify(state));
+                lastCloudDataHash = compressedData; 
+                payload = JSON.stringify({ isCompressed: true, data: compressedData });
+            } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
 
-        function recordHistory() {
-            if (!currentStateSnapshot) return;
-            let newState = captureState();
-            if (newState.html !== currentStateSnapshot.html || newState.heroHtml !== currentStateSnapshot.heroHtml) {
-                undoStack.push(currentStateSnapshot);
-                if (undoStack.length > 20) undoStack.shift(); 
-                redoStack = []; currentStateSnapshot = newState;
+            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
+            localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+            
+            if(!API_URL.startsWith("https://script.google.com")) {
+                setStatus('cloud_off', '本機模式(未綁雲端)', true);
+                if(isManual) alert('❌ 尚未綁定 Google API 網址！\n(資料已安全儲存於您的手機內)'); 
+                pendingSaveAction = false; return;
             }
+            setStatus('sync', '雲端同步壓縮檔中...'); clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => {
+                pendingSaveAction = false; isSavingToCloud = true;
+                fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
+                    isSavingToCloud = false;
+                    if(data.status === "success") { setStatus('cloud_done', '雲端已同步'); if(isManual) alert('✅ 儲存成功！高壓縮檔案已同步至 Google 雲端。'); }
+                }).catch(e => {
+                    isSavingToCloud = false; setStatus('cloud_off', '連線失敗(已存本機)', true);
+                    if(isManual) alert('❌ 同步失敗！請檢查網路連線。');
+                });
+            }, isManual ? 0 : 1500); 
         }
 
-        function undoAction() {
-            if (undoStack.length === 0) { alert('已經退到最一開始，沒有可以復原的操作囉！'); return; }
-            redoStack.push(currentStateSnapshot); let prevState = undoStack.pop(); applyState(prevState);
-        }
+        function loadData() {
+            let isLoaded = false;
+            const fallbackTimeout = setTimeout(() => {
+                if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '網路逾時(讀取本機)', true); }
+            }, 10000);
 
-        function redoAction() {
-            if (redoStack.length === 0) { alert('已經是最新的狀態囉！'); return; }
-            undoStack.push(currentStateSnapshot); let nextState = redoStack.pop(); applyState(nextState);
-        }
+            const forceUnlockTimer = setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if(splash && splash.style.display !== 'none') { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
+            }, 12000);
 
-        function applyState(state) {
-            document.getElementById('main-container').innerHTML = state.html;
-            document.getElementById('hero-container').innerHTML = state.heroHtml;
-            payers = state.payersData; currentStateSnapshot = captureState(); 
-            renderPayerTags(); rebindEvents(); updateDayTabs(); initSortable(); saveData(false, true); 
-        }
+            if (typeof LZString === 'undefined') {
+                alert('⚠️ 錯誤：無法載入壓縮引擎！\n請檢查網路後重新整理。');
+                const splashMsg = document.querySelector('.splash-text p'); if(splashMsg) splashMsg.innerText = '載入失敗，請重整頁面'; return; 
+            }
 
-        function generateShareLink() {
-            let input = prompt('請輸入你想分享給朋友的「天數數字」\n(例如想分享第2天與第3天，請輸入 2,3)：');
-            if (!input) return;
+            const template = document.getElementById('default-template');
+            if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
+            const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal');
+            if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
             
-            let cleanInput = input.replace(/，/g, ',').replace(/、/g, ',');
-            let days = cleanInput.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d) && d > 0);
-            if (days.length === 0) {
-                alert('輸入格式錯誤，請輸入數字並以逗號分隔。');
-                return;
+            if(!API_URL.startsWith("https://script.google.com")) {
+                if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '本機模式(未綁雲端)', true); } return;
             }
             
-            let currentUrl = window.location.href.split('?')[0].split('#')[0];
-            let shareUrl = currentUrl + '?share=' + days.join(',');
-            let successMsg = '✅ 專屬分享網址已成功產生！\n您可以直接去 LINE 或對話框「貼上」給朋友。';
-            
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(shareUrl).then(() => { alert(successMsg); })
-                .catch(err => { prompt('系統無法自動複製，請長按全選以下網址並拷貝：', shareUrl); });
-            } else {
-                prompt('請長按全選以下網址並拷貝 (拷貝後按確定)：\n\n' + successMsg, shareUrl);
-            }
-        }
+            fetch(API_URL).then(res => res.json()).then(rawData => {
+                if(isLoaded) return; isLoaded = true; clearTimeout(fallbackTimeout);
+                let state = rawData;
+                if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') {
+                    try { lastCloudDataHash = rawData.data; state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) { console.error("解壓縮失敗", e); }
+                }
 
-        function applyShareMode() {
-            let href = window.location.href;
-            let shareMatch = href.match(/[?&]share=([0-9,，、]+)/);
-            if (!shareMatch) return false;
-            
-            let allowedIndexes = shareMatch[1].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
-            
-            let hideEls = ['.bottom-nav', '.global-controls', '.add-btn', '.delete-btn', '.img-del-btn'];
-            hideEls.forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = 'none'));
-            
-            let dayTabsContainer = document.getElementById('day-tabs-container');
-            if (dayTabsContainer) dayTabsContainer.style.top = '0px'; 
-            
-            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-            let itTab = document.getElementById('tab-itinerary');
-            if (itTab) { itTab.style.display = 'block'; itTab.style.paddingBottom = '40px'; }
-            
-            let cards = document.querySelectorAll('#itinerary-days-container .day-card');
-            cards.forEach((card, idx) => {
-                if (allowedIndexes.includes(idx)) { card.style.display = 'block'; card.style.marginBottom = '20px'; } 
-                else { card.style.display = 'none'; }
+                if (state && state.html) {
+                    document.getElementById('main-container').innerHTML = state.html;
+                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                    if(state.payersData) payers = state.payersData;
+                    renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
+                } else {
+                    addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); setStatus('cloud_done', '建立新雲端存檔');
+                }
+                finalizeLoad();
+            }).catch(e => { 
+                if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '離線模式(讀取本機)', true); } else { finalizeLoad(); }
             });
+        }
 
-            document.querySelectorAll('.editable').forEach(el => { el.setAttribute('contenteditable', 'false'); el.style.border = 'none'; });
-            let style = document.createElement('style');
-            style.innerHTML = `.timeline-item::before { display: none !important; } .timeline-item { padding-left: 8px !important; } .custom-checkbox, .item-thumb-box, .transport-icon { pointer-events: none !important; } .hero .editable { pointer-events: none !important; }`;
-            document.head.appendChild(style);
-            return true;
+        function loadFromLocal() {
+            const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
+            if (saved) {
+                let state = null;
+                try {
+                    let parsed = JSON.parse(saved);
+                    if (parsed.isCompressed && typeof LZString !== 'undefined') {
+                        lastCloudDataHash = parsed.data; state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
+                    } else { state = parsed; }
+                } catch(e) {}
+                
+                if(state && state.html) {
+                    document.getElementById('main-container').innerHTML = state.html;
+                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                    if(state.payersData) payers = state.payersData;
+                    renderPayerTags(); rebindEvents();
+                }
+            } else { addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); }
+            finalizeLoad();
+        }
+
+        // 🌟 史詩級無痛轉移腳本：統一行內排版 (Inline Action Group) ＋ 自動修復破圖
+        function finalizeLoad() {
+            try {
+                // 1. 全域掃描：將所有的行程、住宿、清單統一加上右側控制面板
+                document.querySelectorAll('.timeline-item, .hotel-card, .link-item, .todo-category-header').forEach(item => {
+                    // 如果已經有新版控制區就跳過
+                    if (item.querySelector('.right-action-group')) return;
+
+                    // 找出並移除舊的獨立刪除按鈕
+                    let oldDel = item.querySelector('.delete-btn:not(.action-box)');
+                    
+                    // 找出並移除舊的圖片區，記錄網址
+                    let oldThumb = item.querySelector('.item-thumb-box');
+                    let oldImgSrc = '';
+                    if (oldThumb) {
+                        let img = oldThumb.querySelector('img');
+                        // 🌟 套用破圖修復神藥
+                        if (img) oldImgSrc = getReliableDriveUrl(img.src);
+                        oldThumb.remove();
+                    }
+                    
+                    // 找出並移除舊的連結區，記錄網址
+                    let oldLinkUrl = '';
+                    let oldNoteLink = item.querySelector('.note-link');
+                    if (oldNoteLink) {
+                        oldLinkUrl = oldNoteLink.getAttribute('href') || oldNoteLink.getAttribute('data-href') || '';
+                        oldNoteLink.remove();
+                    }
+                    // 有些連結可能藏在按鈕列裡面
+                    let actionLinks = item.querySelectorAll('.action-row .btn-nav');
+                    actionLinks.forEach(btn => {
+                        if (btn.innerHTML.includes('add_link') || btn.innerHTML.includes('link')) {
+                            if (!oldLinkUrl) oldLinkUrl = btn.getAttribute('data-href') || '';
+                            btn.remove();
+                        }
+                    });
+
+                    // 建立全新的右側統一控制面板 (Right Action Group)
+                    let group = document.createElement('div');
+                    group.className = 'right-action-group';
+                    group.style.cssText = 'display:flex; flex-direction:column; gap:6px; align-items:center; flex-shrink:0;';
+                    let dashBox = document.createElement('div');
+                    dashBox.className = 'action-dash-box';
+                    
+                    // --- 建立 🔗 獨立連結按鈕 ---
+                    let linkBox = document.createElement('div');
+                    linkBox.className = oldLinkUrl ? 'action-box has-link link-box' : 'action-box link-box';
+                    linkBox.setAttribute('onclick', 'handleItemLink(this, event)');
+                    if (oldLinkUrl) linkBox.setAttribute('data-href', oldLinkUrl);
+                    linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:${oldLinkUrl ? '#1976d2' : '#aaa'};">link</span>`;
+                    dashBox.appendChild(linkBox);
+                    
+                    // --- 建立 🖼️ 獨立圖片按鈕 ---
+                    let photoBox = document.createElement('div');
+                    photoBox.className = oldImgSrc ? 'action-box has-photo photo-box' : 'action-box photo-box';
+                    photoBox.setAttribute('onclick', 'triggerItemUpload(this, event)');
+                    if (oldImgSrc) {
+                        photoBox.innerHTML = `
+                            <img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)">
+                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
+                        `;
+                    } else {
+                        photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
+                    }
+                    dashBox.appendChild(photoBox);
+                    
+                    // --- 建立 🗑️ 刪除按鈕 ---
+                    let delBox = document.createElement('div');
+                    delBox.className = 'action-box delete-box';
+                    let delFn = item.classList.contains('hotel-card') ? 'deleteHotelCard(this, event)' : 'deleteItem(this, event)';
+                    delBox.setAttribute('onclick', delFn);
+                    delBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span>`;
+                    dashBox.appendChild(delBox);
+                    
+                    group.appendChild(dashBox);
+                    
+                    // 安插進項目中
+                    if (item.classList.contains('hotel-card') || item.classList.contains('todo-category-header')) {
+                        let fb = item.querySelector('.flex-between');
+                        if(fb) fb.appendChild(group); else item.appendChild(group);
+                    } else {
+                        item.appendChild(group);
+                    }
+                    if (oldDel) oldDel.remove();
+                });
+
+                // 2. 自動修復所有剩餘圖片的破圖問題 (轉換為安全的 URL)
+                document.querySelectorAll('img').forEach(img => {
+                    let currentSrc = img.getAttribute('src');
+                    let newSrc = getReliableDriveUrl(currentSrc);
+                    if (currentSrc !== newSrc) {
+                        img.src = newSrc;
+                        img.setAttribute('src', newSrc);
+                    }
+                });
+
+                // 3. 把舊的全局上傳區隱藏 (為了保持新版一致性，但不刪除以免遺失資料)
+                document.querySelectorAll('.upload-area, button[onclick*="addLinkItem"]').forEach(el => el.style.display = 'none');
+
+                // 4. 重建預算表比例與重新計算
+                document.querySelectorAll('#budget-tbody tr').forEach(tr => {
+                    if(!tr.querySelector('.split-select')) {
+                        let tds = tr.querySelectorAll('td');
+                        if(tds.length === 5) {
+                            let splitTd = document.createElement('td');
+                            splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`;
+                            tr.insertBefore(splitTd, tds[2]);
+                            let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input');
+                            let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap';
+                            if (currEl) { currEl.style.width = '35%'; currEl.style.display = 'inline-block'; currEl.style.textAlignLast = 'left'; mergedTd.appendChild(currEl); }
+                            if (amtEl) { amtEl.style.width = '60%'; amtEl.style.display = 'inline-block'; amtEl.style.textAlign = 'right'; mergedTd.appendChild(amtEl); }
+                            tr.insertBefore(mergedTd, tds[3].nextSibling); 
+                            tr.removeChild(tds[2]); tr.removeChild(tds[3]); 
+                        }
+                    } else {
+                        let currEl = tr.querySelector('.curr-select'); let amtEl = tr.querySelector('.amount-input');
+                        if (currEl) currEl.style.width = '35%'; if (amtEl) amtEl.style.width = '60%';
+                    }
+                });
+
+                document.querySelectorAll('.amount-input').forEach(input => {
+                    let val = parseFloat(input.value.replace(/,/g, '')) || 0;
+                    input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value);
+                });
+                
+                calcBudget();
+
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                const itTab = document.getElementById('tab-itinerary'); const firstNav = document.querySelectorAll('.nav-item')[0];
+                if(itTab) itTab.classList.add('active'); if(firstNav) firstNav.classList.add('active');
+
+                if (itTab && !document.getElementById('day-tabs-container')) {
+                    let tabsContainer = document.createElement('div'); tabsContainer.id = 'day-tabs-container'; tabsContainer.className = 'day-tabs-wrapper';
+                    let daysContainer = document.getElementById('itinerary-days-container');
+                    if (daysContainer) { itTab.insertBefore(tabsContainer, daysContainer); }
+                }
+                
+                document.querySelectorAll('.luggage-select').forEach(sel => {
+                    let currentVal = sel.value || '背包'; if (currentVal === '手提') currentVal = '背包'; 
+                    sel.innerHTML = `<option value="背包">背包</option><option value="小包包">小包包</option><option value="託運">託運</option>`;
+                    sel.value = currentVal;
+                    Array.from(sel.options).forEach(opt => { if (opt.value === currentVal) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); });
+                });
+
+                document.querySelectorAll('.btn-nav').forEach(btn => {
+                    btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = '';
+                    if (btn.closest('#itinerary-days-container')) {
+                        if (btn.innerText.includes('導航') || btn.innerHTML.includes('place')) { btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">place</span>'; btn.classList.add('btn-circle'); }
+                    } else { btn.classList.remove('btn-circle'); }
+                });
+
+                updateCurrencyOptionsInTable(); updateDayTabs(); initHistory(); initSortable(); 
+                document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
+                applyShareMode();
+
+            } catch(error) {
+                console.error("載入解析錯誤: ", error);
+            } finally {
+                fetchExchangeRate(); initMobileTooltips();
+                isAppReady = true; lastActiveTime = Date.now();
+                setTimeout(() => {
+                    const splash = document.getElementById('splash-screen');
+                    if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
+                }, 100); 
+            }
+        }
+
+        // 🌟 全新獨立的彈窗連結處理邏輯 (絕對不影響編輯文字)
+        function handleItemLink(btn, event) {
+            event.stopPropagation();
+            let currentUrl = btn.getAttribute('data-href');
+            if (currentUrl) {
+                let action = confirm('已綁定網址：\n' + currentUrl + '\n\n【確定】開啟連結\n【取消】刪除此連結');
+                if (action) {
+                    window.open(currentUrl, '_blank');
+                } else {
+                    btn.removeAttribute('data-href');
+                    btn.className = 'action-box link-box';
+                    btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`;
+                    saveData();
+                }
+            } else {
+                let url = prompt('請輸入要綁定的網址 (需包含 http/https)：', 'https://');
+                if (url && url.startsWith('http')) {
+                    btn.setAttribute('data-href', url);
+                    btn.className = 'action-box has-link link-box';
+                    btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2;">link</span>`;
+                    saveData();
+                }
+            }
+        }
+
+        // 🌟 獨立的項目生成，支援全新控制面板
+        function addItineraryItem(btnElement) {
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div><div class="end-time">13:00</div></div>
+                <div class="content-box">
+                    <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
+                    <div class="item-note editable" contenteditable="true">備註：</div>
+                    <div class="action-row" style="margin-top:4px;">
+                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button>
+                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
+                    </div>
+                </div>
+                <div class="right-action-group">
+                    <div class="action-dash-box">
+                        <div class="action-box link-box" onclick="handleItemLink(this, event)" title="設定連結"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div>
+                        <div class="action-box photo-box" onclick="triggerItemUpload(this, event)" title="上傳圖片"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
+                        <div class="action-box delete-box" onclick="deleteItem(this, event)" title="刪除"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div>
+                    </div>
+                </div>
+            `;
+            btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
+        }
+
+        function addTransportText(btn) {
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新交通指南</div></div>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
+            document.getElementById('transport-text-list').appendChild(newItem); saveData();
+        }
+
+        function addHotelCard() {
+            let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
+            div.innerHTML = `
+                <div class="flex-between" style="margin-bottom: 12px;">
+                    <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2>
+                    <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+                </div>
+                <div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div>
+                <div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div>
+                <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航</button>
+            `;
+            container.appendChild(div); saveData();
+        }
+
+        function addGeneralItemWithNote(btnElement) {
+            let wrapper = btnElement.previousElementSibling; let target = wrapper && wrapper.classList.contains('timeline-item') ? wrapper.parentNode : btnElement.parentNode;
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div><div class="item-note editable" contenteditable="true">備註：</div></div>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
+            target.insertBefore(newItem, btnElement); saveData();
+        }
+
+        function addTodoItemToContainer(containerId) {
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註：</div></div>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
+            document.getElementById(containerId).appendChild(newItem); saveData();
+        }
+
+        function addTodoCategory(btnElement) {
+            const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
+            newCat.innerHTML = `
+                <span class="editable" contenteditable="true"> 新增分類名稱</span>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color);"><span class="material-icons-round" style="font-size:16px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
+            btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
+        }
+
+        function addTodoItemHere(btnElement) {
+            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
+            const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
+        }
+
+        // --- 全域工具函式 ---
+        function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定要刪除這個住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
+        function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定要刪除這個項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let img = item.querySelector('img'); if (img) deleteImageFromCloud(img.src); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(); } }
+
+        function triggerItemUpload(boxElement, event) { 
+            if(event) event.stopPropagation();
+            if(boxElement.querySelector('img')) return; 
+            currentItemThumbBox = boxElement; 
+            const input = document.getElementById('item-file-input'); input.value = ''; input.click(); 
+        }
+
+        // 🌟 圖片上傳引擎：存入 Google Drive 並轉為可靠的直連網址
+        function compressImage(file, maxWidth, quality, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
+                    canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    callback(canvas.toDataURL('image/jpeg', quality));
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function uploadImageToDrive(base64Str, filename, callback) {
+            setStatus('sync', '圖片上傳中...');
+            const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
+            fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
+                if(data.status === "success") { 
+                    setStatus('cloud_done', '上傳成功'); 
+                    let driveUrl = getReliableDriveUrl(data.url);
+                    callback(driveUrl); 
+                } 
+                else { setStatus('cloud_off', '上傳失敗', true); alert('圖片上傳失敗：' + (data.message || '未知錯誤')); }
+            }).catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤，圖片無法上傳！'); });
+        }
+
+        function handleItemUpload(event) {
+            const file = event.target.files[0];
+            if (file && currentItemThumbBox) {
+                compressImage(file, 1920, 0.85, function(base64DataUrl) {
+                    uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
+                        currentItemThumbBox.className = 'action-box has-photo photo-box';
+                        currentItemThumbBox.innerHTML = `
+                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)">
+                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
+                        `;
+                        saveData();
+                    });
+                });
+            }
+        }
+
+        function deleteItemThumb(delBtn, event) {
+            event.stopPropagation();
+            if(confirm('確定移除此圖片？')) {
+                let box = delBtn.closest('.action-box');
+                let img = box.querySelector('img'); if (img) deleteImageFromCloud(img.src);
+                box.className = 'action-box photo-box';
+                box.innerHTML = `<span class="material-icons-round" style="font-size: 14px; color: #aaa;">image</span>`; 
+                saveData();
+            }
+        }
+
+        function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
+        function handleReceiptUpload(event) {
+            const file = event.target.files[0];
+            if (file && currentReceiptBox) {
+                compressImage(file, 1920, 0.85, function(base64DataUrl) {
+                    uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
+                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div></div>`; 
+                        saveData();
+                    });
+                });
+            }
+        }
+        function deleteReceiptThumb(btn, event) {
+            event.stopPropagation();
+            if(confirm('確定移除此收據圖片？')) {
+                let wrap = btn.closest('.receipt-thumb-wrap'); let img = wrap.querySelector('img'); if (img) deleteImageFromCloud(img.src);
+                wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
+                saveData();
+            }
+        }
+
+        // --- 記帳與其他功能 ---
+        function addBudgetRow(item = '新項目', payerName = payers[0], split = '平分', currency = currentTravelCurrency, amount = '0') {
+            const tbody = document.getElementById('budget-tbody'); const tr = document.createElement('tr'); tr.className = 'budget-row';
+            let currentRate = allRatesToTWD[currency] || 1; tr.setAttribute('data-rate', currentRate);
+            let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
+            let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR']; if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
+            let currencyOpts = opts.map(c => `<option value="${c}" ${c===currency?'selected':''}>${c}</option>`).join('');
+            let formattedAmt = Number(String(amount).replace(/,/g, '') || 0).toLocaleString('en-US');
+            
+            tr.innerHTML = `
+                <td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td>
+                <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td>
+                <td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${split==='平分'?'selected':''}>平分</option><option value="個人" ${split==='個人'?'selected':''}>個人</option></select></td>
+                <td style="white-space:nowrap;"><select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();" style="width:35%; display:inline-block; padding:0; text-align-last:left;">${currencyOpts}</select><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();" style="width:60%; display:inline-block; text-align:right; padding:0;"></td>
+                <td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>
+            `;
+            tbody.appendChild(tr); calcBudget(); saveData();
+        }
+
+        function deleteBudgetRow(btn) { if(confirm('確定刪除此記帳項目嗎？')) { let tr = btn.closest('tr'); let img = tr.querySelector('.receipt-thumb-wrap img'); if (img) deleteImageFromCloud(img.src); tr.remove(); calcBudget(); saveData(); } }
+
+        function calcBudget() {
+            const rows = document.querySelectorAll('#budget-tbody .budget-row');
+            let totalsPaid = {}; let totalsOwed = {}; let grandTotal = 0;
+            payers.forEach(p => { totalsPaid[p] = 0; totalsOwed[p] = 0; });
+            
+            rows.forEach(r => {
+                let payer = r.querySelector('.payer-select')?.value; let splitType = r.querySelector('.split-select')?.value || '個人';
+                let rowCurr = r.querySelector('.curr-select')?.value; let amountInputEl = r.querySelector('.amount-input'); if(!amountInputEl) return;
+                let valStr = amountInputEl.value.replace(/,/g, ''); let amount = parseFloat(valStr) || 0;
+                if (document.activeElement !== amountInputEl) { let formatted = amount.toLocaleString('en-US'); amountInputEl.value = formatted; amountInputEl.setAttribute('value', formatted); }
+
+                let rowRate = parseFloat(r.getAttribute('data-rate'));
+                if (isNaN(rowRate) || !rowRate) { rowRate = allRatesToTWD[rowCurr] || 1; r.setAttribute('data-rate', rowRate); }
+                if (rowCurr === 'TWD') rowRate = 1; 
+                
+                let amtInTWD = amount * rowRate;
+                if(payer) { if(totalsPaid[payer] === undefined) { totalsPaid[payer] = 0; totalsOwed[payer] = 0; } totalsPaid[payer] += amtInTWD; }
+                grandTotal += amtInTWD;
+                if (splitType === '平分') { let splitAmount = amtInTWD / payers.length; payers.forEach(p => { totalsOwed[p] += splitAmount; }); } else { if(payer) { totalsOwed[payer] += amtInTWD; } }
+            });
+            
+            let balances = {}; let debtors = []; let creditors = [];
+            payers.forEach(p => {
+                balances[p] = totalsPaid[p] - totalsOwed[p];
+                if (balances[p] < -0.5) debtors.push({ name: p, amount: Math.abs(balances[p]) });
+                else if (balances[p] > 0.5) creditors.push({ name: p, amount: balances[p] });
+            });
+            
+            let transfers = []; let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                let debtor = debtors[i]; let creditor = creditors[j]; let amount = Math.min(debtor.amount, creditor.amount);
+                transfers.push(`${debtor.name} <span class="material-icons-round" style="font-size:12px; vertical-align:middle; color:#888;">arrow_forward</span> ${creditor.name}：NT$${Math.round(amount).toLocaleString('en-US')}`);
+                debtor.amount -= amount; creditor.amount -= amount;
+                if (debtor.amount < 0.5) i++; if (creditor.amount < 0.5) j++;
+            }
+            
+            let resHTML = `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px; border-bottom:1px dashed #ccc; padding-bottom:8px; margin-bottom:8px;"><span> 旅程總花費：</span><span>NT$${Math.round(grandTotal).toLocaleString('en-US')}</span></div>`;
+            resHTML += '<div style="font-size:12px; font-weight:bold; margin-bottom:6px; color:#555;"> 各自應付總額 (含個人與共同)：</div>';
+            for(let p in totalsOwed) { resHTML += `<div class="flex-between" style="font-size:13px; margin-bottom:4px; color:#444;"><span> ${p}</span><span>NT$${Math.round(totalsOwed[p]).toLocaleString('en-US')}</span></div>`; }
+            resHTML += `<div style="font-size:13px; font-weight:bold; margin-top:12px; margin-bottom:6px; color:#d32f2f; background:#ffebee; padding:4px 8px; border-radius:4px; display:inline-block;"> 💰 結算：誰該給誰錢？</div>`;
+            if (transfers.length > 0) { transfers.forEach(t => { resHTML += `<div style="font-size:14px; font-weight:bold; margin-bottom:6px; padding-left:4px;">${t}</div>`; }); } 
+            else { resHTML += `<div style="font-size:13px; color:#777; padding-left:4px;">目前帳目平衡，無需給錢。</div>`; }
+            let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
+        }
+
+        function switchTodoPerson(personName) {
+            document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none');
+            let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block';
+            let select = document.getElementById('todo-person-select');
+            Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); });
+            saveData();
+        }
+
+        function addNewTodoPerson() {
+            let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return;
+            if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; }
+            let currentTemplateName = document.getElementById('todo-person-select').value;
+            let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`);
+            let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none';
+            newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed'));
+            document.getElementById('person-todo-container').appendChild(newList);
+            let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name;
+            select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); 
+        }
+
+        function renderPayerTags() {
+            let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; });
+            document.getElementById('payer-tags-container').innerHTML = html;
+        }
+        function updatePayerDropdowns() {
+            let options = payers.map(p => `<option value="${p}">${p}</option>`).join('');
+            document.querySelectorAll('.payer-select').forEach(sel => {
+                let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options;
+                if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; }
+            });
+        }
+        function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
+        function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
+
+        function switchTodoPerson(personName) {
+            document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none');
+            let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block';
+            let select = document.getElementById('todo-person-select');
+            Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); });
+            saveData();
+        }
+        function addNewTodoPerson() {
+            let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return;
+            if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; }
+            let currentTemplateName = document.getElementById('todo-person-select').value;
+            let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`);
+            let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none';
+            newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed'));
+            document.getElementById('person-todo-container').appendChild(newList);
+            let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name;
+            select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); 
+        }
+        function deleteTodoPerson() {
+            let select = document.getElementById('todo-person-select'); let personName = select.value;
+            if (personName === '預設範本') { alert('「預設範本」為系統基礎清單，無法被刪除喔！'); return; }
+            if (confirm(`確定要刪除人員「${personName}」的所有待辦清單嗎？\n(此操作會一併移除該人員的所有項目)`)) {
+                Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); });
+                let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove();
+                select.value = '預設範本'; switchTodoPerson('預設範本');
+            }
+        }
+        function predictLuggageType(titleElement) {
+            const text = titleElement.innerText; const select = titleElement.closest('.timeline-item').querySelector('.luggage-select'); if (!select) return;
+            if (select.value === '背包') {
+                let predicted = null;
+                if (['錢包', '護照', '手機', '面紙', '唇膏', '鑰匙', '隨身'].some(kw => text.includes(kw))) predicted = '小包包';
+                else if (['腳架', '剪刀', '刀', '100ml', '沐浴', '洗髮', '液體', '噴霧', '託運', '行李箱'].some(kw => text.includes(kw))) predicted = '託運';
+                if (predicted) { select.value = predicted; Array.from(select.options).forEach(opt => { if(opt.value === predicted) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); }
+            }
         }
 
         function toggleTransportMode(iconEl, event) {
-            event.stopPropagation();
-            let modes = ['directions_transit', 'directions_walk', 'directions_car'];
-            let current = iconEl.innerText.trim();
-            iconEl.innerText = modes[(modes.indexOf(current) + 1) % modes.length];
+            event.stopPropagation(); let modes = ['directions_transit', 'directions_walk', 'directions_car'];
+            let current = iconEl.innerText.trim(); iconEl.innerText = modes[(modes.indexOf(current) + 1) % modes.length];
             let card = iconEl.closest('.day-card'); if(card) recalculateDayTime(card); saveData();
-        }
-
-        // 🌟 修正：生成分離式的完美自訂連結按鈕
-        function addLinkToNote(btn, event) {
-            event.preventDefault(); event.stopPropagation();
-            let url = prompt('請輸入參考網址 (需包含 http/https)：', 'https://');
-            if (url && url.startsWith('http')) {
-                let text = prompt('請輸入連結顯示名稱：', '參考連結');
-                let noteEl = btn.closest('.content-box').querySelector('.item-note');
-                if(noteEl && noteEl.innerText.trim() === '備註：') { noteEl.innerHTML = ''; }
-                if(noteEl) {
-                    let linkHtml = ` <a data-href="${url}" class="note-link" contenteditable="false"><span class="material-icons-round" style="font-size:14px; cursor:pointer;" contenteditable="false" title="點擊開啟連結">link</span><span class="editable" contenteditable="true" style="cursor:text; border-bottom:1px dashed transparent;">${text||'參考連結'}</span></a> &nbsp;`;
-                    noteEl.innerHTML += linkHtml;
-                }
-                saveData();
-            }
         }
 
         function recalculateDayTime(dayCardElement) {
@@ -929,8 +1111,7 @@
                 if (oldAuto) oldAuto.remove(); if (oldGap) oldGap.remove();
                 if (!startEl || !durationEl || !endEl) return;
 
-                let startMins = 0;
-                let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
+                let startMins = 0; let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
                 if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
                 let duration = parseInt(durationEl.innerText.trim()) || 0;
                 let endMins = startMins + duration;
@@ -939,12 +1120,10 @@
                 if (index > 0 && prevTimeCol) {
                     let expMins = prevEndTimeMins + (prevTravelMins || 0);
                     let gap = startMins - expMins; if (gap < -300) gap += 24 * 60; 
-                    
                     let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start';
                     autoStartEl.innerText = `預計 ${String(Math.floor(expMins / 60) % 24).padStart(2, '0')}:${String(expMins % 60).padStart(2, '0')}`;
                     let gapEl = document.createElement('div'); gapEl.className = 'gap-text';
-                    if (gap < 0) { gapEl.style.color = '#e57373'; gapEl.innerText = `重疊 ${Math.abs(gap)} 分`; } 
-                    else { gapEl.innerText = `隔 ${gap} 分`; }
+                    if (gap < 0) { gapEl.style.color = '#e57373'; gapEl.innerText = `重疊 ${Math.abs(gap)} 分`; } else { gapEl.innerText = `隔 ${gap} 分`; }
                     prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
                 }
                 prevEndTimeMins = endMins; prevTravelMins = travelEl ? (parseInt(travelEl.innerText.trim()) || 0) : 0; prevTimeCol = timeCol;
@@ -960,7 +1139,7 @@
         function initSortable() {
             if (typeof Sortable === 'undefined') return;
             const sortableOptions = {
-                animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
+                animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
                 onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); }
             };
             document.querySelectorAll('.day-card').forEach(card => { if (!card.sortable) card.sortable = Sortable.create(card, sortableOptions); });
@@ -979,16 +1158,6 @@
         function toggleComplete(element, event) {
             if (!event.target.closest('.custom-checkbox')) return;
             element.classList.toggle('completed'); saveData();
-        }
-
-        function deleteItem(btnElement, event) {
-            event.stopPropagation();
-            if(confirm("確定要刪除這個項目嗎？")) {
-                let item = btnElement.closest('.timeline-item, .link-item, .todo-category-header');
-                let img = item.querySelector('img'); if (img) deleteImageFromCloud(img.src);
-                let card = btnElement.closest('.day-card'); item.remove();
-                if(card) recalculateDayTime(card); saveData();
-            }
         }
 
         function autoNavigate(btn, event) {
@@ -1055,7 +1224,10 @@
 
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新交通指南</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新交通指南</div></div>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
 
@@ -1063,15 +1235,26 @@
 
         function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><span class="delete-btn" onclick="deleteHotelCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>`;
+            div.innerHTML = `
+                <div class="flex-between" style="margin-bottom: 12px;">
+                    <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2>
+                    <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+                </div>
+                <div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div>
+                <div class="item-note editable" contenteditable="true" style="margin-top:8px;">訂單編號：<br>入住時間：<br>退房時間：<br>房型：</div>
+                <button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>
+            `;
             container.appendChild(div); saveData();
         }
 
         function addGeneralItemWithNote(btnElement) {
             let wrapper = document.getElementById('shopping-list'); let target = wrapper ? wrapper : btnElement.parentNode;
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
-            if (wrapper) wrapper.appendChild(newItem); else target.insertBefore(newItem, btnElement); saveData();
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div><div class="item-note editable" contenteditable="true">備註：</div></div>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
+            target.insertBefore(newItem, btnElement); saveData();
         }
 
         function openLinkFromText(btn, event) {
@@ -1105,22 +1288,32 @@
 
         function addTodoCategory(btnElement) {
             const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
-            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span><span class="cat-action-icon delete-btn" style="padding:0;" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></span></div>`;
+            newCat.innerHTML = `
+                <span class="editable" contenteditable="true"> 新增分類名稱</span>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color);"><span class="material-icons-round" style="font-size:16px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
             btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
         }
 
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+            newItem.innerHTML = `
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+            `;
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
         function addTodoItemToContainer(containerId) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             if (containerId === 'booking-list') {
-                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+                newItem.innerHTML = `
+                    <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入預訂項目</div><div class="item-note editable" contenteditable="true">備註/貼上連結：</div><div class="action-row"><button class="btn-nav" style="background:#4a6fa5; width:fit-content; padding:4px 10px; border-radius:20px;" onclick="openLinkFromText(this, event)"><span class="material-icons-round" style="font-size:14px;">link</span> 前往連結</button></div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                `;
             } else {
-                newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>`;
+                newItem.innerHTML = `
+                    <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable" contenteditable="true">輸入新項目</div></div><div class="delete-btn" onclick="deleteItem(this, event)"><span class="material-icons-round">delete_outline</span></div>
+                `;
             } document.getElementById(containerId).appendChild(newItem); saveData();
         }
 
@@ -1157,7 +1350,7 @@
             const input = document.getElementById('item-file-input'); input.value = ''; input.click(); 
         }
 
-        // 🌟 圖片上傳引擎：存入 Google Drive 並轉為可靠的 thumbnail 網址
+        // 🌟 圖片上傳引擎：存入 Google Drive 並轉為可靠的直連網址
         function compressImage(file, maxWidth, quality, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -1175,7 +1368,7 @@
         }
 
         function uploadImageToDrive(base64Str, filename, callback) {
-            setStatus('sync', '圖片上傳雲端中...');
+            setStatus('sync', '圖片上傳中...');
             const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
             fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
                 if(data.status === "success") { 
@@ -1183,19 +1376,19 @@
                     let driveUrl = getReliableDriveUrl(data.url);
                     callback(driveUrl); 
                 } 
-                else { setStatus('cloud_off', '上傳失敗', true); alert("圖片上傳失敗：" + (data.message || "未知錯誤")); }
-            }).catch(e => { setStatus('cloud_off', '上傳失敗', true); alert("網路錯誤，圖片無法上傳！"); });
+                else { setStatus('cloud_off', '上傳失敗', true); alert('圖片上傳失敗：' + (data.message || '未知錯誤')); }
+            }).catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤，圖片無法上傳！'); });
         }
 
         function handleItemUpload(event) {
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
-                // 🌟 使用 1920 高畫素、90% 高畫質上傳
-                compressImage(file, 1920, 0.9, function(base64DataUrl) {
+                // 🌟 使用 1920 高畫素、85% 高畫質上傳
+                compressImage(file, 1920, 0.85, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        currentItemThumbBox.style.border = 'none'; currentItemThumbBox.style.background = 'transparent';
+                        currentItemThumbBox.className = 'action-box has-photo photo-box';
                         currentItemThumbBox.innerHTML = `
-                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:4px; cursor:pointer;" onclick="openImageModal(this, event)">
+                            <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)">
                             <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:14px; height:14px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div>
                         `;
                         saveData();
@@ -1207,10 +1400,10 @@
         function deleteItemThumb(delBtn, event) {
             event.stopPropagation();
             if(confirm('確定移除此圖片？')) {
-                let box = delBtn.closest('.item-thumb-box');
+                let box = delBtn.closest('.action-box');
                 let img = box.querySelector('img'); if (img) deleteImageFromCloud(img.src);
-                box.style.border = '1px dashed #ccc'; box.style.background = '#fafafa';
-                box.innerHTML = `<span class="material-icons-round" style="font-size: 16px; color: #aaa;">add_photo_alternate</span>`; 
+                box.className = 'action-box photo-box';
+                box.innerHTML = `<span class="material-icons-round" style="font-size: 14px; color: #aaa;">image</span>`; 
                 saveData();
             }
         }
@@ -1219,7 +1412,7 @@
         function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (file && currentReceiptBox) {
-                compressImage(file, 1920, 0.9, function(base64DataUrl) {
+                compressImage(file, 1920, 0.85, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-6px; right:-6px; background:var(--danger-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:10px; box-shadow:0 1px 3px rgba(0,0,0,0.2); z-index:2; cursor:pointer;">&times;</div></div>`; 
                         saveData();
@@ -1265,7 +1458,7 @@
                 }
             });
             // 修復行內圖片容器
-            document.querySelectorAll('.item-thumb-box img').forEach(img => {
+            document.querySelectorAll('.item-thumb-box img, .photo-box img').forEach(img => {
                 img.onclick = function(e) { openImageModal(this, e); };
             });
         }
