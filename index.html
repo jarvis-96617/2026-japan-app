@@ -55,10 +55,18 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .manual-save-btn { background: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; flex-shrink: 0; padding: 6px 10px; }
+        /* 🌟 徹底解決手機端選字反白問題 */
+        .manual-save-btn { 
+            background: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; flex-shrink: 0; padding: 6px 10px; 
+            -webkit-touch-callout: none !important; 
+            -webkit-user-select: none !important; 
+            user-select: none !important; 
+            touch-action: manipulation;
+        }
+        .manual-save-btn * { pointer-events: none; } /* 阻擋內部元素被選取 */
         .manual-save-btn:active { transform: scale(0.92); }
 
-        #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap;}
         body.dark-mode #mobile-tooltip { background: rgba(255, 255, 255, 0.95); color: #121212; }
 
         .container { padding: 0 15px; }
@@ -74,9 +82,8 @@
         .timeline-item:last-child { border-bottom: none; }
         .timeline-item.completed { opacity: 0.35; }
         
-        /* 🌟 交通票券與指南的排版縮小變密集 */
-        #tab-transport .timeline-item { padding: 4px 4px; }
-        #tab-transport .item-title { font-size: 14px; margin-bottom: 2px; }
+        #tab-transport .timeline-item { padding: 6px 4px; }
+        #tab-transport .item-title { font-size: 14px; margin-bottom: 2px; line-height: 1.2;}
         #tab-todo .timeline-item, #tab-shopping .timeline-item { padding: 4px 4px; }
         
         .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px;}
@@ -142,18 +149,18 @@
         .action-box.has-link { background: #e3f2fd; border-color: #1976d2; }
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
+        .action-box * { pointer-events: none; } /* 阻擋圖示被選取 */
 
         .img-delete-badge {
             position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
             width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center;
             align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            z-index: 10; cursor: pointer;
+            z-index: 10; cursor: pointer; pointer-events: auto; /* 恢復刪除鈕點擊 */
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 🌟 預算表黃金比例設定 */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
@@ -212,28 +219,20 @@
         let payers = ['本人', '家人']; 
         let currentReceiptBox = null;
         let currentItemThumbBox = null;
-        // 🌟 初始化匯率（自帶安全備用值，避免離線時全空）
         let allRatesToTWD = { TWD: 1, JPY: 0.22, KRW: 0.024, THB: 0.9, USD: 32, EUR: 34 }; 
         let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
-        // 🌟 精準抓取最新國際匯率 API
         function fetchExchangeRate() {
             fetch('https://api.exchangerate-api.com/v4/latest/TWD')
             .then(res => res.json())
             .then(data => {
                 if (data && data.rates) {
-                    for (let curr in data.rates) {
-                        allRatesToTWD[curr] = 1 / data.rates[curr]; // 因為基底是 TWD，需倒數轉換
-                    }
-                    allRatesToTWD['TWD'] = 1;
-                    updateRateDisplay();
+                    for (let curr in data.rates) { allRatesToTWD[curr] = 1 / data.rates[curr]; }
+                    allRatesToTWD['TWD'] = 1; updateRateDisplay();
                 }
             })
-            .catch(e => {
-                console.log('匯率載入失敗，使用備用預設匯率。');
-                updateRateDisplay(); // 斷網時依然顯示備用匯率
-            });
+            .catch(e => { console.log('匯率載入失敗，使用備用預設匯率。'); updateRateDisplay(); });
         }
 
         function updateRateDisplay() {
@@ -248,10 +247,7 @@
                 currentTravelCurrency = curr.trim().toUpperCase();
                 localStorage.setItem('travelAppCurrency', currentTravelCurrency);
                 document.getElementById('curr-label').innerText = currentTravelCurrency;
-                updateRateDisplay();
-                updateCurrencyOptionsInTable();
-                calcBudget();
-                saveData();
+                updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData();
             }
         }
 
@@ -272,6 +268,34 @@
                 }
             }
             img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
+        }
+
+        function initMobileTooltips() {
+            if (window._tooltipsInitialized) return;
+            window._tooltipsInitialized = true;
+            let holdTimer = null;
+            const mobileTooltip = document.getElementById('mobile-tooltip');
+            const hideTip = () => { mobileTooltip.style.opacity = '0'; setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200); };
+
+            document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
+                const showTip = () => {
+                    let rect = btn.getBoundingClientRect();
+                    mobileTooltip.innerText = btn.getAttribute('data-tip');
+                    mobileTooltip.style.display = 'block';
+                    mobileTooltip.style.left = (rect.left + (rect.width / 2)) + 'px';
+                    mobileTooltip.style.top = (rect.bottom + 8) + 'px';
+                    mobileTooltip.style.transform = 'translateX(-50%)';
+                    setTimeout(() => mobileTooltip.style.opacity = '1', 10);
+                };
+                btn.addEventListener('touchstart', (e) => { clearTimeout(holdTimer); holdTimer = setTimeout(showTip, 400); }, {passive: true});
+                btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+                btn.addEventListener('mouseenter', showTip);
+                btn.addEventListener('mouseleave', hideTip);
+            });
+            window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideTip(); }, {passive: true});
         }
 
         function checkCloudFreshness() {
@@ -338,21 +362,20 @@
         </div>
     </div>
 
-    <!-- 🌟 精簡收納版的控制列 -->
+    <!-- 控制列 -->
     <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 6px 15px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
             <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto;">
-                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a; padding: 6px 8px;"><span class="material-icons-round" style="font-size:16px;">save</span></button>
-                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af; padding: 6px 8px;"><span class="material-icons-round" style="font-size:16px;">undo</span></button>
-                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb; padding: 6px 8px;"><span class="material-icons-round" style="font-size:16px;">redo</span></button>
-                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6; padding: 6px 8px;"><span class="material-icons-round" style="font-size:16px;">refresh</span></button>
-                <button class="manual-save-btn toggle-more-btn" onclick="toggleMoreOptions()" style="background:#4b5563; padding: 6px 8px;"><span class="material-icons-round" id="more-options-icon" style="font-size:16px;">more_vert</span></button>
+                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a; padding: 6px 8px;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:16px;">save</span></button>
+                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af; padding: 6px 8px;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:16px;">undo</span></button>
+                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb; padding: 6px 8px;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:16px;">redo</span></button>
+                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6; padding: 6px 8px;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:16px;">refresh</span></button>
+                <button class="manual-save-btn toggle-more-btn" onclick="toggleMoreOptions()" style="background:#4b5563; padding: 6px 8px;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:16px;">more_vert</span></button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px; white-space:nowrap;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
-        <!-- 展開的次要功能 -->
         <div id="more-options-bar" class="hide-scrollbar" style="display:none; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-top:8px; padding-top:6px; border-top:1px dashed var(--glass-border);">
             <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7; padding: 6px 10px;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">share</span> 分享</button>
             <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 6px 10px;" data-tip="深色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px; margin-right:4px;">dark_mode</span> 夜間</button>
@@ -473,8 +496,12 @@
             viewer.show();
         }
 
-        // 🌟 防舊資料覆寫：DOM 淨化演算法更新
+        // 🌟 終極 DOM 淨化引擎
         function captureState() {
+            // 存檔前先收起「更多選項」，確保展開狀態不被存入雲端
+            let moreBar = document.getElementById('more-options-bar');
+            if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
+
             let tempMain = document.createElement('div'); tempMain.innerHTML = document.getElementById('main-container').innerHTML;
             let tempHero = document.createElement('div'); tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
@@ -483,10 +510,14 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
-                // 淨化：移除轉圈圈圖示與避免壞掉的點擊殘留
-                container.querySelectorAll('.spin-icon').forEach(el => el.classList.remove('spin-icon'));
-                container.querySelectorAll('.link-box.has-link').forEach(el => el.removeAttribute('onclick'));
-                
+                // 🌟 清除轉圈圈圖示，避免壞檔上傳狀態被存入雲端
+                container.querySelectorAll('.photo-box').forEach(box => {
+                    if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
+                });
+                container.querySelectorAll('.receipt-box').forEach(box => {
+                    if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; }
+                });
+
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
                     if (el.classList.contains('timeline-item')) el.removeAttribute('style'); 
@@ -524,7 +555,7 @@
             setStatus('sync', '雲端同步壓縮檔中...'); clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
                 pendingSaveAction = false; isSavingToCloud = true;
-                fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
+                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).then(res => res.json()).then(data => {
                     isSavingToCloud = false;
                     if(data.status === "success") { setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 儲存成功！高壓縮檔案已同步至 Google 雲端。"); }
                 }).catch(e => {
@@ -610,12 +641,27 @@
 
         function finalizeLoad() {
             try {
-                // 🌟 自動清除舊版的「住宿相關連結」與 YOKU MOKU 散落元素
+                // 🌟 自動清除舊版廢棄區塊
                 document.querySelectorAll('#tab-hotel > div').forEach(div => {
                     if (div.innerText.includes('住宿相關連結與憑證') && !div.querySelector('.hotel-card')) div.remove();
                 });
                 document.querySelectorAll('#tab-shopping .glass-card > div:not(#shopping-list):not(.section-title):not(.add-btn)').forEach(div => {
                     if (!div.classList.contains('timeline-item')) div.remove(); 
+                });
+
+                // 🌟 自動升級舊版「交通指南」DOM 結構
+                document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
+                    if (!item.querySelector('.content-box')) {
+                        let textNode = item.childNodes[0] && item.childNodes[0].nodeType === 3 ? item.childNodes[0].textContent.trim() : '';
+                        if(!textNode) textNode = item.innerText.replace('delete', '').replace('link', '').replace('image', '').trim();
+                        item.innerHTML = `
+                            <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
+                            <div class="content-box">
+                                <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">${textNode || '輸入交通工具名稱'}</span></div>
+                                <div class="item-note editable" contenteditable="true">班次或座位備註：</div>
+                            </div>
+                        `;
+                    }
                 });
 
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
@@ -649,7 +695,6 @@
                     let dashBox = document.createElement('div');
                     dashBox.className = 'action-dash-box';
                     
-                    // 🌟 自動升級舊連結成「無縫開啟」格式
                     let linkBox = document.createElement('div');
                     if (oldLinkUrl) {
                         linkBox.className = 'action-box has-link link-box';
@@ -766,7 +811,7 @@
             } catch(error) {
                 console.error("載入解析錯誤: ", error);
             } finally {
-                fetchExchangeRate(); // 呼叫黃金匯率引擎
+                fetchExchangeRate(); 
                 initMobileTooltips();
                 isAppReady = true; lastActiveTime = Date.now();
                 setTimeout(() => {
@@ -776,26 +821,23 @@
             }
         }
 
-        // 🌟 無縫開啟連結與刪除邏輯
         function deleteItemLink(badgeEl, event) {
             event.stopPropagation();
-            if(confirm("確定移除此連結？")) {
-                let box = badgeEl.closest('.action-box');
-                box.className = 'action-box link-box';
-                box.removeAttribute('data-href');
-                box.setAttribute('onclick', 'handleItemLink(this, event)');
-                box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`;
-                saveData();
-            }
+            let box = badgeEl.closest('.action-box');
+            box.className = 'action-box link-box';
+            box.removeAttribute('data-href');
+            box.setAttribute('onclick', 'handleItemLink(this, event)');
+            box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`;
+            saveData();
         }
 
         function handleItemLink(btn, event) {
             event.stopPropagation();
-            if(btn.classList.contains('has-link')) return; // 已綁定交由內部按鈕處理
+            if(btn.classList.contains('has-link')) return; 
             let url = prompt('請輸入要綁定的網址 (需包含 http/https)：', 'https://');
             if (url && url.startsWith('http')) {
                 btn.className = 'action-box has-link link-box';
-                btn.removeAttribute('onclick'); // 移除外層點擊
+                btn.removeAttribute('onclick'); 
                 btn.innerHTML = `
                     <span class="material-icons-round" style="font-size:14px; color:#1976d2; width:100%; height:100%; display:flex; align-items:center; justify-content:center;" onclick="window.open('${url}', '_blank'); event.stopPropagation();">link</span>
                     <div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888;">&times;</div>
@@ -819,16 +861,16 @@
                 </div>
                 <div class="right-action-group">
                     <div class="action-dash-box">
-                        <div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div>
-                        <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
-                        <div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div>
+                        <div class="action-box link-box" onclick="handleItemLink(this, event)" title="設定連結"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div>
+                        <div class="action-box photo-box" onclick="triggerItemUpload(this, event)" title="上傳圖片"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
+                        <div class="action-box delete-box" onclick="deleteItem(this, event)" title="刪除"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div>
                     </div>
                 </div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
         }
 
-        // 🌟 交通指南升級為標準帶標題格式
+        // 🌟 新版交通指南：擁有完整排版與連結框
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `
