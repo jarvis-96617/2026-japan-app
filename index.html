@@ -166,21 +166,38 @@
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
 
+        /* 🌟 新增：迷你版圖片刪除按鈕樣式 */
+        .img-delete-badge {
+            position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
+            width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 10; cursor: pointer;
+        }
+
         /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
-        #budget-table th:nth-child(1) { width: 25%; } #budget-table th:nth-child(2) { width: 16%; } #budget-table th:nth-child(3) { width: 15%; } #budget-table th:nth-child(4) { width: 31%; } #budget-table th:nth-child(5) { width: 13%; } 
+        
+        /* 🌟 調整預算表寬度比例，讓項目與金額有更多空間 */
+        #budget-table th:nth-child(1) { width: 32%; text-align: left; padding-left: 4px; } 
+        #budget-table th:nth-child(2) { width: 15%; } 
+        #budget-table th:nth-child(3) { width: 13%; } 
+        #budget-table th:nth-child(4) { width: 27%; } 
+        #budget-table th:nth-child(5) { width: 13%; } 
+        #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } /* 項目文字靠左對齊 */
+
         .amount-input { width: 100%; box-sizing: border-box; font-size: 12px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0;}
         .curr-select, .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
-        .receipt-box { width: 20px; height: 20px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; flex-shrink: 0;}
+        /* 🌟 稍微放大發票縮圖框，減少誤按機率 */
+        .receipt-box { width: 26px; height: 26px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; flex-shrink: 0;}
         body.dark-mode .receipt-box { background: #222; border-color: #555; }
-        .receipt-thumb-wrap { position: relative; width: 20px; height: 20px; margin: 0 auto; flex-shrink: 0;}
+        .receipt-thumb-wrap { position: relative; width: 26px; height: 26px; margin: 0 auto; flex-shrink: 0;}
         .receipt-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;}
@@ -238,13 +255,15 @@
         // 你的專屬 Google Apps Script 網址
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
-        // 🌟 核心防破圖黑科技：使用 2024 最穩定的 lh3 直連格式，並保留 thumbnail 安全網址
+        // 🌟 核心防破圖黑科技：升級為 1920px 高畫質
         function getReliableDriveUrl(originalUrl) {
             if (!originalUrl) return '';
-            // 如果 Apps Script 已經回傳了 thumbnail，就直接使用，不亂改格式
-            if (originalUrl.includes('thumbnail') || originalUrl.includes('lh3.googleusercontent.com')) {
-                return originalUrl;
+            
+            // 🌟 攔截 thumbnail 網址，將預設低畫質(w600)強制替換為高畫質(w1920)
+            if (originalUrl.includes('thumbnail')) {
+                return originalUrl.replace(/sz=w\d+/, 'sz=w1920').replace(/sz=s\d+/, 'sz=s1920');
             }
+            
             let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
             if (match && match[1]) {
                 return `https://lh3.googleusercontent.com/d/${match[1]}`;
@@ -252,18 +271,15 @@
             return originalUrl;
         }
 
-        // 🌟 雙重破圖代理防護網
         function handleImageError(img) {
             if (!img.dataset.proxied) {
-                img.dataset.proxied = 'true'; // 標記已代理，避免無限迴圈
+                img.dataset.proxied = 'true';
                 let match = img.src.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/) || img.src.match(/\/d\/([^&/?]+)/);
                 if (match && match[1]) {
-                    // 備用代理也改用 thumbnail 來源，避免被 Google 伺服器拒絕
                     img.src = `https://wsrv.nl/?url=drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
                     return;
                 }
             }
-            // 連代理都失敗，優雅顯示 SVG
             img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
         }
 
@@ -295,7 +311,6 @@
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideTip(); }, {passive: true});
         }
 
-        // 🌟 全域點擊攔截：精準捕捉連結圖示點擊，開啟新分頁
         document.addEventListener('click', function(e) {
             let linkIcon = e.target.closest('.note-link .material-icons-round');
             if (linkIcon) {
@@ -306,7 +321,6 @@
             }
         });
 
-        // 🌟 雲端同步衝突防護引擎：喚醒時查勤 (Hash 比對)
         function checkCloudFreshness() {
             if (!isAppReady || isSavingToCloud || pendingSaveAction) return;
             if (new URLSearchParams(window.location.search).get('share')) return;
@@ -318,7 +332,6 @@
                 if (isSavingToCloud || pendingSaveAction) { setStatus('cloud_done', '已就緒'); return; }
                 if (rawData && rawData.isCompressed && rawData.data) {
                     if (rawData.data !== lastCloudDataHash) {
-                        console.warn("偵測到其他裝置已更新資料，強制覆寫本機防衝突！");
                         isAppReady = false; 
                         const splash = document.getElementById('splash-screen');
                         if (splash) {
@@ -484,7 +497,6 @@
     </nav>
 
     <script>
-        // 🌟 專業圖片放大套件 (Viewer.js)
         function openImageModal(imgElement, event) {
             event.stopPropagation();
             const viewer = new Viewer(imgElement, {
@@ -494,7 +506,6 @@
             viewer.show();
         }
 
-        // 🌟 終極 DOM 淨化引擎
         function captureState() {
             let tempMain = document.createElement('div'); tempMain.innerHTML = document.getElementById('main-container').innerHTML;
             let tempHero = document.createElement('div'); tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
@@ -625,10 +636,8 @@
             }
         }
 
-        // 🌟 史詩級無痛轉移腳本：統一行內排版 (Inline Action Group) ＋ 自動修復破圖
         function finalizeLoad() {
             try {
-                // 1. 全域掃描：將所有的行程、住宿、清單統一加上右側控制面板
                 document.querySelectorAll('.timeline-item, .hotel-card, .link-item, .todo-category-header').forEach(item => {
                     if (item.querySelector('.right-action-group')) return;
 
@@ -674,7 +683,7 @@
                     if (oldImgSrc) {
                         photoBox.innerHTML = `
                             <img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)" onerror="handleImageError(this)">
-                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div>
+                            <div onclick="deleteItemThumb(this, event)" class="img-delete-badge">&times;</div>
                         `;
                     } else {
                         photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
@@ -699,7 +708,6 @@
                     if (oldDel) oldDel.remove();
                 });
 
-                // 2. 自動修復所有剩餘圖片的破圖問題
                 document.querySelectorAll('img').forEach(img => {
                     if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') {
                         img.setAttribute('onerror', 'handleImageError(this)');
@@ -959,24 +967,20 @@
             reader.readAsDataURL(file);
         }
 
-        // 🌟 修正的圖片上傳函數：加入 headers 免受 CORS 阻擋
         function uploadImageToDrive(base64Str, filename, callback) {
             setStatus('sync', '圖片上傳中...');
             const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
             
             fetch(API_URL, { 
                 method: 'POST', 
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8'
-                },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: payload 
             }).then(res => res.json()).then(data => {
                 if(data.status === "success") { 
                     setStatus('cloud_done', '上傳成功'); 
                     let driveUrl = getReliableDriveUrl(data.url);
                     callback(driveUrl); 
-                } 
-                else { 
+                } else { 
                     setStatus('cloud_off', '上傳失敗', true); 
                     alert('圖片上傳失敗：' + (data.message || '未知錯誤')); 
                 }
@@ -989,13 +993,12 @@
         function handleItemUpload(event) {
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
-                // 使用 1920 高畫素、85% 高畫質上傳
                 compressImage(file, 1920, 0.85, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentItemThumbBox.className = 'action-box has-photo photo-box';
                         currentItemThumbBox.innerHTML = `
                             <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)" onerror="handleImageError(this)">
-                            <div onclick="deleteItemThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div>
+                            <div onclick="deleteItemThumb(this, event)" class="img-delete-badge">&times;</div>
                         `;
                         saveData();
                     });
@@ -1004,12 +1007,13 @@
         }
 
         function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
+        
         function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (file && currentReceiptBox) {
                 compressImage(file, 1920, 0.85, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div></div>`; 
+                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" class="img-delete-badge">&times;</div></div>`; 
                         saveData();
                     });
                 });
@@ -1023,7 +1027,7 @@
                     let wrap = btn.closest('.receipt-thumb-wrap'); 
                     let img = wrap.querySelector('img'); 
                     if (img) deleteImageFromCloud(img.src);
-                    wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div>`;
+                    wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>`;
                     saveData();
                 } catch(err) {
                     console.error("刪除收據錯誤", err);
@@ -1045,7 +1049,7 @@
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td>
                 <td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${split==='平分'?'selected':''}>平分</option><option value="個人" ${split==='個人'?'selected':''}>個人</option></select></td>
                 <td style="white-space:nowrap;"><select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();" style="width:35%; display:inline-block; padding:0; text-align-last:left;">${currencyOpts}</select><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();" style="width:60%; display:inline-block; text-align:right; padding:0;"></td>
-                <td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>
+                <td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>
             `;
             tbody.appendChild(tr); calcBudget(); saveData();
         }
@@ -1280,7 +1284,6 @@
         function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天所有行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
 
         function rebindEvents() {
-            // 修復所有舊的圖片容器 (防護 try-catch 確保不報錯)
             document.querySelectorAll('.img-wrapper').forEach(wrapper => {
                 try {
                     const img = wrapper.querySelector('img'); const delBtn = wrapper.querySelector('.img-del-btn');
@@ -1292,17 +1295,12 @@
                         delBtn.onclick = function(e) { 
                             e.stopPropagation(); 
                             if(confirm("確定刪除？")) { 
-                                try {
-                                    if(img) deleteImageFromCloud(img.src);
-                                    wrapper.remove(); 
-                                    saveData(); 
-                                } catch(err) {}
+                                try { if(img) deleteImageFromCloud(img.src); wrapper.remove(); saveData(); } catch(err) {}
                             } 
                         };
                     }
                 } catch(e) {}
             });
-            // 修復記帳區收據容器
             document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
                 try {
                     const img = wrap.querySelector('img'); 
@@ -1312,16 +1310,16 @@
                         wrap.outerHTML = `
                             <div class="receipt-thumb-wrap">
                                 <img src="${img.src}" onclick="openImageModal(this, event)" onerror="handleImageError(this)">
-                                <div onclick="deleteReceiptThumb(this, event)" style="position:absolute; top:-10px; right:-10px; background:var(--danger-color); color:white; width:24px; height:24px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.3); z-index:10; cursor:pointer;">&times;</div>
+                                <div onclick="deleteReceiptThumb(this, event)" class="img-delete-badge">&times;</div>
                             </div>`;
                     } else if (img && delBtn) {
                         img.onclick = function(e) { openImageModal(this, e); };
-                        // 強制放大舊版刪除鍵
-                        delBtn.style.width = '24px'; delBtn.style.height = '24px'; delBtn.style.top = '-10px'; delBtn.style.right = '-10px'; delBtn.style.fontSize = '16px';
+                        // 🌟 套用新版小按鈕
+                        delBtn.className = 'img-delete-badge';
+                        delBtn.removeAttribute('style');
                     }
                 } catch(e) {}
             });
-            // 修復行內圖片容器
             document.querySelectorAll('.item-thumb-box img, .photo-box img').forEach(img => {
                 if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)');
                 img.onclick = function(e) { openImageModal(this, e); };
