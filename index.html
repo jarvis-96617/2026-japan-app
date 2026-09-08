@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2026 京阪</title>
-    <!-- 啟用全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="京阪">
@@ -14,12 +13,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
-    <!-- 🌟 載入觸控拖曳排序套件 SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <!-- 🌟 載入 LZ-String 高效壓縮演算法引擎 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     
-    <!-- 🌟 載入 Viewer.js (專業圖片雙指縮放套件) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
@@ -166,13 +162,16 @@
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
 
-        /* 🌟 新增：迷你版圖片刪除按鈕樣式 */
         .img-delete-badge {
             position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
             width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center;
             align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             z-index: 10; cursor: pointer;
         }
+
+        /* 🌟 新增上傳中的轉圈動畫 */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spin-icon { animation: spin 1.5s linear infinite; }
 
         /* Currency & Budget */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
@@ -252,7 +251,6 @@
         // 你的專屬 Google Apps Script 網址
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
-        // 🌟 徹底拋棄 Thumbnail，強制索取原始高解析檔案！
         function getReliableDriveUrl(originalUrl) {
             if (!originalUrl) return '';
             let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
@@ -482,7 +480,7 @@
         <div class="nav-item active" onclick="switchTab('tab-itinerary', this)"><span class="material-icons-round">format_list_bulleted</span>行程</div>
         <div class="nav-item" onclick="switchTab('tab-transport', this)"><span class="material-icons-round">directions_transit</span>交通</div>
         <div class="nav-item" onclick="switchTab('tab-hotel', this)"><span class="material-icons-round">bed</span>住宿</div>
-        <div class="nav-item" onclick="switchTab('tab-shopping', this)"><span class="material-icons-round">shopping_cart</span>购物</div>
+        <div class="nav-item" onclick="switchTab('tab-shopping', this)"><span class="material-icons-round">shopping_cart</span>購物</div>
         <div class="nav-item" onclick="switchTab('tab-budget', this)"><span class="material-icons-round">savings</span>預算</div>
         <div class="nav-item" onclick="switchTab('tab-todo', this)"><span class="material-icons-round">checklist</span>待辦</div>
     </nav>
@@ -942,23 +940,51 @@
             const input = document.getElementById('item-file-input'); input.value = ''; input.click(); 
         }
 
-        function compressImage(file, maxWidth, quality, callback) {
+        // 🌟 防護網 1：徹底釋放 Canvas 記憶體並微調尺寸
+        function compressImage(file, maxWidth, quality, callback, errorCallback) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
-                    canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    callback(canvas.toDataURL('image/jpeg', quality));
+                    canvas.width = img.width * scaleSize;
+                    canvas.height = img.height * scaleSize;
+                    
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        alert("手機記憶體不足，無法壓縮圖片，請關閉部分分頁後重試！");
+                        if(errorCallback) errorCallback();
+                        return;
+                    }
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const result = canvas.toDataURL('image/jpeg', quality);
+
+                    // 【關鍵】強制釋放 iOS 記憶體
+                    canvas.width = 0; canvas.height = 0; img.src = ""; 
+
+                    if (result === 'data:,') {
+                        alert("圖片處理異常，可能是檔案過大！");
+                        if(errorCallback) errorCallback();
+                        return;
+                    }
+                    callback(result);
+                }
+                img.onerror = function() { 
+                    alert("圖片格式不支援或檔案毀損！"); 
+                    if(errorCallback) errorCallback();
                 }
                 img.src = e.target.result;
+            }
+            reader.onerror = function() { 
+                alert("無法讀取檔案！"); 
+                if(errorCallback) errorCallback();
             }
             reader.readAsDataURL(file);
         }
 
-        function uploadImageToDrive(base64Str, filename, callback) {
+        // 🌟 防護網 2：上傳網路除錯器
+        function uploadImageToDrive(base64Str, filename, callback, errorCallback) {
             setStatus('sync', '圖片上傳中...');
             const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
             
@@ -966,26 +992,35 @@
                 method: 'POST', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: payload 
-            }).then(res => res.json()).then(data => {
+            }).then(res => {
+                if (!res.ok) throw new Error("伺服器回應異常 (" + res.status + ")");
+                return res.json();
+            }).then(data => {
                 if(data.status === "success") { 
                     setStatus('cloud_done', '上傳成功'); 
                     let driveUrl = getReliableDriveUrl(data.url);
                     callback(driveUrl); 
                 } else { 
                     setStatus('cloud_off', '上傳失敗', true); 
-                    alert('圖片上傳失敗：' + (data.message || '未知錯誤')); 
+                    alert('後端錯誤：' + (data.message || '未知')); 
+                    if(errorCallback) errorCallback();
                 }
             }).catch(e => { 
-                setStatus('cloud_off', '上傳失敗', true); 
-                alert('網路錯誤，圖片無法上傳！'); 
+                setStatus('cloud_off', '連線中斷', true); 
+                alert('網路或連線中斷，圖片無法上傳！\n細節: ' + e.message); 
+                if(errorCallback) errorCallback();
             });
         }
 
-function handleItemUpload(event) {
+        // 🌟 防護網 3：加入上傳中的「轉圈圈」動畫，防連點
+        function handleItemUpload(event) {
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
-                // 🌟 【修改這裡】將 1920 改為 1080，0.85 改為 0.75，大幅降低斷線率
-                compressImage(file, 1080, 0.75, function(base64DataUrl) {
+                // 變更圖示為轉圈圈
+                currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
+                
+                // 改為 800px 與 0.6 畫質，檔案縮小為 100KB 左右，確保網路絕對順暢
+                compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentItemThumbBox.className = 'action-box has-photo photo-box';
                         currentItemThumbBox.innerHTML = `
@@ -993,25 +1028,37 @@ function handleItemUpload(event) {
                             <div onclick="deleteItemThumb(this, event)" class="img-delete-badge">&times;</div>
                         `;
                         saveData();
+                    }, function() {
+                        // 失敗時回復原狀
+                        currentItemThumbBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
                     });
+                }, function() {
+                    currentItemThumbBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
                 });
             }
         }
 
         function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
         
+        // 🌟 同樣為收據加入轉圈動畫與記憶體防護
         function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (file && currentReceiptBox) {
-                // 🌟 【修改這裡】同樣將收據上傳改為 1080 與 0.75
-                compressImage(file, 1080, 0.75, function(base64DataUrl) {
+                currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
+                
+                compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" class="img-delete-badge">&times;</div></div>`; 
                         saveData();
+                    }, function() {
+                        currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`;
                     });
+                }, function() {
+                    currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`;
                 });
             }
-        }        
+        }
+        
         function deleteReceiptThumb(btn, event) {
             event.stopPropagation();
             if(confirm('確定移除此收據圖片？')) {
