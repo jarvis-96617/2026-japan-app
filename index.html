@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2026 京阪</title>
+    <!-- 啟用全螢幕 App 模式 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="京阪">
@@ -239,14 +240,14 @@
         let pendingSaveAction = false;
         let syncTimeout = null;
         
+        // 🌟 新增的全域鎖定變數，防範連點衝突
+        let isImageProcessing = false;
+        
         let payers = ['本人', '家人']; 
         let currentReceiptBox = null;
         let currentItemThumbBox = null;
         let allRatesToTWD = { TWD: 1 };
         let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
-        let undoStack = [];
-        let redoStack = [];
-        let currentStateSnapshot = null;
         
         // 你的專屬 Google Apps Script 網址
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
@@ -933,57 +934,76 @@
             }
         }
 
+        // 🌟 防呆：加入上鎖機制，杜絕連點衝突
         function triggerItemUpload(boxElement, event) { 
             if(event) event.stopPropagation();
+            if(isImageProcessing) { alert('⏳ 圖片處理中，請稍候再上傳下一張喔！'); return; } // 上鎖阻擋
             if(boxElement.querySelector('img')) return; 
             currentItemThumbBox = boxElement; 
             const input = document.getElementById('item-file-input'); input.value = ''; input.click(); 
         }
+        
+        function triggerReceiptUpload(boxElement) { 
+            if(isImageProcessing) { alert('⏳ 圖片處理中，請稍候再上傳下一張喔！'); return; } // 上鎖阻擋
+            currentReceiptBox = boxElement; 
+            const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); 
+        }
 
-        // 🌟 防護網 1：徹底釋放 Canvas 記憶體並微調尺寸
+        // 🌟 進階防護：自動重試機制與 iOS 緩衝時間
         function compressImage(file, maxWidth, quality, callback, errorCallback) {
+            if (!file || !file.type.match(/image.*/)) {
+                alert("⚠️ 請選擇正確的圖片檔案！");
+                if(errorCallback) errorCallback();
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
-                    canvas.width = img.width * scaleSize;
-                    canvas.height = img.height * scaleSize;
-                    
-                    const ctx = canvas.getContext('2d');
-                    if (!ctx) {
-                        alert("手機記憶體不足，無法壓縮圖片，請關閉部分分頁後重試！");
-                        if(errorCallback) errorCallback();
-                        return;
-                    }
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const result = canvas.toDataURL('image/jpeg', quality);
-
-                    // 【關鍵】強制釋放 iOS 記憶體
-                    canvas.width = 0; canvas.height = 0; img.src = ""; 
-
-                    if (result === 'data:,') {
-                        alert("圖片處理異常，可能是檔案過大！");
-                        if(errorCallback) errorCallback();
-                        return;
-                    }
-                    callback(result);
-                }
-                img.onerror = function() { 
-                    alert("圖片格式不支援或檔案毀損！"); 
-                    if(errorCallback) errorCallback();
-                }
-                img.src = e.target.result;
-            }
-            reader.onerror = function() { 
-                alert("無法讀取檔案！"); 
+                let retryCount = 0;
+                const tryDecode = () => {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
+                        canvas.width = img.width * scaleSize;
+                        canvas.height = img.height * scaleSize;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) { alert("⚠️ 手機記憶體不足，無法處理圖片！"); if(errorCallback) errorCallback(); return; }
+                        
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const result = canvas.toDataURL('image/jpeg', quality);
+                        
+                        // 強制釋放 iOS 記憶體
+                        canvas.width = 0; canvas.height = 0; img.src = ""; 
+                        
+                        if (result === 'data:,') { alert("⚠️ 圖片處理異常！"); if(errorCallback) errorCallback(); return; }
+                        callback(result);
+                    };
+                    img.onerror = function() {
+                        if (retryCount < 1) {
+                            retryCount++;
+                            console.log("iOS 圖片轉換緩衝中，重新嘗試...");
+                            setTimeout(tryDecode, 800); // 延長等待 iOS 從 iCloud 下載或 HEIC 轉換的時間
+                        } else {
+                            alert("⚠️ 圖片解碼失敗：若是 iCloud 雲端照片，請確保已完全下載至手機內再上傳！");
+                            if(errorCallback) errorCallback();
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                
+                // 延遲 150ms 讓手機作業系統有時間準備檔案
+                setTimeout(tryDecode, 150); 
+            };
+            
+            reader.onerror = function() {
+                alert("⚠️ 無法讀取檔案！");
                 if(errorCallback) errorCallback();
             }
             reader.readAsDataURL(file);
         }
 
-        // 🌟 防護網 2：上傳網路除錯器
+        // 🌟 修改：加入 errorCallback 來處理失敗後的解鎖
         function uploadImageToDrive(base64Str, filename, callback, errorCallback) {
             setStatus('sync', '圖片上傳中...');
             const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
@@ -993,7 +1013,7 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: payload 
             }).then(res => {
-                if (!res.ok) throw new Error("伺服器回應異常 (" + res.status + ")");
+                if(!res.ok) throw new Error("HTTP 異常: " + res.status);
                 return res.json();
             }).then(data => {
                 if(data.status === "success") { 
@@ -1002,24 +1022,23 @@
                     callback(driveUrl); 
                 } else { 
                     setStatus('cloud_off', '上傳失敗', true); 
-                    alert('後端錯誤：' + (data.message || '未知')); 
+                    alert('圖片上傳失敗：' + (data.message || '未知錯誤')); 
                     if(errorCallback) errorCallback();
                 }
             }).catch(e => { 
-                setStatus('cloud_off', '連線中斷', true); 
-                alert('網路或連線中斷，圖片無法上傳！\n細節: ' + e.message); 
+                setStatus('cloud_off', '上傳失敗', true); 
+                alert('網路錯誤，圖片無法上傳！\n細節：' + e.message); 
                 if(errorCallback) errorCallback();
             });
         }
 
-        // 🌟 防護網 3：加入上傳中的「轉圈圈」動畫，防連點
+        // 🌟 處理上傳邏輯並加入轉圈動畫
         function handleItemUpload(event) {
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
-                // 變更圖示為轉圈圈
+                isImageProcessing = true; // 鎖定操作
                 currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
                 
-                // 改為 800px 與 0.6 畫質，檔案縮小為 100KB 左右，確保網路絕對順暢
                 compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentItemThumbBox.className = 'action-box has-photo photo-box';
@@ -1028,50 +1047,37 @@
                             <div onclick="deleteItemThumb(this, event)" class="img-delete-badge">&times;</div>
                         `;
                         saveData();
-                    }, function() {
-                        // 失敗時回復原狀
+                        isImageProcessing = false; // 解鎖
+                    }, function() { // 網路錯誤復原
                         currentItemThumbBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
+                        isImageProcessing = false; // 解鎖
                     });
-                }, function() {
+                }, function() { // 解析錯誤復原
                     currentItemThumbBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
+                    isImageProcessing = false; // 解鎖
                 });
             }
         }
 
-        function triggerReceiptUpload(boxElement) { currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
-        
-        // 🌟 同樣為收據加入轉圈動畫與記憶體防護
         function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (file && currentReceiptBox) {
+                isImageProcessing = true; // 鎖定操作
                 currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
                 
                 compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" class="img-delete-badge">&times;</div></div>`; 
                         saveData();
+                        isImageProcessing = false; // 解鎖
                     }, function() {
                         currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`;
+                        isImageProcessing = false; // 解鎖
                     });
                 }, function() {
                     currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`;
+                    isImageProcessing = false; // 解鎖
                 });
-            }
-        }
-        
-        function deleteReceiptThumb(btn, event) {
-            event.stopPropagation();
-            if(confirm('確定移除此收據圖片？')) {
-                try {
-                    let wrap = btn.closest('.receipt-thumb-wrap'); 
-                    let img = wrap.querySelector('img'); 
-                    if (img) deleteImageFromCloud(img.src);
-                    wrap.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>`;
-                    saveData();
-                } catch(err) {
-                    console.error("刪除收據錯誤", err);
-                    alert("刪除成功，請重新整理頁面。");
-                }
             }
         }
 
