@@ -981,10 +981,11 @@
             });
         }
 
-        function handleItemUpload(event) {
+function handleItemUpload(event) {
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
-                compressImage(file, 1920, 0.85, function(base64DataUrl) {
+                // 🌟 【修改這裡】將 1920 改為 1080，0.85 改為 0.75，大幅降低斷線率
+                compressImage(file, 1080, 0.75, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentItemThumbBox.className = 'action-box has-photo photo-box';
                         currentItemThumbBox.innerHTML = `
@@ -1002,15 +1003,15 @@
         function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (file && currentReceiptBox) {
-                compressImage(file, 1920, 0.85, function(base64DataUrl) {
+                // 🌟 【修改這裡】同樣將收據上傳改為 1080 與 0.75
+                compressImage(file, 1080, 0.75, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" class="img-delete-badge">&times;</div></div>`; 
                         saveData();
                     });
                 });
             }
-        }
-        
+        }        
         function deleteReceiptThumb(btn, event) {
             event.stopPropagation();
             if(confirm('確定移除此收據圖片？')) {
