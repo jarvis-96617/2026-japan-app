@@ -181,20 +181,18 @@
         #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        /* 🌟 調整預算表寬度比例，讓項目與金額有更多空間 */
         #budget-table th:nth-child(1) { width: 32%; text-align: left; padding-left: 4px; } 
         #budget-table th:nth-child(2) { width: 15%; } 
         #budget-table th:nth-child(3) { width: 13%; } 
         #budget-table th:nth-child(4) { width: 27%; } 
         #budget-table th:nth-child(5) { width: 13%; } 
-        #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } /* 項目文字靠左對齊 */
+        #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } 
 
         .amount-input { width: 100%; box-sizing: border-box; font-size: 12px; text-align: center; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0;}
         .curr-select, .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
-        /* 🌟 稍微放大發票縮圖框，減少誤按機率 */
         .receipt-box { width: 26px; height: 26px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; flex-shrink: 0;}
         body.dark-mode .receipt-box { background: #222; border-color: #555; }
         .receipt-thumb-wrap { position: relative; width: 26px; height: 26px; margin: 0 auto; flex-shrink: 0;}
@@ -235,7 +233,6 @@
     <div id="mobile-tooltip"></div>
     
     <script>
-        // 初始化全域變數 (絕對不可重複宣告)
         let isAppReady = false;
         let lastActiveTime = Date.now();
         let lastCloudDataHash = null;
@@ -255,15 +252,9 @@
         // 你的專屬 Google Apps Script 網址
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
-        // 🌟 核心防破圖黑科技：升級為 1920px 高畫質
+        // 🌟 徹底拋棄 Thumbnail，強制索取原始高解析檔案！
         function getReliableDriveUrl(originalUrl) {
             if (!originalUrl) return '';
-            
-            // 🌟 攔截 thumbnail 網址，將預設低畫質(w600)強制替換為高畫質(w1920)
-            if (originalUrl.includes('thumbnail')) {
-                return originalUrl.replace(/sz=w\d+/, 'sz=w1920').replace(/sz=s\d+/, 'sz=s1920');
-            }
-            
             let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
             if (match && match[1]) {
                 return `https://lh3.googleusercontent.com/d/${match[1]}`;
@@ -276,7 +267,7 @@
                 img.dataset.proxied = 'true';
                 let match = img.src.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/) || img.src.match(/\/d\/([^&/?]+)/);
                 if (match && match[1]) {
-                    img.src = `https://wsrv.nl/?url=drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+                    img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`;
                     return;
                 }
             }
@@ -491,7 +482,7 @@
         <div class="nav-item active" onclick="switchTab('tab-itinerary', this)"><span class="material-icons-round">format_list_bulleted</span>行程</div>
         <div class="nav-item" onclick="switchTab('tab-transport', this)"><span class="material-icons-round">directions_transit</span>交通</div>
         <div class="nav-item" onclick="switchTab('tab-hotel', this)"><span class="material-icons-round">bed</span>住宿</div>
-        <div class="nav-item" onclick="switchTab('tab-shopping', this)"><span class="material-icons-round">shopping_cart</span>購物</div>
+        <div class="nav-item" onclick="switchTab('tab-shopping', this)"><span class="material-icons-round">shopping_cart</span>购物</div>
         <div class="nav-item" onclick="switchTab('tab-budget', this)"><span class="material-icons-round">savings</span>預算</div>
         <div class="nav-item" onclick="switchTab('tab-todo', this)"><span class="material-icons-round">checklist</span>待辦</div>
     </nav>
@@ -1314,7 +1305,6 @@
                             </div>`;
                     } else if (img && delBtn) {
                         img.onclick = function(e) { openImageModal(this, e); };
-                        // 🌟 套用新版小按鈕
                         delBtn.className = 'img-delete-badge';
                         delBtn.removeAttribute('style');
                     }
