@@ -234,8 +234,38 @@
         let undoStack = [];
         let redoStack = [];
         let currentStateSnapshot = null;
+        
         // 你的專屬 Google Apps Script 網址
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
+
+        // 🌟 核心防破圖黑科技：使用 2024 最穩定的 lh3 直連格式，並保留 thumbnail 安全網址
+        function getReliableDriveUrl(originalUrl) {
+            if (!originalUrl) return '';
+            // 如果 Apps Script 已經回傳了 thumbnail，就直接使用，不亂改格式
+            if (originalUrl.includes('thumbnail') || originalUrl.includes('lh3.googleusercontent.com')) {
+                return originalUrl;
+            }
+            let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/${match[1]}`;
+            }
+            return originalUrl;
+        }
+
+        // 🌟 雙重破圖代理防護網
+        function handleImageError(img) {
+            if (!img.dataset.proxied) {
+                img.dataset.proxied = 'true'; // 標記已代理，避免無限迴圈
+                let match = img.src.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/) || img.src.match(/\/d\/([^&/?]+)/);
+                if (match && match[1]) {
+                    // 備用代理也改用 thumbnail 來源，避免被 Google 伺服器拒絕
+                    img.src = `https://wsrv.nl/?url=drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+                    return;
+                }
+            }
+            // 連代理都失敗，優雅顯示 SVG
+            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
+        }
 
         function initMobileTooltips() {
             if (window._tooltipsInitialized) return;
@@ -263,32 +293,6 @@
                 btn.addEventListener('mouseleave', hideTip);
             });
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideTip(); }, {passive: true});
-        }
-
-        // 🌟 雙重破圖代理防護網：當 Google Native 網址在 Safari 被阻擋時，瞬間啟動備用穿透代理
-        function handleImageError(img) {
-            if (!img.dataset.proxied) {
-                img.dataset.proxied = 'true'; // 標記已使用備用代理，避免無限迴圈
-                let match = img.src.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
-                if (match && match[1]) {
-                    // 呼叫跨站代理伺服器，完美繞過 Apple ITP 阻擋
-                    img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`;
-                    return;
-                }
-            }
-            // 真的連代理都失敗，給予優雅的提示
-            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
-        }
-
-        // 🌟 核心防破圖黑科技第一層：將 Google 連結轉化為不受 Apple 阻擋的高速使用者內容網域
-        function getReliableDriveUrl(originalUrl) {
-            if (!originalUrl) return '';
-            let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
-            if (match && match[1]) {
-                // 使用 usercontent 下載網域，避免 Safari 對 drive.google.com 的 302 跳轉阻擋
-                return `https://drive.usercontent.google.com/download?id=${match[1]}&export=view&authuser=0`;
-            }
-            return originalUrl;
         }
 
         // 🌟 全域點擊攔截：精準捕捉連結圖示點擊，開啟新分頁
@@ -490,16 +494,6 @@
             viewer.show();
         }
 
-        // 🌟 核心防破圖黑科技：將 Google 連結轉化為不受 Apple 阻擋的高速直連 API (export=view)
-        function getReliableDriveUrl(originalUrl) {
-            if (!originalUrl) return '';
-            let match = originalUrl.match(/(?:id=|\/d\/)([^&/?]+)/);
-            if (match && match[1]) {
-                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-            }
-            return originalUrl;
-        }
-
         // 🌟 終極 DOM 淨化引擎
         function captureState() {
             let tempMain = document.createElement('div'); tempMain.innerHTML = document.getElementById('main-container').innerHTML;
@@ -526,7 +520,7 @@
             if (new URLSearchParams(window.location.search).get('share')) return;
             if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
             if (typeof LZString === 'undefined') { alert("⚠️ 嚴重警告：壓縮引擎發生異常！\n為保護資料安全，系統已鎖定存檔功能。"); return; }
-            if (!skipHistory) { recordHistory(); }
+            if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
             pendingSaveAction = true; let payload;
             try {
@@ -624,35 +618,35 @@
             finalizeLoad();
         }
 
+        function setStatus(icon, text, isError = false) {
+            const statusEl = document.getElementById('sync-status');
+            if(statusEl) {
+                statusEl.innerHTML = `<span class="material-icons-round" style="font-size:14px; color: ${isError ? '#e57373' : '#4CAF50'};">${icon}</span> <span>${text}</span>`;
+            }
+        }
+
         // 🌟 史詩級無痛轉移腳本：統一行內排版 (Inline Action Group) ＋ 自動修復破圖
         function finalizeLoad() {
             try {
                 // 1. 全域掃描：將所有的行程、住宿、清單統一加上右側控制面板
                 document.querySelectorAll('.timeline-item, .hotel-card, .link-item, .todo-category-header').forEach(item => {
-                    // 如果已經有新版控制區就跳過
                     if (item.querySelector('.right-action-group')) return;
 
-                    // 找出並移除舊的獨立刪除按鈕
                     let oldDel = item.querySelector('.delete-btn:not(.action-box)');
-                    
-                    // 找出並移除舊的圖片區，記錄網址
                     let oldThumb = item.querySelector('.item-thumb-box');
                     let oldImgSrc = '';
                     if (oldThumb) {
                         let img = oldThumb.querySelector('img');
-                        // 🌟 套用破圖修復神藥
                         if (img) oldImgSrc = getReliableDriveUrl(img.src);
                         oldThumb.remove();
                     }
                     
-                    // 找出並移除舊的連結區，記錄網址
                     let oldLinkUrl = '';
                     let oldNoteLink = item.querySelector('.note-link');
                     if (oldNoteLink) {
                         oldLinkUrl = oldNoteLink.getAttribute('href') || oldNoteLink.getAttribute('data-href') || '';
                         oldNoteLink.remove();
                     }
-                    // 有些連結可能藏在按鈕列裡面
                     let actionLinks = item.querySelectorAll('.action-row .btn-nav');
                     actionLinks.forEach(btn => {
                         if (btn.innerHTML.includes('add_link') || btn.innerHTML.includes('link')) {
@@ -661,14 +655,12 @@
                         }
                     });
 
-                    // 建立全新的右側統一控制面板 (Right Action Group)
                     let group = document.createElement('div');
                     group.className = 'right-action-group';
                     group.style.cssText = 'display:flex; flex-direction:column; gap:6px; align-items:center; flex-shrink:0;';
                     let dashBox = document.createElement('div');
                     dashBox.className = 'action-dash-box';
                     
-                    // --- 建立 🔗 獨立連結按鈕 ---
                     let linkBox = document.createElement('div');
                     linkBox.className = oldLinkUrl ? 'action-box has-link link-box' : 'action-box link-box';
                     linkBox.setAttribute('onclick', 'handleItemLink(this, event)');
@@ -676,7 +668,6 @@
                     linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:${oldLinkUrl ? '#1976d2' : '#aaa'};">link</span>`;
                     dashBox.appendChild(linkBox);
                     
-                    // --- 建立 🖼️ 獨立圖片按鈕 (搭載巨型防呆刪除鍵 24x24px 與 onerror 備用代理) ---
                     let photoBox = document.createElement('div');
                     photoBox.className = oldImgSrc ? 'action-box has-photo photo-box' : 'action-box photo-box';
                     photoBox.setAttribute('onclick', 'triggerItemUpload(this, event)');
@@ -690,7 +681,6 @@
                     }
                     dashBox.appendChild(photoBox);
                     
-                    // --- 建立 🗑️ 刪除按鈕 ---
                     let delBox = document.createElement('div');
                     delBox.className = 'action-box delete-box';
                     let delFn = item.classList.contains('hotel-card') ? 'deleteHotelCard(this, event)' : 'deleteItem(this, event)';
@@ -700,7 +690,6 @@
                     
                     group.appendChild(dashBox);
                     
-                    // 安插進項目中
                     if (item.classList.contains('hotel-card') || item.classList.contains('todo-category-header')) {
                         let fb = item.querySelector('.flex-between');
                         if(fb) fb.appendChild(group); else item.appendChild(group);
@@ -710,7 +699,7 @@
                     if (oldDel) oldDel.remove();
                 });
 
-                // 2. 自動修復所有剩餘圖片的破圖問題 (轉換為安全的 URL 並掛上備用代理引擎)
+                // 2. 自動修復所有剩餘圖片的破圖問題
                 document.querySelectorAll('img').forEach(img => {
                     if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') {
                         img.setAttribute('onerror', 'handleImageError(this)');
@@ -725,10 +714,8 @@
                     }
                 });
 
-                // 3. 把舊的全局上傳區隱藏 (為了保持新版一致性，但不刪除以免遺失資料)
                 document.querySelectorAll('.upload-area, button[onclick*="addLinkItem"]').forEach(el => el.style.display = 'none');
 
-                // 4. 重建預算表比例與重新計算
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => {
                     if(!tr.querySelector('.split-select')) {
                         let tds = tr.querySelectorAll('td');
@@ -781,14 +768,18 @@
                     } else { btn.classList.remove('btn-circle'); }
                 });
 
-                updateCurrencyOptionsInTable(); updateDayTabs(); initHistory(); initSortable(); 
+                if(typeof updateCurrencyOptionsInTable === 'function') updateCurrencyOptionsInTable(); 
+                updateDayTabs(); 
+                if(typeof initHistory === 'function') initHistory(); 
+                initSortable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
-                applyShareMode();
+                if(typeof applyShareMode === 'function') applyShareMode();
 
             } catch(error) {
                 console.error("載入解析錯誤: ", error);
             } finally {
-                fetchExchangeRate(); initMobileTooltips();
+                if(typeof fetchExchangeRate === 'function') fetchExchangeRate(); 
+                initMobileTooltips();
                 isAppReady = true; lastActiveTime = Date.now();
                 setTimeout(() => {
                     const splash = document.getElementById('splash-screen');
@@ -797,7 +788,6 @@
             }
         }
 
-        // 🌟 獨立的彈窗連結處理邏輯
         function handleItemLink(btn, event) {
             event.stopPropagation();
             let currentUrl = btn.getAttribute('data-href');
@@ -822,7 +812,6 @@
             }
         }
 
-        // 🌟 獨立的項目生成，支援全新控制面板
         function addItineraryItem(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `
@@ -907,7 +896,6 @@
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
-        // --- 刪除功能與工具 ---
         function deleteImageFromCloud(imgUrl) {
             if (!imgUrl) return;
             let match = imgUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
@@ -931,7 +919,6 @@
             } 
         }
 
-        // 🌟 強化版圖片刪除：加入 try-catch 防止報錯卡死，加大點擊範圍
         function deleteItemThumb(delBtn, event) {
             event.stopPropagation();
             if(confirm('確定移除此圖片？')) {
@@ -972,17 +959,31 @@
             reader.readAsDataURL(file);
         }
 
+        // 🌟 修正的圖片上傳函數：加入 headers 免受 CORS 阻擋
         function uploadImageToDrive(base64Str, filename, callback) {
             setStatus('sync', '圖片上傳中...');
             const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
-            fetch(API_URL, { method: 'POST', body: payload }).then(res => res.json()).then(data => {
+            
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                body: payload 
+            }).then(res => res.json()).then(data => {
                 if(data.status === "success") { 
                     setStatus('cloud_done', '上傳成功'); 
                     let driveUrl = getReliableDriveUrl(data.url);
                     callback(driveUrl); 
                 } 
-                else { setStatus('cloud_off', '上傳失敗', true); alert('圖片上傳失敗：' + (data.message || '未知錯誤')); }
-            }).catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤，圖片無法上傳！'); });
+                else { 
+                    setStatus('cloud_off', '上傳失敗', true); 
+                    alert('圖片上傳失敗：' + (data.message || '未知錯誤')); 
+                }
+            }).catch(e => { 
+                setStatus('cloud_off', '上傳失敗', true); 
+                alert('網路錯誤，圖片無法上傳！'); 
+            });
         }
 
         function handleItemUpload(event) {
@@ -1031,7 +1032,6 @@
             }
         }
 
-        // --- 記帳與其他功能 ---
         function addBudgetRow(item = '新項目', payerName = payers[0], split = '平分', currency = currentTravelCurrency, amount = '0') {
             const tbody = document.getElementById('budget-tbody'); const tr = document.createElement('tr'); tr.className = 'budget-row';
             let currentRate = allRatesToTWD[currency] || 1; tr.setAttribute('data-rate', currentRate);
