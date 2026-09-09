@@ -142,13 +142,17 @@
         .action-dash-box { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; padding: 4px; border: 1px dashed #ccc; border-radius: 6px; background: #fafafa; white-space: nowrap; }
         body.dark-mode .action-dash-box { background: #222; border-color: #555; }
         
-        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; }
+        /* 🌟 修復核心：移除強制阻止點擊的語法，但保留防反白設定 */
+        .action-box { 
+            width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; 
+            cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; 
+            -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+        }
         body.dark-mode .action-box { background: #333; border-color: #444; }
         .action-box:active { transform: scale(0.9); }
         .action-box.has-link { background: #e3f2fd; border-color: #1976d2; }
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
-        .action-box * { pointer-events: none; } 
 
         .img-delete-badge {
             position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
@@ -160,6 +164,7 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
+        /* 預算表極致緊湊黃金比例 */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; }
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
@@ -199,7 +204,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🌟 分享模式專屬隱藏樣式 (唯讀保護) */
+        /* 分享模式專屬隱藏樣式 (唯讀保護) */
         body.share-mode-active .global-controls,
         body.share-mode-active .add-btn,
         body.share-mode-active .action-dash-box,
@@ -375,7 +380,7 @@
             document.body.classList.add('dark-mode');
         }
 
-        // 🌟 防呆：啟動分享模式 (隱藏所有操作按鈕，關閉儲存權限)
+        // 防呆：啟動分享模式 (隱藏所有操作按鈕，關閉儲存權限)
         function applyShareMode() {
             if (window.location.search.includes('share=')) {
                 document.body.classList.add('share-mode-active');
@@ -478,7 +483,6 @@
             if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode';
         }
 
-        // 🌟 新版客製化分享功能
         function generateShareLink() {
             let input = prompt("【產生專屬分享網址】\n\n請問您想分享「第幾天」的行程？\n(例如想分享第1和第3天，請輸入 1,3)\n\n※ 若想分享「完整行程」，請直接留空並按確定。");
             if (input === null) return; 
@@ -628,7 +632,7 @@
             viewer.show();
         }
 
-        // 🌟 DOM 淨化引擎 (強化防護網)
+        // 🌟 終極 DOM 淨化引擎 (強化防護網)
         function captureState() {
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
@@ -641,8 +645,10 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
+                // 🌟 清除拖曳桿，避免重複儲存
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
 
+                // 將轉圈圈動畫復原為原本的 icon，確保 DOM 乾淨
                 container.querySelectorAll('.photo-box').forEach(box => {
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                 });
