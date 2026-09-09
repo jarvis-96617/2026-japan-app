@@ -62,7 +62,6 @@
             user-select: none !important; 
             touch-action: manipulation;
         }
-        .manual-save-btn * { pointer-events: none; } 
         .manual-save-btn:active { transform: scale(0.92); }
 
         #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap;}
@@ -142,7 +141,6 @@
         .action-dash-box { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; padding: 4px; border: 1px dashed #ccc; border-radius: 6px; background: #fafafa; white-space: nowrap; }
         body.dark-mode .action-dash-box { background: #222; border-color: #555; }
         
-        /* 🌟 修復核心：移除強制阻止點擊的語法，但保留防反白設定 */
         .action-box { 
             width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; 
             cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; 
@@ -164,7 +162,6 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 預算表極致緊湊黃金比例 */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; }
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
@@ -204,16 +201,25 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 分享模式專屬隱藏樣式 (唯讀保護) */
+        /* 🌟 分享模式專屬隱藏樣式 (唯讀保護 & 隱藏非行程分頁) */
         body.share-mode-active .global-controls,
         body.share-mode-active .add-btn,
         body.share-mode-active .action-dash-box,
         body.share-mode-active .img-delete-badge,
         body.share-mode-active .delete-btn,
         body.share-mode-active .resizer,
-        body.share-mode-active .cat-action-icon { display: none !important; }
-        body.share-mode-active .editable { pointer-events: none !important; border: none !important; }
-        body.share-mode-active select, body.share-mode-active input { pointer-events: none !important; }
+        body.share-mode-active .cat-action-icon,
+        body.share-mode-active .bottom-nav,
+        body.share-mode-active #tab-transport,
+        body.share-mode-active #tab-hotel,
+        body.share-mode-active #tab-shopping,
+        body.share-mode-active #tab-budget,
+        body.share-mode-active #tab-todo { display: none !important; }
+        body.share-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
+        body.share-mode-active .editable, 
+        body.share-mode-active .custom-checkbox,
+        body.share-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; }
+        body.share-mode-active select, body.share-mode-active input { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
     </style>
 </head>
 <body>
@@ -380,7 +386,7 @@
             document.body.classList.add('dark-mode');
         }
 
-        // 防呆：啟動分享模式 (隱藏所有操作按鈕，關閉儲存權限)
+        // 🌟 防呆：啟動分享模式 (隱藏所有操作按鈕，關閉儲存權限，隱藏非行程分頁)
         function applyShareMode() {
             if (window.location.search.includes('share=')) {
                 document.body.classList.add('share-mode-active');
@@ -493,7 +499,7 @@
 
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert("✅ 分享連結已複製到剪貼簿！\n\n(收到連結的旅伴會看到「唯讀模式」，且保留分天排版喔！)");
+                    alert("✅ 分享連結已複製到剪貼簿！\n\n(收到連結的旅伴會看到「唯讀模式」，只會顯示乾淨的行程頁面喔！)");
                 }).catch(() => { prompt("請手動複製以下專屬網址分享：", shareUrl); });
             } else { prompt("請手動複製以下專屬網址分享：", shareUrl); }
         }
@@ -632,7 +638,7 @@
             viewer.show();
         }
 
-        // 🌟 終極 DOM 淨化引擎 (強化防護網)
+        // 🌟 DOM 淨化引擎 (強化防護網)
         function captureState() {
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
