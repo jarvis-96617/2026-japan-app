@@ -55,6 +55,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* 🌟 重新精準設定：防反白，但不阻擋內部點擊 */
         .manual-save-btn { 
             background: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; flex-shrink: 0; padding: 6px 10px; 
             -webkit-touch-callout: none !important; 
@@ -62,7 +63,6 @@
             user-select: none !important; 
             touch-action: manipulation;
         }
-        .manual-save-btn * { pointer-events: none; } 
         .manual-save-btn:active { transform: scale(0.92); }
 
         #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap;}
@@ -142,13 +142,17 @@
         .action-dash-box { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; padding: 4px; border: 1px dashed #ccc; border-radius: 6px; background: #fafafa; white-space: nowrap; }
         body.dark-mode .action-dash-box { background: #222; border-color: #555; }
         
-        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; }
+        /* 防反白，允許內部元素正常點擊 */
+        .action-box { 
+            width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; 
+            cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; 
+            -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+        }
         body.dark-mode .action-box { background: #333; border-color: #444; }
         .action-box:active { transform: scale(0.9); }
         .action-box.has-link { background: #e3f2fd; border-color: #1976d2; }
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
-        .action-box * { pointer-events: none; } 
 
         .img-delete-badge {
             position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
@@ -160,14 +164,13 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 🌟 預算表：自適應縮放機制與拖曳提示 */
+        /* 預算表極致緊湊黃金比例 (42 : 10 : 10 : 30 : 8) */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; }
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        /* 初始黃金比例 (42 : 10 : 10 : 30 : 8) -> 這些可以被拖曳產生的 inline style 覆蓋 */
         #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } 
         #budget-table th:nth-child(2) { width: 10%; } 
         #budget-table th:nth-child(3) { width: 10%; } 
@@ -176,7 +179,7 @@
         #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } 
         #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
 
-        /* 🌟 拖曳桿 (Resizer) 的 UI 設計 */
+        /* 拖曳桿 (Resizer) */
         .resizer { position: absolute; top: 0; right: -8px; width: 16px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; }
         .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(180, 180, 180, 0.4); border-radius: 2px; transition: 0.2s; }
         .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 5px rgba(74, 111, 165, 0.5); }
@@ -228,6 +231,8 @@
         let currentItemThumbBox = null;
         let allRatesToTWD = { TWD: 1, JPY: 0.22, KRW: 0.024, THB: 0.9, USD: 32, EUR: 34 }; 
         let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
+        let undoStack = [];
+        let redoStack = [];
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
 
         function fetchExchangeRate() {
@@ -277,13 +282,20 @@
             img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
         }
 
+        function hideMobileTooltip() {
+            const mobileTooltip = document.getElementById('mobile-tooltip');
+            if(mobileTooltip) {
+                mobileTooltip.style.opacity = '0'; 
+                setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200);
+            }
+        }
+
         function initMobileTooltips() {
             if (window._tooltipsInitialized) return;
             window._tooltipsInitialized = true;
             let holdTimer = null;
             const mobileTooltip = document.getElementById('mobile-tooltip');
-            const hideTip = () => { mobileTooltip.style.opacity = '0'; setTimeout(() => { if(mobileTooltip.style.opacity === '0') mobileTooltip.style.display = 'none'; }, 200); };
-
+            
             document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
                 const showTip = () => {
                     let rect = btn.getBoundingClientRect();
@@ -295,14 +307,14 @@
                     setTimeout(() => mobileTooltip.style.opacity = '1', 10);
                 };
                 btn.addEventListener('touchstart', (e) => { clearTimeout(holdTimer); holdTimer = setTimeout(showTip, 400); }, {passive: true});
-                btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideTip(); });
-                btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideTip(); });
-                btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideTip(); });
+                btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideMobileTooltip(); });
+                btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideMobileTooltip(); });
+                btn.addEventListener('touchcancel', () => { clearTimeout(holdTimer); hideMobileTooltip(); });
                 btn.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
                 btn.addEventListener('mouseenter', showTip);
-                btn.addEventListener('mouseleave', hideTip);
+                btn.addEventListener('mouseleave', hideMobileTooltip);
             });
-            window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideTip(); }, {passive: true});
+            window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideMobileTooltip(); }, {passive: true});
         }
 
         function checkCloudFreshness() {
@@ -373,22 +385,23 @@
     <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 6px 15px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
             <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto;">
-                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a; padding: 6px 8px;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:16px;">save</span></button>
-                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af; padding: 6px 8px;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:16px;">undo</span></button>
-                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb; padding: 6px 8px;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:16px;">redo</span></button>
-                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6; padding: 6px 8px;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:16px;">refresh</span></button>
-                <button class="manual-save-btn toggle-more-btn" onclick="toggleMoreOptions()" style="background:#4b5563; padding: 6px 8px;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:16px;">more_vert</span></button>
+                <!-- 🌟 補回完整 JS 呼叫功能 -->
+                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:16px;">save</span></button>
+                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:16px;">undo</span></button>
+                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:16px;">redo</span></button>
+                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:16px;">refresh</span></button>
+                <button class="manual-save-btn toggle-more-btn" onclick="toggleMoreOptions()" style="background:#4b5563;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:16px;">more_vert</span></button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px; white-space:nowrap;">
                 <span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span>
             </div>
         </div>
         <div id="more-options-bar" class="hide-scrollbar" style="display:none; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-top:8px; padding-top:6px; border-top:1px dashed var(--glass-border);">
-            <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7; padding: 6px 10px;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">share</span> 分享</button>
-            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 6px 10px;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px; margin-right:4px;">dark_mode</span> 夜間</button>
-            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b; padding: 6px 10px;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">picture_as_pdf</span> 列印</button>
-            <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b; padding: 6px 10px;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">download</span> 下載</button>
-            <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c; padding: 6px 10px;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">upload</span> 還原</button>
+            <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">share</span> 分享</button>
+            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px; margin-right:4px;">dark_mode</span> 夜間</button>
+            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">picture_as_pdf</span> 列印</button>
+            <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">download</span> 下載</button>
+            <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">upload</span> 還原</button>
         </div>
     </div>
 
@@ -399,6 +412,95 @@
             if(bar.style.display === 'none') { bar.style.display = 'flex'; icon.innerText = 'expand_less'; } 
             else { bar.style.display = 'none'; icon.innerText = 'more_vert'; }
             adjustStickyTabs();
+        }
+
+        // 🌟 補回按鈕對應的執行腳本
+        function forceManualSave() { saveData(true); }
+
+        function recordHistory() {
+            if (typeof LZString === 'undefined') return;
+            let state = captureState();
+            let compressed = LZString.compressToUTF16(JSON.stringify(state));
+            if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== compressed) {
+                undoStack.push(compressed);
+                if (undoStack.length > 20) undoStack.shift();
+                redoStack = [];
+            }
+        }
+
+        function restoreState(compressedData) {
+            try {
+                let state = JSON.parse(LZString.decompressFromUTF16(compressedData));
+                if(state && state.html) {
+                    document.getElementById('main-container').innerHTML = state.html;
+                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                    if(state.payersData) payers = state.payersData;
+                    renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable();
+                }
+            } catch(e) { console.error("復原失敗", e); }
+        }
+
+        function undoAction() {
+            if (undoStack.length > 0) {
+                let currentState = LZString.compressToUTF16(JSON.stringify(captureState()));
+                redoStack.push(currentState);
+                restoreState(undoStack.pop());
+                saveData(false, true);
+            } else { alert("已經是最早的狀態，無法再上一步囉！"); }
+        }
+
+        function redoAction() {
+            if (redoStack.length > 0) {
+                let currentState = LZString.compressToUTF16(JSON.stringify(captureState()));
+                undoStack.push(currentState);
+                restoreState(redoStack.pop());
+                saveData(false, true);
+            } else { alert("沒有可以重做的動作囉！"); }
+        }
+
+        function initHistory() {
+            if (undoStack.length === 0) recordHistory();
+        }
+
+        function toggleDarkMode() {
+            let isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('travelAppDarkMode', isDark);
+            let icon = document.getElementById('dark-mode-icon');
+            if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode';
+        }
+
+        function generateShareLink() {
+            alert("✅ 目前行程已自動同步至雲端，您可以直接從瀏覽器上方複製網址分享給旅伴！");
+        }
+
+        function exportToPDF() { window.print(); }
+
+        function exportBackup() {
+            let data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
+            if(!data) { alert("目前沒有資料可以備份喔！"); return; }
+            let blob = new Blob([data], {type: "application/json"});
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url; a.download = "2026_京阪之旅_備份檔.json";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function triggerImportBackup() { document.getElementById('backup-file-input').click(); }
+
+        function handleBackupUpload(event) {
+            let file = event.target.files[0];
+            if(!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let content = e.target.result;
+                    JSON.parse(content); 
+                    localStorage.setItem('travelAppSave_Keihan_vCloudFinal', content);
+                    alert("✅ 備份檔還原成功！即將重新載入頁面。");
+                    location.reload();
+                } catch(err) { alert("❌ 備份檔格式不正確，請確認檔案是否有毀損！"); }
+            };
+            reader.readAsText(file);
         }
     </script>
 
@@ -505,7 +607,6 @@
             viewer.show();
         }
 
-        // 🌟 終極 DOM 淨化引擎 (強化防護網)
         function captureState() {
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
@@ -518,9 +619,10 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
-                // 🌟 清除拖曳桿，避免重複儲存
+                // 清除拖曳桿，避免儲存
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
 
+                // 將轉圈圈動畫復原為原本的 icon，確保 DOM 乾淨
                 container.querySelectorAll('.photo-box').forEach(box => {
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                 });
@@ -649,13 +751,12 @@
             }
         }
 
-        // 🌟 初始化拖曳欄寬功能
         function makeTableResizable() {
             const table = document.getElementById('budget-table');
             if (!table) return;
             const cols = table.querySelectorAll('th');
             [].forEach.call(cols, function (col, index) {
-                if (index === cols.length - 1) return; // 發票欄位不給拉
+                if (index === cols.length - 1) return; 
                 if (col.querySelector('.resizer')) return;
 
                 const resizer = document.createElement('div');
@@ -681,7 +782,7 @@
                         document.removeEventListener('mouseup', onUp);
                         document.removeEventListener('touchmove', onMove);
                         document.removeEventListener('touchend', onUp);
-                        saveData(); // 儲存使用者自訂寬度
+                        saveData(); 
                     };
 
                     document.addEventListener('mousemove', onMove);
@@ -884,7 +985,7 @@
                 updateDayTabs(); 
                 if(typeof initHistory === 'function') initHistory(); 
                 initSortable(); 
-                makeTableResizable(); // 🌟 載入拖曳調整欄寬功能
+                makeTableResizable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
                 if(typeof applyShareMode === 'function') applyShareMode();
 
