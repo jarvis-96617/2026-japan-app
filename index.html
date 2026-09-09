@@ -160,13 +160,14 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 🌟 預算表極致緊湊黃金比例 (42 : 10 : 10 : 30 : 8) */
+        /* 🌟 預算表：自適應縮放機制與拖曳提示 */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
-        #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
+        #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; }
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
+        /* 初始黃金比例 (42 : 10 : 10 : 30 : 8) -> 這些可以被拖曳產生的 inline style 覆蓋 */
         #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } 
         #budget-table th:nth-child(2) { width: 10%; } 
         #budget-table th:nth-child(3) { width: 10%; } 
@@ -174,6 +175,11 @@
         #budget-table th:nth-child(5) { width: 8%; } 
         #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } 
         #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
+
+        /* 🌟 拖曳桿 (Resizer) 的 UI 設計 */
+        .resizer { position: absolute; top: 0; right: -8px; width: 16px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; }
+        .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(180, 180, 180, 0.4); border-radius: 2px; transition: 0.2s; }
+        .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 5px rgba(74, 111, 165, 0.5); }
 
         .amount-input { width: 72%; box-sizing: border-box; font-size: 13px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
         .curr-select { width: 28%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block; font-weight: bold;}
@@ -433,10 +439,12 @@
                     </div>
                 </div>
                 <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: var(--glass-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--glass-border);">
-                    輸入金額會自動套用會計格式。最右側框框可點擊上傳發票/收據照片。
+                    可拖曳表格上方灰色直線自由調整寬度。
                 </div>
                 <table id="budget-table">
-                    <tr><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr>
+                    <thead>
+                        <tr><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr>
+                    </thead>
                     <tbody id="budget-tbody"></tbody>
                 </table>
                 <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 4px;">+ 新增記帳項目</button>
@@ -510,7 +518,9 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
-                // 🌟 清除轉圈圈圖示，避免壞檔上傳狀態被存入雲端
+                // 🌟 清除拖曳桿，避免重複儲存
+                container.querySelectorAll('.resizer').forEach(el => el.remove());
+
                 container.querySelectorAll('.photo-box').forEach(box => {
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                 });
@@ -639,6 +649,52 @@
             }
         }
 
+        // 🌟 初始化拖曳欄寬功能
+        function makeTableResizable() {
+            const table = document.getElementById('budget-table');
+            if (!table) return;
+            const cols = table.querySelectorAll('th');
+            [].forEach.call(cols, function (col, index) {
+                if (index === cols.length - 1) return; // 發票欄位不給拉
+                if (col.querySelector('.resizer')) return;
+
+                const resizer = document.createElement('div');
+                resizer.className = 'resizer';
+                col.appendChild(resizer);
+
+                let startX, startW;
+                const onDown = function(e) {
+                    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                    startW = col.offsetWidth;
+                    resizer.classList.add('resizing');
+                    
+                    const onMove = function(e) {
+                        const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                        const newW = startW + (currentX - startX);
+                        const tableW = table.offsetWidth;
+                        col.style.width = `${(newW / tableW) * 100}%`;
+                    };
+                    
+                    const onUp = function() {
+                        resizer.classList.remove('resizing');
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                        document.removeEventListener('touchmove', onMove);
+                        document.removeEventListener('touchend', onUp);
+                        saveData(); // 儲存使用者自訂寬度
+                    };
+
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                    document.addEventListener('touchmove', onMove, { passive: false });
+                    document.addEventListener('touchend', onUp);
+                };
+
+                resizer.addEventListener('mousedown', onDown);
+                resizer.addEventListener('touchstart', onDown, { passive: false });
+            });
+        }
+
         function finalizeLoad() {
             try {
                 let tabTransport = document.getElementById('tab-transport');
@@ -680,11 +736,11 @@
 
                 let budgetHeaders = document.querySelectorAll('#budget-table th');
                 if (budgetHeaders.length === 5) {
-                    budgetHeaders[0].innerText = '項目';
-                    budgetHeaders[1].innerText = '付款人';
-                    budgetHeaders[2].innerText = '分攤';
-                    budgetHeaders[3].innerText = '金額';
-                    budgetHeaders[4].innerText = '發票';
+                    budgetHeaders[0].childNodes[0].nodeValue = '項目';
+                    budgetHeaders[1].childNodes[0].nodeValue = '付款人';
+                    budgetHeaders[2].childNodes[0].nodeValue = '分攤';
+                    budgetHeaders[3].childNodes[0].nodeValue = '金額';
+                    budgetHeaders[4].childNodes[0].nodeValue = '發票';
                 }
 
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
@@ -828,6 +884,7 @@
                 updateDayTabs(); 
                 if(typeof initHistory === 'function') initHistory(); 
                 initSortable(); 
+                makeTableResizable(); // 🌟 載入拖曳調整欄寬功能
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
                 if(typeof applyShareMode === 'function') applyShareMode();
 
