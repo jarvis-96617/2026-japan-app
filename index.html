@@ -160,23 +160,23 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 🌟 預算表重新分配最新比例 (項目:付款人:分攤:金額:發票 = 38:11:9:34:8) */
+        /* 🌟 預算表極致緊湊黃金比例 (42 : 10 : 10 : 30 : 8) */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
-        #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
+        #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
-        #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
+        #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        #budget-table th:nth-child(1) { width: 38%; text-align: left; padding-left: 4px; } 
-        #budget-table th:nth-child(2) { width: 11%; } 
-        #budget-table th:nth-child(3) { width: 9%; } 
-        #budget-table th:nth-child(4) { width: 34%; text-align: right; padding-right: 4px;} 
+        #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } 
+        #budget-table th:nth-child(2) { width: 10%; } 
+        #budget-table th:nth-child(3) { width: 10%; } 
+        #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 4px;} 
         #budget-table th:nth-child(5) { width: 8%; } 
         #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } 
         #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
 
-        .amount-input { width: 75%; box-sizing: border-box; font-size: 12px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
-        .curr-select { width: 23%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block;}
+        .amount-input { width: 72%; box-sizing: border-box; font-size: 13px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
+        .curr-select { width: 28%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block; font-weight: bold;}
         .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
@@ -641,7 +641,6 @@
 
         function finalizeLoad() {
             try {
-                // 🌟 DOM 清道夫：針對性撲殺舊版廢棄區塊與錯誤殘留
                 let tabTransport = document.getElementById('tab-transport');
                 if (tabTransport) {
                     let glassCard = tabTransport.querySelector('.glass-card');
@@ -658,7 +657,6 @@
                     }
                 }
 
-                // 清理舊版住宿與採買清單
                 document.querySelectorAll('#tab-hotel > div').forEach(div => {
                     if (div.innerText.includes('住宿相關連結與憑證') && !div.querySelector('.hotel-card')) div.remove();
                 });
@@ -666,7 +664,6 @@
                     if (!div.classList.contains('timeline-item')) div.remove(); 
                 });
 
-                // 🌟 自動升級舊版「交通指南」DOM 結構至新版
                 document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
                     if (!item.querySelector('.content-box')) {
                         let textNode = item.childNodes[0] && item.childNodes[0].nodeType === 3 ? item.childNodes[0].textContent.trim() : '';
@@ -681,7 +678,6 @@
                     }
                 });
 
-                // 🌟 校正預算表標題
                 let budgetHeaders = document.querySelectorAll('#budget-table th');
                 if (budgetHeaders.length === 5) {
                     budgetHeaders[0].innerText = '項目';
@@ -722,7 +718,6 @@
                     let dashBox = document.createElement('div');
                     dashBox.className = 'action-dash-box';
                     
-                    // 🌟 自動升級舊連結成「無縫開啟」格式
                     let linkBox = document.createElement('div');
                     if (oldLinkUrl) {
                         linkBox.className = 'action-box has-link link-box';
@@ -900,7 +895,6 @@
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
         }
 
-        // 🌟 新版交通指南：擁有完整排版與連結框
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `
