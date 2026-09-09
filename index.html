@@ -55,6 +55,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* 🌟 徹底解決手機端選字反白問題 */
         .manual-save-btn { 
             background: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; flex-shrink: 0; padding: 6px 10px; 
             -webkit-touch-callout: none !important; 
@@ -62,7 +63,7 @@
             user-select: none !important; 
             touch-action: manipulation;
         }
-        .manual-save-btn * { pointer-events: none; } 
+        .manual-save-btn * { pointer-events: none; } /* 阻擋內部元素被選取 */
         .manual-save-btn:active { transform: scale(0.92); }
 
         #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap;}
@@ -148,35 +149,33 @@
         .action-box.has-link { background: #e3f2fd; border-color: #1976d2; }
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
-        .action-box * { pointer-events: none; } 
+        .action-box * { pointer-events: none; } /* 阻擋圖示被選取 */
 
         .img-delete-badge {
             position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
             width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center;
             align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            z-index: 10; cursor: pointer; pointer-events: auto;
+            z-index: 10; cursor: pointer; pointer-events: auto; /* 恢復刪除鈕點擊 */
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 🌟 預算表最新黃金比例 (36:11:11:32:10) */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 2px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: 0.3s;}
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 2px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        #budget-table th:nth-child(1) { width: 36%; text-align: left; padding-left: 4px; } 
-        #budget-table th:nth-child(2) { width: 11%; } 
-        #budget-table th:nth-child(3) { width: 11%; } 
-        #budget-table th:nth-child(4) { width: 32%; text-align: right; padding-right: 4px;} 
-        #budget-table th:nth-child(5) { width: 10%; } 
+        #budget-table th:nth-child(1) { width: 30%; text-align: left; padding-left: 4px; } 
+        #budget-table th:nth-child(2) { width: 12%; } 
+        #budget-table th:nth-child(3) { width: 12%; } 
+        #budget-table th:nth-child(4) { width: 38%; } 
+        #budget-table th:nth-child(5) { width: 8%; } 
         #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } 
-        #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
 
         .amount-input { width: 70%; box-sizing: border-box; font-size: 12px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
-        .curr-select { width: 30%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block;}
+        .curr-select { width: 28%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block;}
         .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
@@ -379,10 +378,10 @@
         </div>
         <div id="more-options-bar" class="hide-scrollbar" style="display:none; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-top:8px; padding-top:6px; border-top:1px dashed var(--glass-border);">
             <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7; padding: 6px 10px;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">share</span> 分享</button>
-            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 6px 10px;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px; margin-right:4px;">dark_mode</span> 夜間</button>
-            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b; padding: 6px 10px;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">picture_as_pdf</span> 列印</button>
+            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151; padding: 6px 10px;" data-tip="深色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px; margin-right:4px;">dark_mode</span> 夜間</button>
+            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b; padding: 6px 10px;" data-tip="匯出PDF"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">picture_as_pdf</span> 列印</button>
             <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b; padding: 6px 10px;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">download</span> 下載</button>
-            <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c; padding: 6px 10px;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">upload</span> 還原</button>
+            <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c; padding: 6px 10px;" data-tip="匯入備份"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">upload</span> 還原</button>
         </div>
     </div>
 
@@ -436,7 +435,7 @@
                     輸入金額會自動套用會計格式。最右側框框可點擊上傳發票/收據照片。
                 </div>
                 <table id="budget-table">
-                    <tr><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr>
+                    <tr><th>項目</th><th>墊款人</th><th>分攤</th><th>金額</th><th>操作</th></tr>
                     <tbody id="budget-tbody"></tbody>
                 </table>
                 <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 4px;">+ 新增記帳項目</button>
@@ -497,8 +496,9 @@
             viewer.show();
         }
 
-        // 🌟 終極 DOM 淨化引擎 (強化防護網)
+        // 🌟 終極 DOM 淨化引擎
         function captureState() {
+            // 存檔前先收起「更多選項」，確保展開狀態不被存入雲端
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
 
@@ -641,23 +641,7 @@
 
         function finalizeLoad() {
             try {
-                // 🌟 DOM 清道夫：針對性撲殺舊版廢棄區塊與錯誤殘留
-                let tabTransport = document.getElementById('tab-transport');
-                if (tabTransport) {
-                    // 1. 清除所有直接放在 tab-transport 裡面，但不是玻璃卡片的舊元素
-                    Array.from(tabTransport.children).forEach(child => {
-                        if (!child.classList.contains('glass-card')) child.remove();
-                    });
-                    // 2. 徹底找出版面上所有含有舊字眼的區塊並拔除
-                    document.querySelectorAll('#tab-transport *').forEach(el => {
-                        if (el.textContent && el.textContent.includes('京都巴士33路')) {
-                            let item = el.closest('.timeline-item') || el.closest('div[style*="padding"]');
-                            if (item) item.remove();
-                        }
-                    });
-                }
-
-                // 清理舊版住宿與採買清單
+                // 🌟 自動清除舊版廢棄區塊
                 document.querySelectorAll('#tab-hotel > div').forEach(div => {
                     if (div.innerText.includes('住宿相關連結與憑證') && !div.querySelector('.hotel-card')) div.remove();
                 });
@@ -665,7 +649,7 @@
                     if (!div.classList.contains('timeline-item')) div.remove(); 
                 });
 
-                // 🌟 自動升級舊版「交通指南」DOM 結構至新版
+                // 🌟 自動升級舊版「交通指南」DOM 結構
                 document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
                     if (!item.querySelector('.content-box')) {
                         let textNode = item.childNodes[0] && item.childNodes[0].nodeType === 3 ? item.childNodes[0].textContent.trim() : '';
@@ -679,16 +663,6 @@
                         `;
                     }
                 });
-
-                // 🌟 校正預算表標題 (防止舊版資料綁架)
-                let budgetHeaders = document.querySelectorAll('#budget-table th');
-                if (budgetHeaders.length === 5) {
-                    budgetHeaders[0].innerText = '項目';
-                    budgetHeaders[1].innerText = '付款人';
-                    budgetHeaders[2].innerText = '分攤';
-                    budgetHeaders[3].innerText = '金額';
-                    budgetHeaders[4].innerText = '發票';
-                }
 
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
                     if (item.querySelector('.right-action-group')) return;
