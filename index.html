@@ -62,6 +62,7 @@
             user-select: none !important; 
             touch-action: manipulation;
         }
+        .manual-save-btn * { pointer-events: none; } 
         .manual-save-btn:active { transform: scale(0.92); }
 
         #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap;}
@@ -162,15 +163,16 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
+        /* 🌟 預算表極限壓縮黃金比例 (44 : 9 : 9 : 30 : 8) */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; }
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } 
-        #budget-table th:nth-child(2) { width: 10%; } 
-        #budget-table th:nth-child(3) { width: 10%; } 
+        #budget-table th:nth-child(1) { width: 44%; text-align: left; padding-left: 4px; } 
+        #budget-table th:nth-child(2) { width: 9%; } 
+        #budget-table th:nth-child(3) { width: 9%; } 
         #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 4px;} 
         #budget-table th:nth-child(5) { width: 8%; } 
         #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } 
@@ -180,9 +182,11 @@
         .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(180, 180, 180, 0.4); border-radius: 2px; transition: 0.2s; }
         .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 5px rgba(74, 111, 165, 0.5); }
 
-        .amount-input { width: 72%; box-sizing: border-box; font-size: 13px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
-        .curr-select { width: 28%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block; font-weight: bold;}
-        .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
+        /* 🌟 金額欄位與幣別比例調整 (20:78) + 字體放大 */
+        .amount-input { width: 78%; box-sizing: border-box; font-size: 14px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
+        .curr-select { width: 20%; font-size: 10px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block; font-weight: bold;}
+        .payer-select, .split-select { font-size: 10px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
+        
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
 
@@ -201,7 +205,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🌟 分享模式專屬隱藏樣式 (唯讀保護 & 隱藏非行程分頁) */
+        /* 分享模式專屬隱藏樣式 (唯讀保護 & 隱藏非行程分頁) */
         body.share-mode-active .global-controls,
         body.share-mode-active .add-btn,
         body.share-mode-active .action-dash-box,
@@ -386,7 +390,7 @@
             document.body.classList.add('dark-mode');
         }
 
-        // 🌟 防呆：啟動分享模式 (隱藏所有操作按鈕，關閉儲存權限，隱藏非行程分頁)
+        // 防呆：啟動分享模式
         function applyShareMode() {
             if (window.location.search.includes('share=')) {
                 document.body.classList.add('share-mode-active');
@@ -638,7 +642,7 @@
             viewer.show();
         }
 
-        // 🌟 DOM 淨化引擎 (強化防護網)
+        // 🌟 終極 DOM 淨化引擎 (強化防護網)
         function captureState() {
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
@@ -651,7 +655,7 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
-                // 🌟 清除拖曳桿，避免重複儲存
+                // 清除拖曳桿，避免重複儲存
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
 
                 // 將轉圈圈動畫復原為原本的 icon，確保 DOM 乾淨
@@ -661,6 +665,9 @@
                 container.querySelectorAll('.receipt-box').forEach(box => {
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; }
                 });
+
+                // 清理所有 inline 寬度 (針對輸入框)，迫使吃 CSS 比例
+                container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
 
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
@@ -855,8 +862,7 @@
 
                 document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
                     if (!item.querySelector('.content-box')) {
-                        let textNode = item.childNodes[0] && item.childNodes[0].nodeType === 3 ? item.childNodes[0].textContent.trim() : '';
-                        if(!textNode) textNode = item.innerText.replace('delete', '').replace('link', '').replace('image', '').trim();
+                        let textNode = item.innerText.replace(/delete_outline|delete|link|image/g, '').trim();
                         item.innerHTML = `
                             <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                             <div class="content-box">
@@ -981,6 +987,9 @@
                     } 
                 });
 
+                // 移除舊的 inline width 以便套用最新 CSS 寬度
+                document.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
+
                 document.querySelectorAll('.amount-input').forEach(input => {
                     let val = parseFloat(input.value.replace(/,/g, '')) || 0;
                     input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value);
@@ -1019,7 +1028,7 @@
                 initSortable(); 
                 makeTableResizable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card));
-                if(typeof applyShareMode === 'function') applyShareMode();
+                applyShareMode();
 
             } catch(error) {
                 console.error("載入解析錯誤: ", error);
