@@ -262,6 +262,15 @@
         let undoStack = [];
         let redoStack = [];
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
+        const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; // 🔴 新增：對應後端的存取權杖
+
+        // 🔴 新增：基本 XSS 防護清理函數，移除惡意腳本與 iframe，保留互動功能
+        function sanitizeHTML(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+                      .replace(/javascript:/gi, 'about:blank');
+        }
 
         function fetchExchangeRate() {
             fetch('https://api.exchangerate-api.com/v4/latest/TWD')
@@ -367,8 +376,8 @@
                         let state = null;
                         try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
                         if(state && state.html) {
-                            document.getElementById('main-container').innerHTML = state.html;
-                            if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                            document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); // 🔴 修改：使用 sanitizeHTML 清理
+                            if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); // 🔴 修改
                             if(state.payersData) payers = state.payersData;
                             renderPayerTags(); rebindEvents();
                         }
@@ -468,8 +477,8 @@
             try {
                 let state = JSON.parse(LZString.decompressFromUTF16(compressedData));
                 if(state && state.html) {
-                    document.getElementById('main-container').innerHTML = state.html;
-                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); // 🔴 修改
+                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); // 🔴 修改
                     if(state.payersData) payers = state.payersData;
                     renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable();
                 }
@@ -729,7 +738,8 @@
                 const state = captureState(); 
                 const compressedData = LZString.compressToUTF16(JSON.stringify(state));
                 lastCloudDataHash = compressedData; 
-                payload = JSON.stringify({ isCompressed: true, data: compressedData });
+                // 🔴 修改：存檔時，包入驗證 token 讓後端可以放行
+                payload = JSON.stringify({ isCompressed: true, data: compressedData, token: APP_TOKEN });
             } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
 
             localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
@@ -786,8 +796,8 @@
                 }
 
                 if (state && state.html) {
-                    document.getElementById('main-container').innerHTML = state.html;
-                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); // 🔴 修改
+                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); // 🔴 修改
                     if(state.payersData) payers = state.payersData;
                     renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
                 } else {
@@ -811,8 +821,8 @@
                 } catch(e) {}
                 
                 if(state && state.html) {
-                    document.getElementById('main-container').innerHTML = state.html;
-                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = state.heroHtml;
+                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); // 🔴 修改
+                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); // 🔴 修改
                     if(state.payersData) payers = state.payersData;
                     renderPayerTags(); rebindEvents();
                 }
@@ -1222,7 +1232,8 @@
             if (!imgUrl) return;
             let match = imgUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
             if (match && match[1]) {
-                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteImage', fileId: match[1] }) }).catch(e => console.log('雲端刪除失敗', e));
+                // 🔴 修改：加入 token 權限驗證
+                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteImage', fileId: match[1], token: APP_TOKEN }) }).catch(e => console.log('雲端刪除失敗', e));
             }
         }
 
@@ -1305,7 +1316,8 @@
 
         function uploadImageToDrive(base64Str, filename, callback, errorCallback) {
             setStatus('sync', '圖片上傳中...');
-            const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename });
+            // 🔴 修改：上傳圖片時，包入驗證 token
+            const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename, token: APP_TOKEN });
             
             fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
             .then(res => { if(!res.ok) throw new Error("HTTP 異常: " + res.status); return res.json(); })
