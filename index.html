@@ -142,7 +142,6 @@
         .action-dash-box { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; padding: 4px; border: 1px dashed #ccc; border-radius: 6px; background: #fafafa; white-space: nowrap; }
         body.dark-mode .action-dash-box { background: #222; border-color: #555; }
         
-        /* 🌟 徹底解鎖內部元素點擊限制 */
         .action-box { 
             width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; 
             cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; 
@@ -153,7 +152,6 @@
         .action-box.has-link { background: #e3f2fd; border-color: #1976d2; }
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
-        /* ❌ 移除了誤擋點擊的 pointer-events: none */
 
         .img-delete-badge {
             position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
@@ -205,7 +203,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 分享模式專屬隱藏樣式 */
+        /* 分享模式專屬隱藏樣式 (唯讀保護 & 隱藏非行程分頁) */
         body.share-mode-active .bottom-nav,
         body.share-mode-active #tab-transport,
         body.share-mode-active #tab-hotel,
@@ -518,12 +516,27 @@
             let paramName = (type === "1") ? "share" : "readonly";
             let shareUrl = cleanInput ? baseUrl + "?" + paramName + "=" + cleanInput : baseUrl + "?" + paramName + "=all";
 
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    let msg = type === "1" ? "✅ 「協作」連結已複製！\n旅伴打開後可與您即時同步編輯指定天數。" : "✅ 「唯讀」連結已複製！\n旅伴只能觀看指定天數，無法修改。";
-                    alert(msg);
-                }).catch(() => { prompt("請手動複製以下專屬網址分享：", shareUrl); });
-            } else { prompt("請手動複製以下專屬網址分享：", shareUrl); }
+            setStatus('sync', '產生短網址中...');
+
+            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`)
+                .then(res => res.text())
+                .then(shortUrl => {
+                    setStatus('cloud_done', '已就緒');
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(shortUrl).then(() => {
+                            let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`;
+                            alert(msg);
+                        }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); });
+                    } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); }
+                })
+                .catch(err => {
+                    setStatus('cloud_done', '已就緒');
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            alert("⚠️ 縮址伺服器目前忙碌中，已為您複製「原始長網址」！\n(功能不受影響，可直接分享)");
+                        }).catch(() => { prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
+                    } else { prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); }
+                });
         }
 
         function exportToPDF() { window.print(); }
@@ -660,7 +673,7 @@
             viewer.show();
         }
 
-        // 🌟 終極 DOM 淨化引擎
+        // 🌟 終極 DOM 淨化引擎 (強化防護網)
         function captureState() {
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
@@ -673,8 +686,10 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
+                // 清除拖曳桿，避免重複儲存
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
 
+                // 將轉圈圈動畫復原為原本的 icon，確保 DOM 乾淨
                 container.querySelectorAll('.photo-box').forEach(box => {
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                 });
@@ -682,6 +697,7 @@
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; }
                 });
 
+                // 清理所有 inline 寬度 (針對輸入框)，迫使吃 CSS 比例
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
 
                 container.querySelectorAll('*').forEach(el => {
@@ -858,6 +874,19 @@
 
         function finalizeLoad() {
             try {
+                // 🌟 把散落在採買清單卡片外層的項目，收攏回正確可拖曳的地方
+                let shoppingList = document.getElementById('shopping-list');
+                if (shoppingList) {
+                    let shoppingCard = shoppingList.closest('.glass-card');
+                    if (shoppingCard) {
+                        Array.from(shoppingCard.children).forEach(child => {
+                            if (child.classList.contains('timeline-item')) {
+                                shoppingList.appendChild(child);
+                            }
+                        });
+                    }
+                }
+
                 let tabTransport = document.getElementById('tab-transport');
                 if (tabTransport) {
                     let glassCard = tabTransport.querySelector('.glass-card');
@@ -1009,6 +1038,9 @@
                     } 
                 });
 
+                // 移除舊的 inline width 以便套用最新 CSS 寬度
+                document.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
+
                 document.querySelectorAll('.amount-input').forEach(input => {
                     let val = parseFloat(input.value.replace(/,/g, '')) || 0;
                     input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value);
@@ -1141,7 +1173,6 @@
         }
 
         function addGeneralItemWithNote(btnElement) {
-            let wrapper = btnElement.previousElementSibling; let target = wrapper && wrapper.classList.contains('timeline-item') ? wrapper.parentNode : btnElement.parentNode;
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
@@ -1151,7 +1182,9 @@
                 </div>
                 <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
             `;
-            target.insertBefore(newItem, btnElement); saveData();
+            // 🌟 確保新增的項目落在正確的拖曳區域內
+            document.getElementById('shopping-list').appendChild(newItem); 
+            saveData();
         }
 
         function addTodoItemToContainer(containerId) {
