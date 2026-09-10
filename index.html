@@ -142,6 +142,7 @@
         .action-dash-box { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; padding: 4px; border: 1px dashed #ccc; border-radius: 6px; background: #fafafa; white-space: nowrap; }
         body.dark-mode .action-dash-box { background: #222; border-color: #555; }
         
+        /* 🌟 徹底解鎖內部元素點擊限制 */
         .action-box { 
             width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; 
             cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; 
@@ -152,7 +153,7 @@
         .action-box.has-link { background: #e3f2fd; border-color: #1976d2; }
         body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; }
         .action-box.has-photo { border: none; background: transparent; }
-        .action-box * { pointer-events: none; } 
+        /* ❌ 移除了誤擋點擊的 pointer-events: none */
 
         .img-delete-badge {
             position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white;
@@ -164,16 +165,15 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 預算表極限壓縮黃金比例 (44 : 9 : 9 : 30 : 8) */
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;}
         #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; }
         body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;}
         #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;}
         body.dark-mode #budget-table td { border-bottom-color: #333; }
         
-        #budget-table th:nth-child(1) { width: 44%; text-align: left; padding-left: 4px; } 
-        #budget-table th:nth-child(2) { width: 9%; } 
-        #budget-table th:nth-child(3) { width: 9%; } 
+        #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } 
+        #budget-table th:nth-child(2) { width: 10%; } 
+        #budget-table th:nth-child(3) { width: 10%; } 
         #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 4px;} 
         #budget-table th:nth-child(5) { width: 8%; } 
         #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } 
@@ -183,9 +183,9 @@
         .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(180, 180, 180, 0.4); border-radius: 2px; transition: 0.2s; }
         .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 5px rgba(74, 111, 165, 0.5); }
 
-        .amount-input { width: 78%; box-sizing: border-box; font-size: 14px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
-        .curr-select { width: 20%; font-size: 10px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block; font-weight: bold;}
-        .payer-select, .split-select { font-size: 10px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
+        .amount-input { width: 72%; box-sizing: border-box; font-size: 13px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;}
+        .curr-select { width: 28%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block; font-weight: bold;}
+        .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
         
         .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;}
         body.dark-mode .payer-tag { background: #333; color: #90caf9;}
@@ -205,7 +205,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🌟 分享模式 (協作與唯讀共用：隱藏下方導覽列與非行程分頁) */
+        /* 分享模式專屬隱藏樣式 */
         body.share-mode-active .bottom-nav,
         body.share-mode-active #tab-transport,
         body.share-mode-active #tab-hotel,
@@ -221,7 +221,7 @@
         
         body.share-mode-active, body.readonly-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
 
-        /* 🌟 唯讀模式專屬：強制隱藏控制列、按鈕，並全面鎖定編輯權限 */
+        /* 唯讀模式專屬：強制隱藏控制列、按鈕，並全面鎖定編輯權限 */
         body.readonly-mode-active .global-controls,
         body.readonly-mode-active .add-btn,
         body.readonly-mode-active .action-dash-box,
@@ -348,7 +348,6 @@
         }
 
         function checkCloudFreshness() {
-            // 🌟 唯讀模式不檢查雲端更新（防止被其他人的編輯干擾）
             if (new URLSearchParams(window.location.search).get('readonly')) return;
             if (!isAppReady || isSavingToCloud || pendingSaveAction) return;
             if (!lastCloudDataHash) return; 
@@ -401,15 +400,12 @@
             document.body.classList.add('dark-mode');
         }
 
-        // 🌟 啟動新版分享雙模式 (協作 vs 唯讀)
         function applyShareMode() {
             let search = window.location.search;
             if (search.includes('readonly=')) {
-                // 唯讀模式：關閉存檔權限，套用隱藏控制按鈕樣式
                 document.body.classList.add('readonly-mode-active');
                 isAppReady = false; 
             } else if (search.includes('share=')) {
-                // 協作模式：只隱藏非行程分頁，但保持 isAppReady = true 允許即時同步
                 document.body.classList.add('share-mode-active');
             }
         }
@@ -509,7 +505,6 @@
             if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode';
         }
 
-        // 🌟 新增雙模式分享功能
         function generateShareLink() {
             let type = prompt("請問要產生哪種分享網址？\n\n輸入 1：【協作模式】(旅伴可共同編輯與新增)\n輸入 2：【唯讀模式】(對方只能觀看，無法修改)", "1");
             if (type !== "1" && type !== "2") return; 
@@ -665,9 +660,8 @@
             viewer.show();
         }
 
-        // 🌟 終極 DOM 淨化引擎 (強化防護網)
+        // 🌟 終極 DOM 淨化引擎
         function captureState() {
-            // 存檔前強制關閉分享選單，避免狀態錯誤
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
 
@@ -679,10 +673,8 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 
-                // 清除拖曳桿，避免重複儲存
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
 
-                // 將轉圈圈動畫復原為原本的 icon，確保 DOM 乾淨
                 container.querySelectorAll('.photo-box').forEach(box => {
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                 });
@@ -690,7 +682,6 @@
                     if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; }
                 });
 
-                // 清理所有 inline 寬度 (針對輸入框)，迫使吃 CSS 比例
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
 
                 container.querySelectorAll('*').forEach(el => {
@@ -702,7 +693,7 @@
                 });
             });
 
-            // 確保每次存檔都強制切回「行程分頁」，避免在分享模式下載入錯誤分頁
+            // 強制切回「行程分頁」確保雲端存檔標籤正確
             tempMain.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             let itTab = tempMain.querySelector('#tab-itinerary');
             if(itTab) itTab.classList.add('active');
@@ -711,7 +702,7 @@
         }
 
         function saveData(isManual = false, skipHistory = false) {
-            // 🌟 唯讀模式絕對禁止存檔，但協作模式允許！
+            // 唯讀模式絕對禁止存檔，保護資料
             if (new URLSearchParams(window.location.search).get('readonly')) return;
             if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
             if (typeof LZString === 'undefined') { alert("⚠️ 嚴重警告：壓縮引擎發生異常！\n為保護資料安全，系統已鎖定存檔功能。"); return; }
@@ -1018,9 +1009,6 @@
                     } 
                 });
 
-                // 移除舊的 inline width 以便套用最新 CSS 寬度
-                document.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
-
                 document.querySelectorAll('.amount-input').forEach(input => {
                     let val = parseFloat(input.value.replace(/,/g, '')) || 0;
                     input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value);
@@ -1028,7 +1016,6 @@
                 
                 calcBudget();
 
-                // 確保強制跳回行程分頁，防止存到錯誤的分頁標籤
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                 document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                 const itTab = document.getElementById('tab-itinerary'); const firstNav = document.querySelectorAll('.nav-item')[0];
