@@ -637,7 +637,6 @@
                 document.querySelectorAll('img').forEach(img => { if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') { img.setAttribute('onerror', 'handleImageError(this)'); } let currentSrc = img.getAttribute('src'); if(currentSrc) { let newSrc = getReliableDriveUrl(currentSrc); if (currentSrc !== newSrc) { img.src = newSrc; img.setAttribute('src', newSrc); } } });
                 document.querySelectorAll('.upload-area, button[onclick*="addLinkItem"]').forEach(el => el.style.display = 'none');
                 
-                // 🌟 自動清理舊的打叉按鈕 (因為現在改用 Viewer 裡面的垃圾桶單張刪除)
                 document.querySelectorAll('.action-box.has-photo.photo-box').forEach(box => {
                     let delBadge = box.querySelector('.img-delete-badge');
                     if (delBadge) delBadge.remove(); 
@@ -761,6 +760,7 @@
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
 
+        // 🌟 新增：延遲並具備 Retry 重試次數的圖片壓縮處理
         function compressImage(file, maxWidth, quality, callback, errorCallback) {
             if (!file || !file.type.match(/image.*/)) { alert("⚠️ 請選擇圖片檔案！"); if(errorCallback) errorCallback(); return; }
             const reader = new FileReader();
@@ -769,19 +769,40 @@
                 const tryDecode = () => {
                     const img = new Image();
                     img.onload = function() {
-                        const canvas = document.createElement('canvas'); let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
-                        canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
-                        const ctx = canvas.getContext('2d'); if (!ctx) { alert("記憶體不足！"); if(errorCallback) errorCallback(); return; }
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        const result = canvas.toDataURL('image/jpeg', quality);
-                        canvas.width = 0; canvas.height = 0; img.src = ""; 
-                        if (result === 'data:,') { alert("處理異常！"); if(errorCallback) errorCallback(); return; }
-                        callback(result);
+                        try {
+                            const canvas = document.createElement('canvas'); 
+                            let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
+                            canvas.width = img.width * scaleSize; 
+                            canvas.height = img.height * scaleSize;
+                            const ctx = canvas.getContext('2d'); 
+                            if (!ctx) { alert("記憶體不足！"); if(errorCallback) errorCallback(); return; }
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            const result = canvas.toDataURL('image/jpeg', quality);
+                            canvas.width = 0; canvas.height = 0; img.src = ""; 
+                            if (result === 'data:,') { 
+                                if (retryCount < 4) { retryCount++; setTimeout(tryDecode, 1000); return; }
+                                alert("處理異常！"); if(errorCallback) errorCallback(); return; 
+                            }
+                            callback(result);
+                        } catch (err) {
+                            if (retryCount < 4) { retryCount++; setTimeout(tryDecode, 1000); return; }
+                            alert("圖片處理失敗！"); if(errorCallback) errorCallback();
+                        }
                     };
-                    img.onerror = function() { if (retryCount < 1) { retryCount++; setTimeout(tryDecode, 800); } else { alert("圖片解碼失敗！"); if(errorCallback) errorCallback(); } };
+                    img.onerror = function() { 
+                        if (retryCount < 5) { 
+                            retryCount++; 
+                            setTimeout(tryDecode, 1000); 
+                        } else { 
+                            alert("圖片解碼失敗！\n如果這是 iCloud 雲端照片，請確認手機已下載完成後再試一次。"); 
+                            if(errorCallback) errorCallback(); 
+                        } 
+                    };
                     img.src = e.target.result;
-                }; setTimeout(tryDecode, 150); 
-            }; reader.onerror = function() { alert("無法讀取檔案！"); if(errorCallback) errorCallback(); }
+                }; 
+                setTimeout(tryDecode, 300); 
+            }; 
+            reader.onerror = function() { alert("無法讀取檔案！"); if(errorCallback) errorCallback(); }
             reader.readAsDataURL(file);
         }
 
@@ -983,7 +1004,6 @@
         function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
 
         function rebindEvents() {
-            // 確保所有單張圖片與相簿重新綁定事件，並清掉舊的刪除 Badge
             document.querySelectorAll('.photo-box img').forEach(img => { 
                 if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
                 if (!img.closest('.photo-album-container')) { img.onclick = function(e) { openImageModal(this, e); }; }
