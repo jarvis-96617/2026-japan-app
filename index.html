@@ -151,11 +151,74 @@
             if (url && (url.startsWith('http://') || url.startsWith('https://'))) { window.open(url, '_blank'); } else { alert("無效或不安全的連結！"); }
         }
 
-        // 🌟 新增：相簿專用預覽功能 (支援左右滑動多張照片)
+        // 🌟 新增：注入專屬單張刪除垃圾桶
+        function addViewerDeleteBtn(viewer, containerElement, parentBox, isReceipt = false) {
+            const existingBtn = document.querySelector('.viewer-custom-delete');
+            if (existingBtn) existingBtn.remove();
+
+            const deleteBtn = document.createElement('div');
+            deleteBtn.className = 'viewer-custom-delete';
+            deleteBtn.innerHTML = '<span class="material-icons-round" style="color:white; font-size:24px;">delete</span>';
+            deleteBtn.style.cssText = 'position:absolute; top:20px; left:20px; z-index:9999; cursor:pointer; background:rgba(229, 115, 115, 0.9); width:44px; height:44px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.3);';
+            
+            deleteBtn.onclick = function(e) {
+                e.stopPropagation();
+                if(confirm("確定要刪除這張照片嗎？")) {
+                    const index = viewer.index || 0; 
+                    let imgToRemove;
+                    if (isReceipt) {
+                        imgToRemove = containerElement; 
+                    } else {
+                        const imgs = containerElement.querySelectorAll('img');
+                        imgToRemove = imgs[index];
+                    }
+                    
+                    if (imgToRemove) {
+                        deleteImageFromCloud(imgToRemove.src);
+                        imgToRemove.remove(); 
+                        
+                        if (isReceipt || containerElement.querySelectorAll('img').length === 0) {
+                            viewer.hide();
+                            if (parentBox) {
+                                if (parentBox.classList.contains('receipt-thumb-wrap')) {
+                                    parentBox.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>`;
+                                } else if (parentBox.classList.contains('action-box')) {
+                                    parentBox.className = 'action-box photo-box';
+                                    parentBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
+                                }
+                            }
+                        } else {
+                            viewer.update();
+                            if (parentBox && parentBox.querySelector('.album-count-badge')) {
+                                let badge = parentBox.querySelector('.album-count-badge');
+                                const remaining = containerElement.querySelectorAll('img').length;
+                                if (remaining > 1) badge.innerText = '+' + (remaining - 1);
+                                else badge.remove();
+                            }
+                        }
+                        saveData();
+                    }
+                }
+            };
+            document.querySelector('.viewer-container').appendChild(deleteBtn);
+        }
+
+        // 🌟 更新：支援內部單張刪除的 Modal
+        function openImageModal(imgElement, event) { 
+            if(event) event.stopPropagation(); 
+            const viewer = new Viewer(imgElement, { 
+                inline: false, toolbar: false, navbar: false, title: false, button: true, 
+                viewed() { addViewerDeleteBtn(viewer, imgElement, imgElement.closest('.receipt-thumb-wrap'), true); },
+                hidden: function () { viewer.destroy(); } 
+            }); 
+            viewer.show(); 
+        }
+
         function openAlbumModal(containerElement, event) {
-            event.stopPropagation();
+            if(event) event.stopPropagation();
             const viewer = new Viewer(containerElement, {
                 inline: false, toolbar: 1, navbar: 1, title: false, button: true,
+                viewed() { addViewerDeleteBtn(viewer, containerElement, containerElement.closest('.action-box'), false); },
                 hidden: function () { viewer.destroy(); }
             });
             viewer.show();
@@ -169,7 +232,39 @@
         function updateRateDisplay() { let rate = allRatesToTWD[currentTravelCurrency]; if(rate) document.getElementById('rate-num').innerText = rate.toFixed(4); else document.getElementById('rate-num').innerText = '無資料'; }
         function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); localStorage.setItem('travelAppCurrency', currentTravelCurrency); document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
         function getReliableDriveUrl(originalUrl) { if (!originalUrl) return ''; let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/); if (match && match[1]) { return `https://lh3.googleusercontent.com/d/${match[1]}`; } return originalUrl; }
-        function handleImageError(img) { if (!img.dataset.proxied) { img.dataset.proxied = 'true'; let match = img.src.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/) || img.src.match(/\/d\/([^&/?]+)/); if (match && match[1]) { img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`; return; } } img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>"; }
+        
+        // 🌟 升級版：智慧延遲 Retry 機制 (不再馬上報錯)
+        function handleImageError(img) { 
+            if (img.dataset.failed === 'true') return;
+            
+            let retryCount = parseInt(img.dataset.retryCount || '0');
+            let originalSrc = img.dataset.originalSrc || img.src;
+            if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
+
+            if (retryCount < 4) {
+                img.dataset.retryCount = retryCount + 1;
+                // 暫時顯示載入中，避免破圖
+                img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23888888'>載入中...</text></svg>";
+                
+                setTimeout(() => {
+                    let separator = originalSrc.includes('?') ? '&' : '?';
+                    img.src = originalSrc + separator + 'retry=' + Date.now();
+                }, 1500);
+                return;
+            }
+            
+            if (!img.dataset.proxied) {
+                img.dataset.proxied = 'true';
+                let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+                if (match && match[1]) {
+                    img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`;
+                    return;
+                }
+            }
+            
+            img.dataset.failed = 'true';
+            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
+        }
         
         function hideMobileTooltip() { const tip = document.getElementById('mobile-tooltip'); if(tip) { tip.style.opacity = '0'; setTimeout(() => { if(tip.style.opacity === '0') tip.style.display = 'none'; }, 200); } }
         function initMobileTooltips() {
@@ -360,8 +455,6 @@
     </nav>
 
     <script>
-        function openImageModal(imgElement, event) { event.stopPropagation(); const viewer = new Viewer(imgElement, { inline: false, toolbar: false, navbar: false, title: false, button: true, hidden: function () { viewer.destroy(); } }); viewer.show(); }
-
         function captureState() {
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
@@ -526,7 +619,13 @@
                     dashBox.appendChild(linkBox);
                     
                     let photoBox = document.createElement('div'); photoBox.className = oldImgSrc ? 'action-box has-photo photo-box' : 'action-box photo-box'; photoBox.setAttribute('onclick', 'triggerItemUpload(this, event)');
-                    if (oldImgSrc) { photoBox.innerHTML = `<img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteItemThumb(this, event)" class="img-delete-badge">&times;</div>`; } else { photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
+                    if (oldImgSrc) { 
+                        photoBox.innerHTML = `
+                        <div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)">
+                            <img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)">
+                        </div>
+                        <div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>`; 
+                    } else { photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                     dashBox.appendChild(photoBox);
                     
                     let delBox = document.createElement('div'); delBox.className = 'action-box delete-box'; delBox.setAttribute('onclick', item.classList.contains('hotel-card') ? 'deleteHotelCard(this, event)' : 'deleteItem(this, event)'); delBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span>`; dashBox.appendChild(delBox);
@@ -538,8 +637,11 @@
                 document.querySelectorAll('img').forEach(img => { if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') { img.setAttribute('onerror', 'handleImageError(this)'); } let currentSrc = img.getAttribute('src'); if(currentSrc) { let newSrc = getReliableDriveUrl(currentSrc); if (currentSrc !== newSrc) { img.src = newSrc; img.setAttribute('src', newSrc); } } });
                 document.querySelectorAll('.upload-area, button[onclick*="addLinkItem"]').forEach(el => el.style.display = 'none');
                 
-                // 🌟 自動升級舊版單張圖片為「隱藏相簿」結構
+                // 🌟 自動清理舊的打叉按鈕 (因為現在改用 Viewer 裡面的垃圾桶單張刪除)
                 document.querySelectorAll('.action-box.has-photo.photo-box').forEach(box => {
+                    let delBadge = box.querySelector('.img-delete-badge');
+                    if (delBadge) delBadge.remove(); 
+
                     if (!box.querySelector('.photo-album-container')) {
                         let img = box.querySelector('img');
                         if (img) {
@@ -548,11 +650,15 @@
                                 <div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)">
                                     <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)">
                                 </div>
-                                <div onclick="deleteItemThumb(this, event)" class="img-delete-badge">&times;</div>
                                 <div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>
                             `;
                         }
                     }
+                });
+
+                document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
+                    let delBadge = wrap.querySelector('.img-delete-badge') || wrap.querySelector('div[onclick*="deleteReceiptThumb"]');
+                    if (delBadge) delBadge.remove(); 
                 });
 
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => { if(!tr.querySelector('.split-select')) { let tds = tr.querySelectorAll('td'); if(tds.length === 5) { let splitTd = document.createElement('td'); splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`; tr.insertBefore(splitTd, tds[2]); let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input'); let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap'; if (currEl) { currEl.style.display = 'inline-block'; mergedTd.appendChild(currEl); } if (amtEl) { amtEl.style.display = 'inline-block'; mergedTd.appendChild(amtEl); } tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]); } } });
@@ -652,21 +758,6 @@
         function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
         function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定刪除項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let imgs = item.querySelectorAll('img'); imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(); } }
         
-        // 🌟 更新：刪除相簿時，連同隱藏的所有圖片一起自雲端刪除
-        function deleteItemThumb(delBtn, event) { 
-            event.stopPropagation(); 
-            if(confirm('確定移除此相簿的【所有】圖片？')) { 
-                try { 
-                    let box = delBtn.closest('.action-box'); 
-                    let imgs = box.querySelectorAll('img'); 
-                    imgs.forEach(img => { if (img && img.src) deleteImageFromCloud(img.src); }); 
-                    box.className = 'action-box photo-box'; 
-                    box.innerHTML = `<span class="material-icons-round" style="font-size: 14px; color: #aaa;">image</span>`; 
-                    saveData(); 
-                } catch(err) {} 
-            } 
-        }
-
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
 
@@ -703,7 +794,6 @@
             .catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤！'); if(errorCallback) errorCallback(); });
         }
 
-        // 🌟 更新：支援多圖上傳與相簿累加邏輯
         function handleItemUpload(event) {
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
@@ -726,7 +816,6 @@
                                 <div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)">
                                     <img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)">
                                 </div>
-                                <div onclick="deleteItemThumb(this, event)" class="img-delete-badge">&times;</div>
                                 <div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>
                             `;
                         } else {
@@ -764,7 +853,7 @@
                 isImageProcessing = true; currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
                 compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" class="img-delete-badge">&times;</div></div>`; 
+                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"></div>`; 
                         saveData(); isImageProcessing = false;
                     }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; isImageProcessing = false; });
                 }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; isImageProcessing = false; });
@@ -894,13 +983,14 @@
         function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
 
         function rebindEvents() {
-            document.querySelectorAll('.img-wrapper').forEach(wrapper => { try { const img = wrapper.querySelector('img'); const delBtn = wrapper.querySelector('.img-del-btn'); if(img) { if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); img.onclick = function(e) { openImageModal(this, e); }; } if(delBtn) { delBtn.onclick = function(e) { e.stopPropagation(); if(confirm("確定刪除？")) { try { if(img) deleteImageFromCloud(img.src); wrapper.remove(); saveData(); } catch(err) {} } }; } } catch(e) {} });
-            document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => { try { const img = wrap.querySelector('img'); const delBtn = wrap.querySelector('div[onclick*="deleteReceiptThumb"]'); if(img && !img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); if(img && !delBtn) { wrap.outerHTML = `<div class="receipt-thumb-wrap"><img src="${img.src}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"><div onclick="deleteReceiptThumb(this, event)" class="img-delete-badge">&times;</div></div>`; } else if (img && delBtn) { img.onclick = function(e) { openImageModal(this, e); }; delBtn.className = 'img-delete-badge'; delBtn.removeAttribute('style'); } } catch(e) {} });
-            
-            // 排除相簿內的圖片，只綁定單張圖片的點擊事件
+            // 確保所有單張圖片與相簿重新綁定事件，並清掉舊的刪除 Badge
             document.querySelectorAll('.photo-box img').forEach(img => { 
                 if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
                 if (!img.closest('.photo-album-container')) { img.onclick = function(e) { openImageModal(this, e); }; }
+            });
+            document.querySelectorAll('.receipt-thumb-wrap img').forEach(img => { 
+                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
+                img.onclick = function(e) { openImageModal(this, e); };
             });
             document.querySelectorAll('.photo-album-container img').forEach(img => { img.onclick = null; });
         }
