@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>2026 京阪</title>
+    <title>2026 古京阪</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="京阪">
+    <meta name="apple-mobile-web-app-title" content="古京阪">
     
     <link rel="apple-touch-icon" href="icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -121,7 +121,7 @@
     <div id="splash-screen">
         <img id="splash-bg-img" src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
         <div class="splash-text">
-            <h2>2026 京阪之旅</h2>
+            <h2>2026 古京阪之旅</h2>
             <p>行程載入中...</p>
         </div>
     </div>
@@ -213,7 +213,7 @@
 
     <div style="position: relative;">
         <div class="hero" id="hero-container">
-            <h1 class="editable" contenteditable="true">2026 京阪六天五夜</h1>
+            <h1 class="editable" contenteditable="true">2026 古京阪六天五夜</h1>
             <p class="editable" contenteditable="true" style="max-width: 75%;">09/25 - 09/30 | 2人同行 | 京都 & 大阪</p>
         </div>
         <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="position: absolute; right: 15px; bottom: 15px; z-index: 10; font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.9); text-align: right; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; border: 1px solid rgba(255,255,255,0.2);">
@@ -264,7 +264,7 @@
             fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
         }
         function exportToPDF() { window.print(); }
-        function exportBackup() { let data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+        function exportBackup() { let data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
         function triggerImportBackup() { document.getElementById('backup-file-input').click(); }
         function handleBackupUpload(event) { let file = event.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(e) { try { let content = e.target.result; JSON.parse(content); localStorage.setItem('travelAppSave_Keihan_vCloudFinal', content); alert("✅ 備份檔還原成功！即將重新載入頁面。"); location.reload(); } catch(err) { alert("❌ 備份檔格式不正確，請確認檔案是否有毀損！"); } }; reader.readAsText(file); }
     </script>
