@@ -100,7 +100,7 @@
         .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10; cursor: pointer; pointer-events: auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 🌟 子地點相關樣式 */
+        /* 子地點相關樣式 */
         .sub-items-container { display:flex; flex-direction:column; gap:6px; width:100%; margin-top:6px; }
         .sub-item { display:flex; align-items:flex-start; gap:6px; padding:6px 8px; background:rgba(0,0,0,0.03); border-radius:6px; border-left:3px solid #0284c7; transition:0.2s; }
         body.dark-mode .sub-item { background:rgba(255,255,255,0.05); }
@@ -138,7 +138,10 @@
     <div id="mobile-tooltip"></div>
     
     <script>
+        // 🌟 新增：isInitializing 變數鎖定載入期間的存檔動作
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
+        let isInitializing = true; 
+        
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
         let allRatesToTWD = { TWD: 1, JPY: 0.22, KRW: 0.024, THB: 0.9, USD: 32, EUR: 34 }; 
         let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
@@ -229,25 +232,6 @@
         function updateRateDisplay() { let rate = allRatesToTWD[currentTravelCurrency]; if(rate) document.getElementById('rate-num').innerText = rate.toFixed(4); else document.getElementById('rate-num').innerText = '無資料'; }
         function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); localStorage.setItem('travelAppCurrency', currentTravelCurrency); document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
         function getReliableDriveUrl(originalUrl) { if (!originalUrl) return ''; let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/); if (match && match[1]) { return `https://lh3.googleusercontent.com/d/${match[1]}`; } return originalUrl; }
-        
-        function handleImageError(img) { 
-            if (img.dataset.failed === 'true') return;
-            let retryCount = parseInt(img.dataset.retryCount || '0');
-            let originalSrc = img.dataset.originalSrc || img.src;
-            if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
-            if (retryCount < 4) {
-                img.dataset.retryCount = retryCount + 1;
-                img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23888888'>載入中...</text></svg>";
-                setTimeout(() => { let separator = originalSrc.includes('?') ? '&' : '?'; img.src = originalSrc + separator + 'retry=' + Date.now(); }, 1500);
-                return;
-            }
-            if (!img.dataset.proxied) {
-                img.dataset.proxied = 'true'; let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
-                if (match && match[1]) { img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`; return; }
-            }
-            img.dataset.failed = 'true';
-            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
-        }
         
         function hideMobileTooltip() { const tip = document.getElementById('mobile-tooltip'); if(tip) { tip.style.opacity = '0'; setTimeout(() => { if(tip.style.opacity === '0') tip.style.display = 'none'; }, 200); } }
         function initMobileTooltips() {
@@ -423,9 +407,10 @@
         </div>
     </template>
 
-    <input type="file" id="global-file-input" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
-    <input type="file" id="receipt-file-input" accept="image/*" style="display: none;" onchange="handleReceiptUpload(event)">
-    <input type="file" id="item-file-input" accept="image/*" style="display: none;" onchange="handleItemUpload(event)">
+    <!-- 🌟 針對電腦端修復檔案挑選卡頓的問題，加上明確的圖片副檔名限制 -->
+    <input type="file" id="global-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleImageUpload(event)">
+    <input type="file" id="receipt-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleReceiptUpload(event)">
+    <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleItemUpload(event)">
     <input type="file" id="backup-file-input" accept=".json,.txt" style="display: none;" onchange="handleBackupUpload(event)">
 
     <nav class="bottom-nav">
@@ -473,6 +458,9 @@
             if (typeof LZString === 'undefined') return;
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
+            // 🌟 加入初始化鎖定：防止手機一打開就把剛抓下來的資料蓋回雲端
+            if (isInitializing && !isManual) return;
+
             pendingSaveAction = true; let payload;
             try {
                 const state = captureState(); 
@@ -497,7 +485,7 @@
         function loadData() {
             let isLoaded = false;
             const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 10000);
-            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } }, 12000);
+            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 12000);
 
             if (typeof LZString === 'undefined') return;
             const template = document.getElementById('default-template'); if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
@@ -548,6 +536,7 @@
         }
 
         function finalizeLoad() {
+            isInitializing = true; // 確保過程鎖定
             try {
                 let shoppingList = document.getElementById('shopping-list');
                 if (shoppingList) { let card = shoppingList.closest('.glass-card'); if (card) { Array.from(card.children).forEach(child => { if (child.classList.contains('timeline-item')) { shoppingList.appendChild(child); } }); } }
@@ -565,7 +554,6 @@
                 });
 
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
-                    // 🌟 自動幫舊進度的行程卡片補上「新增子項目」按鈕與容器
                     let contentBox = item.querySelector('.content-box');
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
@@ -679,7 +667,12 @@
 
                 if(typeof updateCurrencyOptionsInTable === 'function') updateCurrencyOptionsInTable(); updateDayTabs(); if(typeof initHistory === 'function') initHistory(); initSortable(); makeTableResizable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();
-            } catch(error) { console.error("載入解析錯誤: ", error); } finally { fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } }, 100); }
+            } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
+                fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
+                setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } 
+                isInitializing = false; // 🌟 所有動作完成後解除鎖定，允許手動/切換存檔
+                }, 500); 
+            }
         }
 
         function deleteItemLink(badgeEl, event) {
@@ -708,7 +701,6 @@
             } else if (url) { alert("請輸入有效的網址 (需包含 http 或 https)！"); }
         }
 
-        // 🌟 新增：產生「子地點」的函式
         function addSubItem(btn, event) {
             event.stopPropagation();
             let container = btn.closest('.content-box').querySelector('.sub-items-container');
@@ -734,7 +726,6 @@
             saveData();
         }
 
-        // 🌟 新增：刪除「子地點」的函式
         function deleteSubItem(btn, event) {
             event.stopPropagation();
             if(confirm("確定移除此子項目？")) {
@@ -746,7 +737,6 @@
             }
         }
 
-        // 🌟 新增：子地點專用的 Google Maps 單點搜尋導航
         function autoNavigateSub(btn, event) {
             event.stopPropagation();
             let titleEl = btn.closest('.sub-item').querySelector('.sub-item-title');
@@ -823,49 +813,48 @@
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
 
+        // 🌟 替換為不卡死、單次穩定渲染的 createObjectURL 機制
         function compressImage(file, maxWidth, quality, callback, errorCallback) {
-            if (!file || !file.type.match(/image.*/)) { alert("⚠️ 請選擇圖片檔案！"); if(errorCallback) errorCallback(); return; }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let retryCount = 0;
-                const tryDecode = () => {
-                    const img = new Image();
-                    img.onload = function() {
-                        try {
-                            const canvas = document.createElement('canvas'); 
-                            let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
-                            canvas.width = img.width * scaleSize; 
-                            canvas.height = img.height * scaleSize;
-                            const ctx = canvas.getContext('2d'); 
-                            if (!ctx) { alert("記憶體不足！"); if(errorCallback) errorCallback(); return; }
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            const result = canvas.toDataURL('image/jpeg', quality);
-                            canvas.width = 0; canvas.height = 0; img.src = ""; 
-                            if (result === 'data:,') { 
-                                if (retryCount < 4) { retryCount++; setTimeout(tryDecode, 1000); return; }
-                                alert("處理異常！"); if(errorCallback) errorCallback(); return; 
-                            }
-                            callback(result);
-                        } catch (err) {
-                            if (retryCount < 4) { retryCount++; setTimeout(tryDecode, 1000); return; }
-                            alert("圖片處理失敗！"); if(errorCallback) errorCallback();
-                        }
-                    };
-                    img.onerror = function() { 
-                        if (retryCount < 5) { 
-                            retryCount++; 
-                            setTimeout(tryDecode, 1000); 
-                        } else { 
-                            alert("圖片解碼失敗！\n如果這是 iCloud 雲端照片，請確認手機已下載完成後再試一次。"); 
-                            if(errorCallback) errorCallback(); 
-                        } 
-                    };
-                    img.src = e.target.result;
-                }; 
-                setTimeout(tryDecode, 300); 
-            }; 
-            reader.onerror = function() { alert("無法讀取檔案！"); if(errorCallback) errorCallback(); }
-            reader.readAsDataURL(file);
+            if (!file) { if(errorCallback) errorCallback(); return; }
+            if (file.type && !file.type.startsWith('image/') && !file.name.match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/i)) {
+                alert("⚠️ 請選擇正確的圖片檔案！"); if(errorCallback) errorCallback(); return;
+            }
+
+            let isProcessed = false;
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+
+            img.onload = function() {
+                if (isProcessed) return;
+                isProcessed = true;
+                URL.revokeObjectURL(objectUrl);
+                try {
+                    const canvas = document.createElement('canvas');
+                    let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
+                    canvas.width = img.width * scaleSize;
+                    canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) throw new Error("無法建立 Canvas");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const result = canvas.toDataURL('image/jpeg', quality);
+                    if (result === 'data:,') throw new Error("Canvas 內容為空");
+                    callback(result);
+                } catch (err) {
+                    alert("圖片處理失敗，可能是檔案過大導致記憶體不足！");
+                    if(errorCallback) errorCallback();
+                }
+            };
+
+            img.onerror = function() {
+                if (isProcessed) return;
+                isProcessed = true;
+                URL.revokeObjectURL(objectUrl);
+                alert("圖片載入失敗！若是 iCloud 雲端照片，請確認已下載至手機後再試。");
+                if(errorCallback) errorCallback();
+            };
+
+            // 解決 iOS 偶爾延遲觸發 onload 的問題
+            setTimeout(() => { img.src = objectUrl; }, 100);
         }
 
         function uploadImageToDrive(base64Str, filename, callback, errorCallback) {
@@ -874,7 +863,7 @@
             fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
             .then(res => { if(!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
             .then(data => { if(data.status === "success") { setStatus('cloud_done', '上傳成功'); callback(getReliableDriveUrl(data.url)); } else { setStatus('cloud_off', '上傳失敗', true); alert('失敗：' + (data.message || '未知')); if(errorCallback) errorCallback(); } })
-            .catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤！'); if(errorCallback) errorCallback(); });
+            .catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤！\n(請確認電腦網路暢通)'); if(errorCallback) errorCallback(); });
         }
 
         function handleItemUpload(event) {
