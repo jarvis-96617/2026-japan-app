@@ -56,7 +56,6 @@
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🌟 重大更新：加入 flex-wrap 允許子項目折疊到下一行 */
         .timeline-item { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0px; position: relative; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
         body.dark-mode .timeline-item { border-bottom-color: #333; }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.35; }
@@ -73,7 +72,6 @@
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; } body.dark-mode .sortable-drag { background-color: #1e1e1e !important; }
         #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 24px !important; }
         
-        /* 🌟 重大更新：把拖曳手把固定在上方 22px 的位置，避免被子項目撐高跑掉 */
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 22px; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
         
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
@@ -103,22 +101,10 @@
         .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10; cursor: pointer; pointer-events: auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 🌟 重大更新：子地點縮排與 100% 填滿樣式 */
-        .sub-items-container { 
-            flex-basis: 100%; /* 強制換行到主項目下方 */
-            display: flex; flex-direction: column; gap: 6px; width: 100%; 
-            margin-top: 4px; padding-left: 42px; padding-right: 4px; box-sizing: border-box; 
-        }
-        .sub-item { 
-            display: flex; align-items: flex-start; gap: 6px; padding: 6px 6px 6px 20px; 
-            background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 3px solid #0284c7; 
-            transition: 0.2s; position: relative; width: 100%; box-sizing: border-box; 
-        }
+        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 4px; padding-left: 42px; padding-right: 4px; box-sizing: border-box; }
+        .sub-item { display: flex; align-items: flex-start; gap: 6px; padding: 6px 6px 6px 20px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 3px solid #0284c7; transition: 0.2s; position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.05); }
-        .sub-item::before { 
-            content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); 
-            color: #cfcfcf; font-size: 13px; letter-spacing: -1px; pointer-events: none; 
-        }
+        .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #cfcfcf; font-size: 13px; letter-spacing: -1px; pointer-events: none; }
         .sub-item-title { font-size: 13px; font-weight: bold; flex-grow: 1; outline: none; }
         .sub-item-note { font-size: 11px; color: #666; margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
         body.dark-mode .sub-item-note { color: #aaa; }
@@ -136,9 +122,23 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;} body.dark-mode .bottom-nav { background: rgba(30,30,30,0.85); border-top-color: #444; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; } .nav-item.active { color: var(--primary-color); font-weight: 700; transform: translateY(-2px); } .nav-item .material-icons-round { font-size: 24px; margin-bottom: 2px; }
         .tab-content { display: none; animation: fadeIn 0.3s; position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* 🌟 重大更新：唯讀保護模式 (View Mode) 專屬樣式，防護層級不隱藏上方工具列 */
+        body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
+        body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
+        body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
+        body.view-mode-active .action-box.delete-box, body.view-mode-active .action-box.photo-box:not(.has-photo), 
+        body.view-mode-active .action-box.link-box:not(.has-link), body.view-mode-active .payer-del-btn { display: none !important; }
+        
+        body.view-mode-active .editable, body.view-mode-active .custom-checkbox, body.view-mode-active #exchange-rate-display,
+        body.view-mode-active .transport-icon { pointer-events: none !important; } 
+        body.view-mode-active .editable { border: none !important; background: transparent !important; }
+        body.view-mode-active select, body.view-mode-active input { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
+        body.view-mode-active .action-box.has-photo { pointer-events: auto; } /* 允許點擊預覽圖片 */
+
+        /* 分享專用極度唯讀模式 (全隱藏) */
         body.share-mode-active .bottom-nav, body.share-mode-active #tab-transport, body.share-mode-active #tab-hotel, body.share-mode-active #tab-shopping, body.share-mode-active #tab-budget, body.share-mode-active #tab-todo, body.readonly-mode-active .bottom-nav, body.readonly-mode-active #tab-transport, body.readonly-mode-active #tab-hotel, body.readonly-mode-active #tab-shopping, body.readonly-mode-active #tab-budget, body.readonly-mode-active #tab-todo { display: none !important; }
         body.share-mode-active, body.readonly-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
-        body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .action-dash-box, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
+        body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn, body.readonly-mode-active .action-box.delete-box, body.readonly-mode-active .action-box.photo-box:not(.has-photo), body.readonly-mode-active .action-box.link-box:not(.has-link), body.readonly-mode-active .payer-del-btn { display: none !important; }
         body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
     </style>
 </head>
@@ -153,8 +153,13 @@
     <div id="mobile-tooltip"></div>
     
     <script>
+        // 🌟 新增狀態變數：控制鎖定模式與最後編輯時間
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
         let isInitializing = true; 
+        let isEditMode = false; // 預設關閉編輯
+        let lastCloudModifiedTime = 0;
+        let hasShownStartupToast = false;
+        window.sortableInstances = [];
         
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
         let allRatesToTWD = { TWD: 1, JPY: 0.22, KRW: 0.024, THB: 0.9, USD: 32, EUR: 34 }; 
@@ -164,37 +169,78 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
 
+        // 🌟 浮動提示框 (Toast)
+        function showToast(msg) {
+            let el = document.getElementById('toast-msg');
+            if(!el) {
+                el = document.createElement('div'); el.id = 'toast-msg';
+                el.style.cssText = 'position:fixed; top:70px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:10px 20px; border-radius:24px; font-size:13px; font-weight:bold; z-index:10000; opacity:0; pointer-events:none; transition:0.3s; box-shadow:0 4px 12px rgba(0,0,0,0.2); white-space:nowrap;';
+                document.body.appendChild(el);
+            }
+            el.innerText = msg; el.style.opacity = '1';
+            setTimeout(() => { el.style.opacity = '0'; }, 4000);
+        }
+
+        // 🌟 一鍵解鎖 / 鎖定功能，並加入防撞車警告
+        function toggleEditMode() {
+            if (new URLSearchParams(window.location.search).get('readonly')) { alert("此為專屬唯讀分享連結，無法解鎖編輯。"); return; }
+            if (!isEditMode) {
+                let now = Date.now();
+                if (lastCloudModifiedTime > 0) {
+                    let diffMinutes = Math.floor((now - lastCloudModifiedTime) / 60000);
+                    if (diffMinutes < 5 && diffMinutes >= 0) {
+                        if (!confirm(`⚠️ 警告：大約 ${diffMinutes} 分鐘前才剛有人編輯並儲存過這份行程！\n\n如果你的旅伴正在編輯，你現在解鎖並儲存可能會覆蓋他的進度。\n\n確定要解鎖編輯嗎？`)) { return; }
+                    }
+                }
+                isEditMode = true;
+                document.body.classList.remove('view-mode-active');
+                updateEditToggleButton();
+                window.sortableInstances.forEach(s => s.option("disabled", false));
+                showToast("🔓 已解鎖編輯模式");
+            } else {
+                saveData(true); 
+                isEditMode = false;
+                document.body.classList.add('view-mode-active');
+                updateEditToggleButton();
+                window.sortableInstances.forEach(s => s.option("disabled", true));
+                showToast("🔒 已恢復唯讀模式並自動儲存");
+            }
+            adjustStickyTabs();
+        }
+
+        function updateEditToggleButton() {
+            let btn = document.getElementById('edit-toggle-btn'); let icon = document.getElementById('edit-toggle-icon');
+            if (!btn || !icon) return;
+            if (isEditMode) { btn.style.background = "#d97706"; btn.setAttribute('data-tip', '編輯中，點擊鎖定並儲存'); icon.innerText = "lock_open"; } 
+            else { btn.style.background = "#059669"; btn.setAttribute('data-tip', '目前唯讀，點擊解鎖'); icon.innerText = "lock"; }
+        }
+
         function sanitizeHTML(str) {
             if (typeof str !== 'string') return str;
             return str.replace(/<(script|iframe|object|embed|applet|base|meta|link|style)\b[^<]*(?:(?!<\/\1>)<[^<]*)*<\/\1>/gi, '')
                       .replace(/<(script|iframe|object|embed|applet|base|meta|link|style)\b[^>]*>/gi, '')
-                      .replace(/javascript:/gi, 'about:blank')
-                      .replace(/srcdoc/gi, '');
+                      .replace(/javascript:/gi, 'about:blank').replace(/srcdoc/gi, '');
         }
 
         function openStoredLink(el, event) {
-            event.stopPropagation();
-            let url = el.getAttribute('data-href');
+            event.stopPropagation(); let url = el.getAttribute('data-href');
             if (url && (url.startsWith('http://') || url.startsWith('https://'))) { window.open(url, '_blank'); } else { alert("無效或不安全的連結！"); }
         }
 
         function addViewerDeleteBtn(viewer, containerElement, parentBox, isReceipt = false) {
-            const existingBtn = document.querySelector('.viewer-custom-delete');
-            if (existingBtn) existingBtn.remove();
+            // 唯讀模式下禁止刪除相片
+            if (!isEditMode || document.body.classList.contains('readonly-mode-active')) return;
+            const existingBtn = document.querySelector('.viewer-custom-delete'); if (existingBtn) existingBtn.remove();
 
-            const deleteBtn = document.createElement('div');
-            deleteBtn.className = 'viewer-custom-delete';
+            const deleteBtn = document.createElement('div'); deleteBtn.className = 'viewer-custom-delete';
             deleteBtn.innerHTML = '<span class="material-icons-round" style="color:white; font-size:24px;">delete</span>';
             deleteBtn.style.cssText = 'position:absolute; top:20px; left:20px; z-index:9999; cursor:pointer; background:rgba(229, 115, 115, 0.9); width:44px; height:44px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.3);';
             
             deleteBtn.onclick = function(e) {
                 e.stopPropagation();
                 if(confirm("確定要刪除這張照片嗎？")) {
-                    const index = viewer.index || 0; 
-                    let imgToRemove;
-                    if (isReceipt) { imgToRemove = containerElement; } 
-                    else { const imgs = containerElement.querySelectorAll('img'); imgToRemove = imgs[index]; }
-                    
+                    const index = viewer.index || 0; let imgToRemove;
+                    if (isReceipt) { imgToRemove = containerElement; } else { const imgs = containerElement.querySelectorAll('img'); imgToRemove = imgs[index]; }
                     if (imgToRemove) {
                         deleteImageFromCloud(imgToRemove.src); imgToRemove.remove(); 
                         if (isReceipt || containerElement.querySelectorAll('img').length === 0) {
@@ -210,8 +256,7 @@
                                 const remaining = containerElement.querySelectorAll('img').length;
                                 if (remaining > 1) badge.innerText = '+' + (remaining - 1); else badge.remove();
                             }
-                        }
-                        saveData();
+                        } saveData();
                     }
                 }
             };
@@ -220,50 +265,33 @@
 
         function openImageModal(imgElement, event) { 
             if(event) event.stopPropagation(); 
-            const viewer = new Viewer(imgElement, { 
-                inline: false, toolbar: false, navbar: false, title: false, button: true, 
-                viewed() { addViewerDeleteBtn(viewer, imgElement, imgElement.closest('.receipt-thumb-wrap'), true); },
-                hidden: function () { viewer.destroy(); } 
-            }); 
+            const viewer = new Viewer(imgElement, { inline: false, toolbar: false, navbar: false, title: false, button: true, viewed() { addViewerDeleteBtn(viewer, imgElement, imgElement.closest('.receipt-thumb-wrap'), true); }, hidden: function () { viewer.destroy(); } }); 
             viewer.show(); 
         }
 
         function openAlbumModal(containerElement, event) {
             if(event) event.stopPropagation();
-            const viewer = new Viewer(containerElement, {
-                inline: false, toolbar: 1, navbar: 1, title: false, button: true,
-                viewed() { addViewerDeleteBtn(viewer, containerElement, containerElement.closest('.action-box'), false); },
-                hidden: function () { viewer.destroy(); }
-            });
+            const viewer = new Viewer(containerElement, { inline: false, toolbar: 1, navbar: 1, title: false, button: true, viewed() { addViewerDeleteBtn(viewer, containerElement, containerElement.closest('.action-box'), false); }, hidden: function () { viewer.destroy(); } });
             viewer.show();
         }
 
-        function fetchExchangeRate() {
-            fetch('https://api.exchangerate-api.com/v4/latest/TWD').then(res => res.json()).then(data => {
-                if (data && data.rates) { for (let curr in data.rates) { allRatesToTWD[curr] = 1 / data.rates[curr]; } allRatesToTWD['TWD'] = 1; updateRateDisplay(); }
-            }).catch(e => { console.log('匯率載入失敗'); updateRateDisplay(); });
-        }
+        function fetchExchangeRate() { fetch('https://api.exchangerate-api.com/v4/latest/TWD').then(res => res.json()).then(data => { if (data && data.rates) { for (let curr in data.rates) { allRatesToTWD[curr] = 1 / data.rates[curr]; } allRatesToTWD['TWD'] = 1; updateRateDisplay(); } }).catch(e => { console.log('匯率載入失敗'); updateRateDisplay(); }); }
         function updateRateDisplay() { let rate = allRatesToTWD[currentTravelCurrency]; if(rate) document.getElementById('rate-num').innerText = rate.toFixed(4); else document.getElementById('rate-num').innerText = '無資料'; }
         function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); localStorage.setItem('travelAppCurrency', currentTravelCurrency); document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
         function getReliableDriveUrl(originalUrl) { if (!originalUrl) return ''; let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/); if (match && match[1]) { return `https://lh3.googleusercontent.com/d/${match[1]}`; } return originalUrl; }
         
         function handleImageError(img) { 
             if (img.dataset.failed === 'true') return;
-            let retryCount = parseInt(img.dataset.retryCount || '0');
-            let originalSrc = img.dataset.originalSrc || img.src;
-            if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
+            let retryCount = parseInt(img.dataset.retryCount || '0'); let originalSrc = img.dataset.originalSrc || img.src; if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
             if (retryCount < 4) {
-                img.dataset.retryCount = retryCount + 1;
-                img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23888888'>載入中...</text></svg>";
-                setTimeout(() => { let separator = originalSrc.includes('?') ? '&' : '?'; img.src = originalSrc + separator + 'retry=' + Date.now(); }, 1500);
-                return;
+                img.dataset.retryCount = retryCount + 1; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23888888'>載入中...</text></svg>";
+                setTimeout(() => { let separator = originalSrc.includes('?') ? '&' : '?'; img.src = originalSrc + separator + 'retry=' + Date.now(); }, 1500); return;
             }
             if (!img.dataset.proxied) {
                 img.dataset.proxied = 'true'; let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
                 if (match && match[1]) { img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`; return; }
             }
-            img.dataset.failed = 'true';
-            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
+            img.dataset.failed = 'true'; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
         }
         
         function hideMobileTooltip() { const tip = document.getElementById('mobile-tooltip'); if(tip) { tip.style.opacity = '0'; setTimeout(() => { if(tip.style.opacity === '0') tip.style.display = 'none'; }, 200); } }
@@ -291,10 +319,12 @@
                         lastCloudDataHash = rawData.data; let state = null;
                         try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
                         if(state && state.html) {
+                            if (state.lastModified) lastCloudModifiedTime = state.lastModified;
                             document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
                             if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
                             if(state.payersData) payers = state.payersData;
                             renderPayerTags(); rebindEvents();
+                            showToast("🔄 資料已自動同步最新進度");
                         }
                         finalizeLoad();
                     } else { setStatus('cloud_done', '已就緒'); }
@@ -307,7 +337,18 @@
         ['touchstart', 'mousemove', 'keydown', 'scroll', 'click'].forEach(evt => { document.addEventListener(evt, () => { if (Date.now() - lastActiveTime > 180000) checkCloudFreshness(); lastActiveTime = Date.now(); }, {passive: true}); });
         if (window.location.search.includes('share=') || window.location.search.includes('readonly=')) { var splashImg = document.getElementById('splash-bg-img'); if (splashImg) splashImg.style.display = 'none'; }
         if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) { document.body.classList.add('dark-mode'); }
-        function applyShareMode() { let search = window.location.search; if (search.includes('readonly=')) { document.body.classList.add('readonly-mode-active'); isAppReady = false; } else if (search.includes('share=')) { document.body.classList.add('share-mode-active'); } }
+        
+        function applyShareMode() { 
+            let search = window.location.search; 
+            if (search.includes('readonly=')) { document.body.classList.add('readonly-mode-active'); isAppReady = false; } 
+            else if (search.includes('share=')) { document.body.classList.add('share-mode-active'); } 
+            
+            // 🌟 將所有人預設為檢視模式 (View Mode)，除非他們主動解鎖
+            if (!search.includes('readonly=') && !isEditMode) {
+                document.body.classList.add('view-mode-active');
+                updateEditToggleButton();
+            }
+        }
     </script>
 
     <div style="position: relative;">
@@ -320,15 +361,18 @@
         </div>
     </div>
 
-    <!-- 控制列 -->
-    <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 6px 15px;">
+    <!-- 🌟 控制列：新增了解鎖按鈕，並隱藏了預設編輯按鈕 -->
+    <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 8px 15px 6px 15px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
             <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto;">
-                <button class="manual-save-btn" onclick="forceManualSave()" style="background:#1e3a8a;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:16px;">save</span></button>
-                <button class="manual-save-btn" onclick="undoAction()" style="background:#1e40af;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:16px;">undo</span></button>
-                <button class="manual-save-btn" onclick="redoAction()" style="background:#2563eb;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:16px;">redo</span></button>
-                <button class="manual-save-btn" onclick="location.reload()" style="background:#3b82f6;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:16px;">refresh</span></button>
-                <button class="manual-save-btn toggle-more-btn" onclick="toggleMoreOptions()" style="background:#4b5563;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:16px;">more_vert</span></button>
+                <button id="edit-toggle-btn" class="manual-save-btn always-show" onclick="toggleEditMode()" style="background:#059669;" data-tip="目前唯讀，點擊解鎖"><span class="material-icons-round" id="edit-toggle-icon" style="font-size:16px;">lock</span></button>
+                
+                <button class="manual-save-btn edit-only-btn" onclick="forceManualSave()" style="background:#1e3a8a;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:16px;">save</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="undoAction()" style="background:#1e40af;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:16px;">undo</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="redoAction()" style="background:#2563eb;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:16px;">redo</span></button>
+                
+                <button class="manual-save-btn always-show" onclick="location.reload()" style="background:#3b82f6;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:16px;">refresh</span></button>
+                <button class="manual-save-btn toggle-more-btn always-show" onclick="toggleMoreOptions()" style="background:#4b5563;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:16px;">more_vert</span></button>
             </div>
             <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px; white-space:nowrap;"><span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span></div>
         </div>
@@ -337,18 +381,18 @@
             <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px; margin-right:4px;">dark_mode</span> 夜間</button>
             <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">picture_as_pdf</span> 列印</button>
             <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">download</span> 下載</button>
-            <button class="manual-save-btn" onclick="triggerImportBackup()" style="background:#ea580c;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">upload</span> 還原</button>
+            <button class="manual-save-btn edit-only-btn" onclick="triggerImportBackup()" style="background:#ea580c;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">upload</span> 還原</button>
         </div>
     </div>
 
     <script>
         function toggleMoreOptions() { let bar = document.getElementById('more-options-bar'); let icon = document.getElementById('more-options-icon'); if(bar.style.display === 'none') { bar.style.display = 'flex'; icon.innerText = 'expand_less'; } else { bar.style.display = 'none'; icon.innerText = 'more_vert'; } adjustStickyTabs(); }
         function forceManualSave() { saveData(true); }
-        function recordHistory() { if (typeof LZString === 'undefined') return; let state = captureState(); let compressed = LZString.compressToUTF16(JSON.stringify(state)); if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== compressed) { undoStack.push(compressed); if (undoStack.length > 20) undoStack.shift(); redoStack = []; } }
-        function restoreState(compressedData) { try { let state = JSON.parse(LZString.decompressFromUTF16(compressedData)); if(state && state.html) { document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable(); } } catch(e) { console.error("復原失敗", e); } }
+        function recordHistory() { if (typeof LZString === 'undefined' || !isEditMode) return; let state = captureState(); let compressed = LZString.compressToUTF16(JSON.stringify(state)); if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== compressed) { undoStack.push(compressed); if (undoStack.length > 20) undoStack.shift(); redoStack = []; } }
+        function restoreState(compressedData) { try { let state = JSON.parse(LZString.decompressFromUTF16(compressedData)); if(state && state.html) { if (state.lastModified) lastCloudModifiedTime = state.lastModified; document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable(); } } catch(e) { console.error("復原失敗", e); } }
         function undoAction() { if (undoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); redoStack.push(currentState); restoreState(undoStack.pop()); saveData(false, true); } else { alert("已經是最早的狀態，無法再上一步囉！"); } }
         function redoAction() { if (redoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); undoStack.push(currentState); restoreState(redoStack.pop()); saveData(false, true); } else { alert("沒有可以重做的動作囉！"); } }
-        function initHistory() { if (undoStack.length === 0) recordHistory(); }
+        function initHistory() { if (undoStack.length === 0 && isEditMode) recordHistory(); }
         function toggleDarkMode() { let isDark = document.body.classList.toggle('dark-mode'); localStorage.setItem('travelAppDarkMode', isDark); let icon = document.getElementById('dark-mode-icon'); if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode'; }
         
         function generateShareLink() {
@@ -481,17 +525,21 @@
             tempMain.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             let itTab = tempMain.querySelector('#tab-itinerary'); if(itTab) itTab.classList.add('active');
 
-            return { html: tempMain.innerHTML, heroHtml: tempHero.innerHTML, payersData: JSON.parse(JSON.stringify(payers)) };
+            // 🌟 加入最後編輯時間戳記
+            return { html: tempMain.innerHTML, heroHtml: tempHero.innerHTML, payersData: JSON.parse(JSON.stringify(payers)), lastModified: Date.now() };
         }
 
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('readonly')) return;
             if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
             if (typeof LZString === 'undefined') return;
-            if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
+            // 🌟 唯讀模式下禁止任何拖曳、打勾造成的隱形存檔
+            if (!isEditMode && !isManual) return;
             if (isInitializing && !isManual) return;
 
+            if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
+            
             pendingSaveAction = true; let payload;
             try {
                 const state = captureState(); 
@@ -516,7 +564,7 @@
         function loadData() {
             let isLoaded = false;
             const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 10000);
-            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 12000);
+            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } }, 12000);
 
             if (typeof LZString === 'undefined') return;
             const template = document.getElementById('default-template'); if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
@@ -528,6 +576,7 @@
                 let state = rawData;
                 if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') { try { lastCloudDataHash = rawData.data; state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {} }
                 if (state && state.html) {
+                    if (state.lastModified) lastCloudModifiedTime = state.lastModified;
                     document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
                     if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
                     if(state.payersData) payers = state.payersData;
@@ -542,7 +591,7 @@
             if (saved) {
                 let state = null;
                 try { let parsed = JSON.parse(saved); if (parsed.isCompressed && typeof LZString !== 'undefined') { lastCloudDataHash = parsed.data; state = JSON.parse(LZString.decompressFromUTF16(parsed.data)); } else { state = parsed; } } catch(e) {}
-                if(state && state.html) { document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); }
+                if(state && state.html) { if (state.lastModified) lastCloudModifiedTime = state.lastModified; document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); }
             } else { addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); }
             finalizeLoad();
         }
@@ -601,11 +650,8 @@
                             }
                         }
                         
-                        // 🌟 把舊的 sub-items-container 從 contentBox 移出，放到 timeline-item 的最底層
                         let subCont = item.querySelector('.sub-items-container');
-                        if (subCont && subCont.parentNode === contentBox) {
-                            item.appendChild(subCont);
-                        }
+                        if (subCont && subCont.parentNode === contentBox) { item.appendChild(subCont); }
                     }
 
                     if (item.querySelector('.right-action-group')) {
@@ -613,10 +659,8 @@
                         if (oldLinkBox && oldLinkBox.getAttribute('onclick') && oldLinkBox.getAttribute('onclick').includes('window.open')) {
                             let match = oldLinkBox.getAttribute('onclick').match(/window\.open\('([^']+)'/);
                             if (match && match[1]) {
-                                oldLinkBox.removeAttribute('onclick');
-                                let parentBox = oldLinkBox.closest('.action-box');
-                                parentBox.setAttribute('data-href', match[1]);
-                                parentBox.setAttribute('onclick', 'openStoredLink(this, event)');
+                                oldLinkBox.removeAttribute('onclick'); let parentBox = oldLinkBox.closest('.action-box');
+                                parentBox.setAttribute('data-href', match[1]); parentBox.setAttribute('onclick', 'openStoredLink(this, event)');
                                 oldLinkBox.style.pointerEvents = 'none';
                             }
                         }
@@ -634,23 +678,14 @@
                     let group = document.createElement('div'); group.className = 'right-action-group'; let dashBox = document.createElement('div'); dashBox.className = 'action-dash-box';
                     let linkBox = document.createElement('div');
                     if (oldLinkUrl) {
-                        linkBox.className = 'action-box has-link link-box';
-                        linkBox.setAttribute('data-href', oldLinkUrl);
-                        linkBox.setAttribute('onclick', 'openStoredLink(this, event)');
+                        linkBox.className = 'action-box has-link link-box'; linkBox.setAttribute('data-href', oldLinkUrl); linkBox.setAttribute('onclick', 'openStoredLink(this, event)');
                         linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888; pointer-events:auto;">&times;</div>`;
-                    } else {
-                        linkBox.className = 'action-box link-box'; linkBox.setAttribute('onclick', 'handleItemLink(this, event)');
-                        linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`;
-                    }
+                    } else { linkBox.className = 'action-box link-box'; linkBox.setAttribute('onclick', 'handleItemLink(this, event)'); linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`; }
                     dashBox.appendChild(linkBox);
                     
                     let photoBox = document.createElement('div'); photoBox.className = oldImgSrc ? 'action-box has-photo photo-box' : 'action-box photo-box'; photoBox.setAttribute('onclick', 'triggerItemUpload(this, event)');
                     if (oldImgSrc) { 
-                        photoBox.innerHTML = `
-                        <div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)">
-                            <img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)">
-                        </div>
-                        <div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>`; 
+                        photoBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>`; 
                     } else { photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                     dashBox.appendChild(photoBox);
                     
@@ -664,26 +699,22 @@
                 document.querySelectorAll('.upload-area, button[onclick*="addLinkItem"]').forEach(el => el.style.display = 'none');
                 
                 document.querySelectorAll('.action-box.has-photo.photo-box').forEach(box => {
-                    let delBadge = box.querySelector('.img-delete-badge');
-                    if (delBadge) delBadge.remove(); 
-
+                    let delBadge = box.querySelector('.img-delete-badge'); if (delBadge) delBadge.remove(); 
                     if (!box.querySelector('.photo-album-container')) {
                         let img = box.querySelector('img');
                         if (img) {
                             let imgSrc = img.getAttribute('src');
-                            box.innerHTML = `
-                                <div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)">
-                                    <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)">
-                                </div>
-                                <div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>
-                            `;
+                            box.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
                         }
                     }
                 });
 
-                document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => {
-                    let delBadge = wrap.querySelector('.img-delete-badge') || wrap.querySelector('div[onclick*="deleteReceiptThumb"]');
-                    if (delBadge) delBadge.remove(); 
+                document.querySelectorAll('.receipt-thumb-wrap').forEach(wrap => { let delBadge = wrap.querySelector('.img-delete-badge') || wrap.querySelector('div[onclick*="deleteReceiptThumb"]'); if (delBadge) delBadge.remove(); });
+                
+                document.querySelectorAll('.payer-tag').forEach(tag => {
+                    if(tag.querySelector('span') && !tag.querySelector('.payer-del-btn')) {
+                        tag.querySelector('span').className = 'payer-del-btn';
+                    }
                 });
 
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => { if(!tr.querySelector('.split-select')) { let tds = tr.querySelectorAll('td'); if(tds.length === 5) { let splitTd = document.createElement('td'); splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`; tr.insertBefore(splitTd, tds[2]); let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input'); let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap'; if (currEl) { currEl.style.display = 'inline-block'; mergedTd.appendChild(currEl); } if (amtEl) { amtEl.style.display = 'inline-block'; mergedTd.appendChild(amtEl); } tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]); } } });
@@ -702,7 +733,16 @@
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
                 setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } 
-                isInitializing = false;
+                isInitializing = false; 
+                
+                // 🌟 載入完成後，如果發現進度是5分鐘內更新的，且尚未提示過，給予通知
+                if (!hasShownStartupToast && lastCloudModifiedTime > 0) {
+                    let diffMins = Math.floor((Date.now() - lastCloudModifiedTime) / 60000);
+                    if (diffMins < 5 && diffMins >= 0) {
+                        setTimeout(() => showToast(`💡 提示：這份行程在 ${diffMins===0 ? '剛才' : diffMins + ' 分鐘前'} 剛被編輯過！`), 800);
+                    }
+                    hasShownStartupToast = true;
+                }
                 }, 500); 
             }
         }
@@ -756,7 +796,7 @@
                 </div>
                 <div class="right-action-group" style="flex-direction:row; margin-left:auto; gap:4px;">
                     <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
-                    <div class="action-box" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">close</span></div>
+                    <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">close</span></div>
                 </div>
             `;
             container.appendChild(sub);
@@ -1015,7 +1055,7 @@
             let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
         }
 
-        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
+        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
         function updatePayerDropdowns() { let options = payers.map(p => `<option value="${p}">${p}</option>`).join(''); document.querySelectorAll('.payer-select').forEach(sel => { let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options; if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; } }); }
         function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
         function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
@@ -1055,21 +1095,32 @@
 
         function initSortable() {
             if (typeof Sortable === 'undefined') return;
-            const sortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } };
-            document.querySelectorAll('.day-card').forEach(card => { if (!card.sortable) card.sortable = Sortable.create(card, sortableOptions); });
-            const lists = ['transport-text-list', 'shopping-list', 'booking-list']; lists.forEach(id => { let el = document.getElementById(id); if(el && !el.sortable) el.sortable = Sortable.create(el, sortableOptions); });
-            document.querySelectorAll('.person-todo-list').forEach(list => { if (!list.sortable) list.sortable = Sortable.create(list, sortableOptions); });
+            
+            // 每次初始化前先清空舊的監聽
+            window.sortableInstances.forEach(s => s.destroy());
+            window.sortableInstances = [];
 
-            // 🌟 新增：子項目的拖曳排序綁定
-            const subSortableOptions = {
-                animation: 150, delay: 250, delayOnTouchOnly: true, 
-                draggable: '.sub-item', 
-                filter: '.editable, img, .action-box, .material-icons-round', 
+            const sortableOptions = { 
+                animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', 
+                filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box', 
                 preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', 
+                disabled: !isEditMode, // 🌟 根據鎖定狀態決定是否能拖曳
+                onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } 
+            };
+            document.querySelectorAll('.day-card').forEach(card => { window.sortableInstances.push(Sortable.create(card, sortableOptions)); });
+            const lists = ['transport-text-list', 'shopping-list', 'booking-list']; 
+            lists.forEach(id => { let el = document.getElementById(id); if(el) window.sortableInstances.push(Sortable.create(el, sortableOptions)); });
+            document.querySelectorAll('.person-todo-list').forEach(list => { window.sortableInstances.push(Sortable.create(list, sortableOptions)); });
+
+            const subSortableOptions = {
+                animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.sub-item', 
+                filter: '.editable, img, .action-box, .material-icons-round', preventOnFilter: false, 
+                ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', 
+                disabled: !isEditMode, // 🌟 根據鎖定狀態決定是否能拖曳
                 onEnd: function () { saveData(); }
             };
             document.querySelectorAll('.sub-items-container').forEach(cont => {
-                if (!cont.sortable) cont.sortable = Sortable.create(cont, subSortableOptions);
+                window.sortableInstances.push(Sortable.create(cont, subSortableOptions));
             });
         }
 
