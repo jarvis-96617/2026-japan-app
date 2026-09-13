@@ -56,7 +56,8 @@
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        .timeline-item { display: flex; gap: 8px; margin-bottom: 0px; position: relative; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
+        /* 🌟 重大更新：加入 flex-wrap 允許子項目折疊到下一行 */
+        .timeline-item { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0px; position: relative; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
         body.dark-mode .timeline-item { border-bottom-color: #333; }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.35; }
         #tab-transport .timeline-item { padding: 6px 4px; } #tab-transport .item-title { font-size: 14px; margin-bottom: 2px; line-height: 1.2;}
@@ -71,7 +72,9 @@
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; } body.dark-mode .sortable-ghost { background-color: #333 !important; }
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; } body.dark-mode .sortable-drag { background-color: #1e1e1e !important; }
         #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 24px !important; }
-        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
+        
+        /* 🌟 重大更新：把拖曳手把固定在上方 22px 的位置，避免被子項目撐高跑掉 */
+        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 22px; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
         
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
         .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); margin-bottom: 3px; line-height: 1; }
@@ -100,15 +103,27 @@
         .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10; cursor: pointer; pointer-events: auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 子地點相關樣式 */
-        .sub-items-container { display:flex; flex-direction:column; gap:6px; width:100%; margin-top:6px; }
-        .sub-item { display:flex; align-items:flex-start; gap:6px; padding:6px 8px; background:rgba(0,0,0,0.03); border-radius:6px; border-left:3px solid #0284c7; transition:0.2s; }
-        body.dark-mode .sub-item { background:rgba(255,255,255,0.05); }
-        .sub-item-title { font-size:13px; font-weight:bold; flex-grow:1; outline:none; }
-        .sub-item-note { font-size:11px; color:#666; margin-top:2px; display:block; outline:none; }
-        body.dark-mode .sub-item-note { color:#aaa; }
-        .sub-item .action-box { width:22px; height:22px; border:none; background:rgba(255,255,255,0.5); }
-        body.dark-mode .sub-item .action-box { background:rgba(0,0,0,0.3); }
+        /* 🌟 重大更新：子地點縮排與 100% 填滿樣式 */
+        .sub-items-container { 
+            flex-basis: 100%; /* 強制換行到主項目下方 */
+            display: flex; flex-direction: column; gap: 6px; width: 100%; 
+            margin-top: 4px; padding-left: 42px; padding-right: 4px; box-sizing: border-box; 
+        }
+        .sub-item { 
+            display: flex; align-items: flex-start; gap: 6px; padding: 6px 6px 6px 20px; 
+            background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 3px solid #0284c7; 
+            transition: 0.2s; position: relative; width: 100%; box-sizing: border-box; 
+        }
+        body.dark-mode .sub-item { background: rgba(255,255,255,0.05); }
+        .sub-item::before { 
+            content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); 
+            color: #cfcfcf; font-size: 13px; letter-spacing: -1px; pointer-events: none; 
+        }
+        .sub-item-title { font-size: 13px; font-weight: bold; flex-grow: 1; outline: none; }
+        .sub-item-note { font-size: 11px; color: #666; margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
+        body.dark-mode .sub-item-note { color: #aaa; }
+        .sub-item .action-box { width: 22px; height: 22px; border: none; background: rgba(255,255,255,0.5); }
+        body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); }
 
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;} #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; } body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;} #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;} body.dark-mode #budget-table td { border-bottom-color: #333; }
         #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } #budget-table th:nth-child(2) { width: 10%; } #budget-table th:nth-child(3) { width: 10%; } #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 4px;} #budget-table th:nth-child(5) { width: 8%; } #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
@@ -138,7 +153,6 @@
     <div id="mobile-tooltip"></div>
     
     <script>
-        // 🌟 新增：isInitializing 變數鎖定載入期間的存檔動作
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
         let isInitializing = true; 
         
@@ -232,6 +246,25 @@
         function updateRateDisplay() { let rate = allRatesToTWD[currentTravelCurrency]; if(rate) document.getElementById('rate-num').innerText = rate.toFixed(4); else document.getElementById('rate-num').innerText = '無資料'; }
         function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); localStorage.setItem('travelAppCurrency', currentTravelCurrency); document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
         function getReliableDriveUrl(originalUrl) { if (!originalUrl) return ''; let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/); if (match && match[1]) { return `https://lh3.googleusercontent.com/d/${match[1]}`; } return originalUrl; }
+        
+        function handleImageError(img) { 
+            if (img.dataset.failed === 'true') return;
+            let retryCount = parseInt(img.dataset.retryCount || '0');
+            let originalSrc = img.dataset.originalSrc || img.src;
+            if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
+            if (retryCount < 4) {
+                img.dataset.retryCount = retryCount + 1;
+                img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23888888'>載入中...</text></svg>";
+                setTimeout(() => { let separator = originalSrc.includes('?') ? '&' : '?'; img.src = originalSrc + separator + 'retry=' + Date.now(); }, 1500);
+                return;
+            }
+            if (!img.dataset.proxied) {
+                img.dataset.proxied = 'true'; let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+                if (match && match[1]) { img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`; return; }
+            }
+            img.dataset.failed = 'true';
+            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
+        }
         
         function hideMobileTooltip() { const tip = document.getElementById('mobile-tooltip'); if(tip) { tip.style.opacity = '0'; setTimeout(() => { if(tip.style.opacity === '0') tip.style.display = 'none'; }, 200); } }
         function initMobileTooltips() {
@@ -407,7 +440,6 @@
         </div>
     </template>
 
-    <!-- 🌟 針對電腦端修復檔案挑選卡頓的問題，加上明確的圖片副檔名限制 -->
     <input type="file" id="global-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleImageUpload(event)">
     <input type="file" id="receipt-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleReceiptUpload(event)">
     <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleItemUpload(event)">
@@ -458,7 +490,6 @@
             if (typeof LZString === 'undefined') return;
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
-            // 🌟 加入初始化鎖定：防止手機一打開就把剛抓下來的資料蓋回雲端
             if (isInitializing && !isManual) return;
 
             pendingSaveAction = true; let payload;
@@ -536,7 +567,7 @@
         }
 
         function finalizeLoad() {
-            isInitializing = true; // 確保過程鎖定
+            isInitializing = true; 
             try {
                 let shoppingList = document.getElementById('shopping-list');
                 if (shoppingList) { let card = shoppingList.closest('.glass-card'); if (card) { Array.from(card.children).forEach(child => { if (child.classList.contains('timeline-item')) { shoppingList.appendChild(child); } }); } }
@@ -569,10 +600,11 @@
                                 actionRow.insertBefore(btn, actionRow.children[1] || actionRow.firstChild);
                             }
                         }
-                        if (!contentBox.querySelector('.sub-items-container')) {
-                            let subCont = document.createElement('div');
-                            subCont.className = 'sub-items-container';
-                            contentBox.appendChild(subCont);
+                        
+                        // 🌟 把舊的 sub-items-container 從 contentBox 移出，放到 timeline-item 的最底層
+                        let subCont = item.querySelector('.sub-items-container');
+                        if (subCont && subCont.parentNode === contentBox) {
+                            item.appendChild(subCont);
                         }
                     }
 
@@ -670,7 +702,7 @@
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
                 setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } 
-                isInitializing = false; // 🌟 所有動作完成後解除鎖定，允許手動/切換存檔
+                isInitializing = false;
                 }, 500); 
             }
         }
@@ -703,8 +735,13 @@
 
         function addSubItem(btn, event) {
             event.stopPropagation();
-            let container = btn.closest('.content-box').querySelector('.sub-items-container');
-            if(!container) { container = document.createElement('div'); container.className = 'sub-items-container'; btn.closest('.content-box').appendChild(container); }
+            let timelineItem = btn.closest('.timeline-item');
+            let container = timelineItem.querySelector('.sub-items-container');
+            if(!container) { 
+                container = document.createElement('div'); 
+                container.className = 'sub-items-container'; 
+                timelineItem.appendChild(container); 
+            }
             
             let sub = document.createElement('div');
             sub.className = 'sub-item';
@@ -723,6 +760,7 @@
                 </div>
             `;
             container.appendChild(sub);
+            initSortable();
             saveData();
         }
 
@@ -759,9 +797,9 @@
                         <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add_location_alt</span></button>
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
                     </div>
-                    <div class="sub-items-container"></div>
                 </div>
                 <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+                <div class="sub-items-container"></div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
         }
@@ -813,7 +851,6 @@
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
 
-        // 🌟 替換為不卡死、單次穩定渲染的 createObjectURL 機制
         function compressImage(file, maxWidth, quality, callback, errorCallback) {
             if (!file) { if(errorCallback) errorCallback(); return; }
             if (file.type && !file.type.startsWith('image/') && !file.name.match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/i)) {
@@ -853,7 +890,6 @@
                 if(errorCallback) errorCallback();
             };
 
-            // 解決 iOS 偶爾延遲觸發 onload 的問題
             setTimeout(() => { img.src = objectUrl; }, 100);
         }
 
@@ -1023,6 +1059,18 @@
             document.querySelectorAll('.day-card').forEach(card => { if (!card.sortable) card.sortable = Sortable.create(card, sortableOptions); });
             const lists = ['transport-text-list', 'shopping-list', 'booking-list']; lists.forEach(id => { let el = document.getElementById(id); if(el && !el.sortable) el.sortable = Sortable.create(el, sortableOptions); });
             document.querySelectorAll('.person-todo-list').forEach(list => { if (!list.sortable) list.sortable = Sortable.create(list, sortableOptions); });
+
+            // 🌟 新增：子項目的拖曳排序綁定
+            const subSortableOptions = {
+                animation: 150, delay: 250, delayOnTouchOnly: true, 
+                draggable: '.sub-item', 
+                filter: '.editable, img, .action-box, .material-icons-round', 
+                preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', 
+                onEnd: function () { saveData(); }
+            };
+            document.querySelectorAll('.sub-items-container').forEach(cont => {
+                if (!cont.sortable) cont.sortable = Sortable.create(cont, subSortableOptions);
+            });
         }
 
         function switchTab(tabId, element) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); document.getElementById(tabId).classList.add('active'); element.classList.add('active'); window.scrollTo(0,0); if(tabId === 'tab-budget') calcBudget(); if(tabId === 'tab-itinerary') adjustStickyTabs(); }
