@@ -100,6 +100,16 @@
         .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10; cursor: pointer; pointer-events: auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
+        /* 🌟 子地點相關樣式 */
+        .sub-items-container { display:flex; flex-direction:column; gap:6px; width:100%; margin-top:6px; }
+        .sub-item { display:flex; align-items:flex-start; gap:6px; padding:6px 8px; background:rgba(0,0,0,0.03); border-radius:6px; border-left:3px solid #0284c7; transition:0.2s; }
+        body.dark-mode .sub-item { background:rgba(255,255,255,0.05); }
+        .sub-item-title { font-size:13px; font-weight:bold; flex-grow:1; outline:none; }
+        .sub-item-note { font-size:11px; color:#666; margin-top:2px; display:block; outline:none; }
+        body.dark-mode .sub-item-note { color:#aaa; }
+        .sub-item .action-box { width:22px; height:22px; border:none; background:rgba(255,255,255,0.5); }
+        body.dark-mode .sub-item .action-box { background:rgba(0,0,0,0.3); }
+
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;} #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; } body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;} #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;} body.dark-mode #budget-table td { border-bottom-color: #333; }
         #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } #budget-table th:nth-child(2) { width: 10%; } #budget-table th:nth-child(3) { width: 10%; } #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 4px;} #budget-table th:nth-child(5) { width: 8%; } #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
 
@@ -113,7 +123,7 @@
 
         body.share-mode-active .bottom-nav, body.share-mode-active #tab-transport, body.share-mode-active #tab-hotel, body.share-mode-active #tab-shopping, body.share-mode-active #tab-budget, body.share-mode-active #tab-todo, body.readonly-mode-active .bottom-nav, body.readonly-mode-active #tab-transport, body.readonly-mode-active #tab-hotel, body.readonly-mode-active #tab-shopping, body.readonly-mode-active #tab-budget, body.readonly-mode-active #tab-todo { display: none !important; }
         body.share-mode-active, body.readonly-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
-        body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .action-dash-box, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge { display: none !important; }
+        body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .action-dash-box, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
         body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
     </style>
 </head>
@@ -151,7 +161,6 @@
             if (url && (url.startsWith('http://') || url.startsWith('https://'))) { window.open(url, '_blank'); } else { alert("無效或不安全的連結！"); }
         }
 
-        // 🌟 新增：注入專屬單張刪除垃圾桶
         function addViewerDeleteBtn(viewer, containerElement, parentBox, isReceipt = false) {
             const existingBtn = document.querySelector('.viewer-custom-delete');
             if (existingBtn) existingBtn.remove();
@@ -166,34 +175,23 @@
                 if(confirm("確定要刪除這張照片嗎？")) {
                     const index = viewer.index || 0; 
                     let imgToRemove;
-                    if (isReceipt) {
-                        imgToRemove = containerElement; 
-                    } else {
-                        const imgs = containerElement.querySelectorAll('img');
-                        imgToRemove = imgs[index];
-                    }
+                    if (isReceipt) { imgToRemove = containerElement; } 
+                    else { const imgs = containerElement.querySelectorAll('img'); imgToRemove = imgs[index]; }
                     
                     if (imgToRemove) {
-                        deleteImageFromCloud(imgToRemove.src);
-                        imgToRemove.remove(); 
-                        
+                        deleteImageFromCloud(imgToRemove.src); imgToRemove.remove(); 
                         if (isReceipt || containerElement.querySelectorAll('img').length === 0) {
                             viewer.hide();
                             if (parentBox) {
-                                if (parentBox.classList.contains('receipt-thumb-wrap')) {
-                                    parentBox.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>`;
-                                } else if (parentBox.classList.contains('action-box')) {
-                                    parentBox.className = 'action-box photo-box';
-                                    parentBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`;
-                                }
+                                if (parentBox.classList.contains('receipt-thumb-wrap')) { parentBox.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>`; } 
+                                else if (parentBox.classList.contains('action-box')) { parentBox.className = 'action-box photo-box'; parentBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                             }
                         } else {
                             viewer.update();
                             if (parentBox && parentBox.querySelector('.album-count-badge')) {
                                 let badge = parentBox.querySelector('.album-count-badge');
                                 const remaining = containerElement.querySelectorAll('img').length;
-                                if (remaining > 1) badge.innerText = '+' + (remaining - 1);
-                                else badge.remove();
+                                if (remaining > 1) badge.innerText = '+' + (remaining - 1); else badge.remove();
                             }
                         }
                         saveData();
@@ -203,7 +201,6 @@
             document.querySelector('.viewer-container').appendChild(deleteBtn);
         }
 
-        // 🌟 更新：支援內部單張刪除的 Modal
         function openImageModal(imgElement, event) { 
             if(event) event.stopPropagation(); 
             const viewer = new Viewer(imgElement, { 
@@ -233,35 +230,21 @@
         function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); localStorage.setItem('travelAppCurrency', currentTravelCurrency); document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
         function getReliableDriveUrl(originalUrl) { if (!originalUrl) return ''; let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/); if (match && match[1]) { return `https://lh3.googleusercontent.com/d/${match[1]}`; } return originalUrl; }
         
-        // 🌟 升級版：智慧延遲 Retry 機制 (不再馬上報錯)
         function handleImageError(img) { 
             if (img.dataset.failed === 'true') return;
-            
             let retryCount = parseInt(img.dataset.retryCount || '0');
             let originalSrc = img.dataset.originalSrc || img.src;
             if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
-
             if (retryCount < 4) {
                 img.dataset.retryCount = retryCount + 1;
-                // 暫時顯示載入中，避免破圖
                 img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23888888'>載入中...</text></svg>";
-                
-                setTimeout(() => {
-                    let separator = originalSrc.includes('?') ? '&' : '?';
-                    img.src = originalSrc + separator + 'retry=' + Date.now();
-                }, 1500);
+                setTimeout(() => { let separator = originalSrc.includes('?') ? '&' : '?'; img.src = originalSrc + separator + 'retry=' + Date.now(); }, 1500);
                 return;
             }
-            
             if (!img.dataset.proxied) {
-                img.dataset.proxied = 'true';
-                let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
-                if (match && match[1]) {
-                    img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`;
-                    return;
-                }
+                img.dataset.proxied = 'true'; let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+                if (match && match[1]) { img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`; return; }
             }
-            
             img.dataset.failed = 'true';
             img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
         }
@@ -582,6 +565,29 @@
                 });
 
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
+                    // 🌟 自動幫舊進度的行程卡片補上「新增子項目」按鈕與容器
+                    let contentBox = item.querySelector('.content-box');
+                    if (contentBox && item.closest('#itinerary-days-container')) {
+                        let actionRow = contentBox.querySelector('.action-row');
+                        if (actionRow) {
+                            actionRow.style.display = 'flex'; actionRow.style.gap = '4px'; actionRow.style.alignItems = 'center';
+                            if (!actionRow.querySelector('.add-sub-btn')) {
+                                let btn = document.createElement('button');
+                                btn.className = 'btn-nav btn-circle add-sub-btn';
+                                btn.setAttribute('onclick', 'addSubItem(this, event)');
+                                btn.setAttribute('title', '新增子地點');
+                                btn.style.background = '#0284c7';
+                                btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">add_location_alt</span>';
+                                actionRow.insertBefore(btn, actionRow.children[1] || actionRow.firstChild);
+                            }
+                        }
+                        if (!contentBox.querySelector('.sub-items-container')) {
+                            let subCont = document.createElement('div');
+                            subCont.className = 'sub-items-container';
+                            contentBox.appendChild(subCont);
+                        }
+                    }
+
                     if (item.querySelector('.right-action-group')) {
                         let oldLinkBox = item.querySelector('.action-box.has-link span');
                         if (oldLinkBox && oldLinkBox.getAttribute('onclick') && oldLinkBox.getAttribute('onclick').includes('window.open')) {
@@ -702,12 +708,69 @@
             } else if (url) { alert("請輸入有效的網址 (需包含 http 或 https)！"); }
         }
 
+        // 🌟 新增：產生「子地點」的函式
+        function addSubItem(btn, event) {
+            event.stopPropagation();
+            let container = btn.closest('.content-box').querySelector('.sub-items-container');
+            if(!container) { container = document.createElement('div'); container.className = 'sub-items-container'; btn.closest('.content-box').appendChild(container); }
+            
+            let sub = document.createElement('div');
+            sub.className = 'sub-item';
+            sub.innerHTML = `
+                <div style="flex-grow:1; display:flex; flex-direction:column; min-width:0;">
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <span class="material-icons-round" style="font-size:14px; color:var(--primary-color);">subdirectory_arrow_right</span>
+                        <span class="editable sub-item-title" contenteditable="true">輸入子地點/店名</span>
+                        <span class="material-icons-round" style="font-size:14px; color:#1976d2; cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
+                    </div>
+                    <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
+                </div>
+                <div class="right-action-group" style="flex-direction:row; margin-left:auto; gap:4px;">
+                    <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
+                    <div class="action-box" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">close</span></div>
+                </div>
+            `;
+            container.appendChild(sub);
+            saveData();
+        }
+
+        // 🌟 新增：刪除「子地點」的函式
+        function deleteSubItem(btn, event) {
+            event.stopPropagation();
+            if(confirm("確定移除此子項目？")) {
+                let item = btn.closest('.sub-item');
+                let imgs = item.querySelectorAll('img');
+                imgs.forEach(img => { if(img && img.src) deleteImageFromCloud(img.src); });
+                item.remove();
+                saveData();
+            }
+        }
+
+        // 🌟 新增：子地點專用的 Google Maps 單點搜尋導航
+        function autoNavigateSub(btn, event) {
+            event.stopPropagation();
+            let titleEl = btn.closest('.sub-item').querySelector('.sub-item-title');
+            let dest = titleEl ? titleEl.innerText.trim() : '';
+            if(!dest || dest === '輸入子地點/店名') { alert('請先輸入地點名稱！'); return; }
+            let mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest)}`;
+            window.open(mapUrl, '_blank');
+        }
+
         function addItineraryItem(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                 <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">60</span> 分</div><div class="end-time">13:00</div></div>
-                <div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div><div class="item-note editable" contenteditable="true">備註：</div><div class="action-row" style="margin-top:4px;"><button class="btn-nav btn-circle" onclick="autoNavigate(this, event)"><span class="material-icons-round" style="font-size:16px;">place</span></button><div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div></div></div>
+                <div class="content-box">
+                    <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
+                    <div class="item-note editable" contenteditable="true">備註：</div>
+                    <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center;">
+                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:16px;">place</span></button>
+                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add_location_alt</span></button>
+                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15</span> 分鐘</div>
+                    </div>
+                    <div class="sub-items-container"></div>
+                </div>
                 <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
@@ -760,7 +823,6 @@
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
 
-        // 🌟 新增：延遲並具備 Retry 重試次數的圖片壓縮處理
         function compressImage(file, maxWidth, quality, callback, errorCallback) {
             if (!file || !file.type.match(/image.*/)) { alert("⚠️ 請選擇圖片檔案！"); if(errorCallback) errorCallback(); return; }
             const reader = new FileReader();
