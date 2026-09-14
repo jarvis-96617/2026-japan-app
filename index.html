@@ -146,6 +146,28 @@
         body.share-mode-active, body.readonly-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
         body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .action-dash-box, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
         body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
+
+        /* 🌟 新增：隱私解鎖果凍視窗 CSS */
+        #password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
+        #password-overlay.show { opacity: 1; }
+        body.dark-mode #password-overlay { background: rgba(0,0,0,0.5); }
+        .pwd-modal { background: rgba(255,255,255,0.95); padding: 30px 25px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.5) inset; text-align: center; width: 85%; max-width: 320px; transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        body.dark-mode .pwd-modal { background: rgba(30,30,30,0.95); box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset; }
+        #password-overlay.show .pwd-modal { transform: translateY(0) scale(1); }
+        .pwd-icon { width: 60px; height: 60px; background: #e0f2fe; color: #0284c7; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; box-shadow: 0 8px 16px rgba(2, 132, 199, 0.15); }
+        body.dark-mode .pwd-icon { background: rgba(2, 132, 199, 0.2); color: #38bdf8; }
+        .pwd-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; } body.dark-mode .pwd-title { color: #e0e0e0; }
+        .pwd-desc { font-size: 12px; color: #666; margin-bottom: 20px; line-height: 1.5; } body.dark-mode .pwd-desc { color: #aaa; }
+        .pwd-input { width: 100%; padding: 12px 20px; border: 2px solid #e5e7eb; border-radius: 50px; font-size: 16px; text-align: center; outline: none; transition: 0.3s; box-sizing: border-box; font-weight: bold; letter-spacing: 2px; -webkit-appearance: none; }
+        .pwd-input:focus { border-color: #0284c7; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1); }
+        body.dark-mode .pwd-input { background: #222; border-color: #444; color: white; }
+        .pwd-btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .pwd-btn { flex: 1; padding: 12px 0; border-radius: 50px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .pwd-btn-cancel { background: #f3f4f6; color: #555; } body.dark-mode .pwd-btn-cancel { background: #444; color: #ddd; }
+        .pwd-btn-confirm { background: #0284c7; color: white; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
+        .pwd-btn:active { transform: scale(0.95); }
+        @keyframes shake-anim { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+        .shake-err { animation: shake-anim 0.4s ease-in-out; }
     </style>
 </head>
 <body>
@@ -157,6 +179,20 @@
         </div>
     </div>
     <div id="mobile-tooltip"></div>
+    
+    <!-- 🌟 新增：隱私解鎖視窗 HTML -->
+    <div id="password-overlay">
+        <div class="pwd-modal">
+            <div class="pwd-icon"><span class="material-icons-round" style="font-size:30px;">lock</span></div>
+            <div class="pwd-title">隱私保護</div>
+            <div class="pwd-desc">票券與記帳內容已上鎖，<br>請輸入密碼以檢視完整資訊。</div>
+            <input type="password" id="privacy-pwd-input" class="pwd-input" placeholder="輸入密碼" inputmode="numeric">
+            <div class="pwd-btn-group">
+                <button class="pwd-btn pwd-btn-cancel" onclick="closePrivacyModal()">取消</button>
+                <button class="pwd-btn pwd-btn-confirm" onclick="verifyPrivacyPwd()">解鎖</button>
+            </div>
+        </div>
+    </div>
     
     <script>
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
@@ -174,6 +210,9 @@
         
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
+        
+        // 🔒 [隱私設定] 進入其他分頁的解鎖密碼 (你可以自行修改這個數字)
+        const TAB_PASSWORD = "0719"; 
 
         function parseMins(str) {
             if (!str) return 0;
@@ -207,6 +246,61 @@
                 saveData();
             }
         });
+
+        // 🌟 隱私解鎖視窗邏輯
+        let pendingTabId = null; let pendingTabElement = null;
+        function openPrivacyModal(tabId, element) {
+            pendingTabId = tabId; pendingTabElement = element;
+            const overlay = document.getElementById('password-overlay');
+            const input = document.getElementById('privacy-pwd-input');
+            overlay.style.display = 'flex';
+            setTimeout(() => { overlay.classList.add('show'); input.focus(); }, 10);
+        }
+
+        function closePrivacyModal() {
+            const overlay = document.getElementById('password-overlay');
+            overlay.classList.remove('show');
+            setTimeout(() => { overlay.style.display = 'none'; document.getElementById('privacy-pwd-input').value = ''; }, 300);
+        }
+
+        function verifyPrivacyPwd() {
+            const input = document.getElementById('privacy-pwd-input');
+            if (input.value === TAB_PASSWORD) {
+                sessionStorage.setItem('travelTabsUnlocked', 'true'); // 存入 Session，關閉分頁前免重複輸入
+                closePrivacyModal();
+                if (pendingTabId && pendingTabElement) {
+                    switchTab(pendingTabId, pendingTabElement);
+                }
+            } else {
+                const modal = document.querySelector('.pwd-modal');
+                modal.classList.add('shake-err');
+                input.value = ''; input.placeholder = '密碼錯誤！';
+                setTimeout(() => modal.classList.remove('shake-err'), 400);
+            }
+        }
+
+        // 監聽 Enter 鍵直接送出密碼
+        document.getElementById('privacy-pwd-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') verifyPrivacyPwd();
+        });
+
+        // 🌟 更新版 switchTab：加入隱私檢查
+        function switchTab(tabId, element) {
+            // 若非行程頁且未解鎖，阻擋並彈出密碼框
+            if (tabId !== 'tab-itinerary' && sessionStorage.getItem('travelTabsUnlocked') !== 'true') {
+                openPrivacyModal(tabId, element);
+                return;
+            }
+
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); 
+            document.getElementById(tabId).classList.add('active'); 
+            element.classList.add('active'); 
+            window.scrollTo(0,0); 
+            
+            if(tabId === 'tab-budget') calcBudget(); 
+            if(tabId === 'tab-itinerary') adjustStickyTabs(); 
+        }
 
         function showToast(msg, isError = false) {
             let el = document.getElementById('toast-msg');
@@ -430,7 +524,7 @@
             let paramName = (type === "1") ? "share" : "readonly";
             let shareUrl = cleanInput ? baseUrl + "?" + paramName + "=" + cleanInput : baseUrl + "?" + paramName + "=all";
             setStatus('sync', '產生短網址中...');
-            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
+            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
         }
         function exportToPDF() { window.print(); }
         function exportBackup() { let data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
@@ -569,43 +663,30 @@
 
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
-            pendingSaveAction = true; 
-            clearTimeout(syncTimeout);
-            syncTimeout = setTimeout(() => {
-                pendingSaveAction = false; 
-                isSavingToCloud = true;
-                
-                let payload;
-                let compressedData;
-                try {
-                    const state = captureState(); 
-                    compressedData = LZString.compressToUTF16(JSON.stringify(state));
-                    payload = JSON.stringify({ 
-                        isCompressed: true, 
-                        data: compressedData, 
-                        token: APP_TOKEN,
-                        baseHash: lastCloudDataHash 
-                    });
-                    localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
-                    localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
-                } catch(e) { console.error("存檔壓縮失敗", e); isSavingToCloud = false; return; }
+            pendingSaveAction = true; let payload;
+            try {
+                const state = captureState(); 
+                const compressedData = LZString.compressToUTF16(JSON.stringify(state));
+                payload = JSON.stringify({ 
+                    isCompressed: true, 
+                    data: compressedData, 
+                    token: APP_TOKEN,
+                    baseHash: lastCloudDataHash 
+                });
+                lastCloudDataHash = compressedData; 
+            } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
 
-                if(!API_URL.startsWith("https://script.google.com")) { 
-                    setStatus('cloud_off', '本機模式', true); 
-                    isSavingToCloud = false; 
-                    if (needsSaveAfterFetch) { needsSaveAfterFetch = false; saveData(); }
-                    return; 
-                }
-                
-                setStatus('sync', '同步壓縮檔中...'); 
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-                .then(res => res.json())
-                .then(data => {
+            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
+            localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+            
+            if(!API_URL.startsWith("https://script.google.com")) { setStatus('cloud_off', '本機模式', true); pendingSaveAction = false; return; }
+            setStatus('sync', '同步壓縮檔中...'); clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => {
+                pendingSaveAction = false; isSavingToCloud = true;
+                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).then(res => res.json()).then(data => {
                     isSavingToCloud = false; 
                     if(data.status === "success") { 
-                        lastCloudDataHash = compressedData; 
-                        setStatus('cloud_done', '雲端已同步'); 
-                        if(isManual) showToast("✅ 同步成功！"); 
+                        setStatus('cloud_done', '雲端已同步'); if(isManual) showToast("✅ 同步成功！"); 
                     } else if (data.status === "conflict") {
                         setStatus('cloud_off', '版本衝突，拒絕存檔', true);
                         alert("🚨 【版本衝突警告】\n\n在你編輯的期間，有人已經存檔了新版本！\n為了避免覆蓋別人的心血，系統已「拒絕」本次存檔。\n\n請點擊上方工具列的「下載」按鈕保留你的修改，然後重新整理頁面。");
@@ -793,16 +874,8 @@
                 document.querySelectorAll('.amount-input').forEach(input => { let val = parseFloat(input.value.replace(/,/g, '')) || 0; input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value); });
                 calcBudget();
 
-                // 🌟 新增：強制每次開啟 App 都回到「行程分頁」的第一天
-                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                const itTab = document.getElementById('tab-itinerary'); const firstNav = document.querySelectorAll('.nav-item')[0]; if(itTab) itTab.classList.add('active'); if(firstNav) firstNav.classList.add('active');
-                if (itTab && !document.getElementById('day-tabs-container')) { let tabsContainer = document.createElement('div'); tabsContainer.id = 'day-tabs-container'; tabsContainer.className = 'day-tabs-wrapper'; let daysContainer = document.getElementById('itinerary-days-container'); if (daysContainer) { itTab.insertBefore(tabsContainer, daysContainer); } }
-                document.querySelectorAll('.luggage-select').forEach(sel => { let currentVal = sel.value || '背包'; if (currentVal === '手提') currentVal = '背包'; sel.innerHTML = `<option value="背包">背包</option><option value="小包包">小包包</option><option value="託運">託運</option>`; sel.value = currentVal; Array.from(sel.options).forEach(opt => { if (opt.value === currentVal) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); });
-                document.querySelectorAll('.btn-nav').forEach(btn => { btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = ''; if (btn.closest('#itinerary-days-container')) { if (btn.innerText.includes('導航') || btn.innerHTML.includes('place')) { btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">place</span>'; btn.classList.add('btn-circle'); } } else { btn.classList.remove('btn-circle'); } });
-
                 if(typeof updateCurrencyOptionsInTable === 'function') updateCurrencyOptionsInTable(); 
                 
-                // 🌟 強制切換回 Day 1 (防呆機制)
                 updateDayTabs(); 
                 let startDayIdx = 0;
                 let shareMatch = window.location.href.match(/[?&](share|readonly)=([0-9,，、]+)/);
@@ -812,7 +885,14 @@
                 }
                 switchDayCard(startDayIdx); 
                 updateDayTabs();
-                if(firstNav) switchTab('tab-itinerary', firstNav); 
+                
+                // 強制每次重啟 App 都回到行程分頁
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                const itTab = document.getElementById('tab-itinerary'); 
+                const firstNav = document.querySelectorAll('.nav-item')[0]; 
+                if(itTab) itTab.classList.add('active'); 
+                if(firstNav) firstNav.classList.add('active');
                 window.scrollTo(0, 0);
 
                 if(typeof initHistory === 'function') initHistory(); initSortable(); makeTableResizable(); 
@@ -1150,7 +1230,6 @@
             document.querySelectorAll('.sub-items-container').forEach(cont => { window.sortableInstances.push(Sortable.create(cont, subSortableOptions)); });
         }
 
-        function switchTab(tabId, element) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); document.getElementById(tabId).classList.add('active'); element.classList.add('active'); window.scrollTo(0,0); if(tabId === 'tab-budget') calcBudget(); if(tabId === 'tab-itinerary') adjustStickyTabs(); }
         function toggleComplete(element, event) { if (!event.target.closest('.custom-checkbox')) return; element.classList.toggle('completed'); saveData(); }
 
         function autoNavigate(btn, event) {
