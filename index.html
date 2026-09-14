@@ -24,12 +24,12 @@
             --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.9);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.04); --safe-bottom: env(safe-area-inset-bottom, 16px); 
             --danger-color: #dc2626; --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --accent-color: #3b82f6;
+            --accent-color: #0284c7; 
         }
         body.dark-mode {
             --bg-color: #09090b; --primary-color: #a1a1aa; --text-main: #f4f4f5; --text-muted: #a1a1aa;
             --glass-bg: rgba(24, 24, 27, 0.75); --glass-border: rgba(255, 255, 255, 0.05);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --accent-color: #60a5fa;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --accent-color: #38bdf8;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(75px + var(--safe-bottom)); overflow-x: hidden; transition: 0.3s ease; }
@@ -65,6 +65,7 @@
         .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
+        /* 🌟 完美的左中右三欄排版 */
         .timeline-item { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 0px; position: relative; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
         body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.4; filter: grayscale(100%);}
@@ -84,7 +85,7 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; pointer-events: none; }
         body.dark-mode #itinerary-days-container .timeline-item::before { color: #52525b; }
         
-        /* 🌟 左側：時間區塊 */
+        /* 左側時間欄位 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
         .start-time { font-weight: 800; font-size: 14px; color: var(--accent-color); margin-bottom: 2px; line-height: 1; }
         .duration-wrap { font-size: 9px; font-weight: 700; color: var(--text-muted); background: rgba(0,0,0,0.04); padding: 2px 4px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); }
@@ -92,13 +93,22 @@
         .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
         .auto-start { font-size: 9px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 9px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
 
-        /* 🌟 中間：內容與按鈕區塊 */
+        /* 中間內容區塊 (撐開最大空間) */
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 0px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
-        .item-note { display: block; background: transparent; padding: 0 0 4px 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 2px; color: var(--text-muted); width: 100%; word-break: break-word; white-space: pre-wrap; line-height: 1.5; transition: 0.3s; min-height: 16px;} 
+        .item-note { display: block; background: transparent; padding: 0 0 6px 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 6px; color: var(--text-muted); width: 100%; word-break: break-word; white-space: pre-wrap; line-height: 1.5; transition: 0.3s; min-height: 20px;} 
         body.dark-mode .item-note { border-left-color: rgba(255,255,255,0.1); }
-        
         .action-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; width: 100%;}
+        
+        /* 右側操作按鈕群組 (直向疊加) */
+        .right-action-group { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; margin-left: 4px; justify-content: flex-start; padding-top: 2px;} 
+        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
+        body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
+        .action-box:active { transform: scale(0.9); } 
+        .action-box.has-link { background: #e0f2fe; color: #0284c7; } 
+        body.dark-mode .action-box.has-link { background: rgba(2, 132, 199, 0.2); color: #38bdf8; } 
+        .action-box.has-photo { background: transparent; }
+        .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 14px; height: 14px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.2s var(--spring);}
         
         select, input { transition: 0.3s var(--spring); } body.dark-mode select, body.dark-mode input { background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;}
         .luggage-select { font-size: 11px; padding: 2px 6px; border-radius: 50px; border: 1.5px solid var(--primary-color); color: var(--primary-color); background: rgba(255,255,255,0.5); margin-right: 4px; cursor: pointer; font-weight: 800; outline: none; transition: 0.3s var(--spring);}
@@ -112,17 +122,6 @@
         
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.03); color: var(--primary-color); border: 1px dashed rgba(0,0,0,0.1); border-radius: 50px; font-weight: 800; font-size: 12px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #a1a1aa;}
         
-        /* 🌟 右側操作按鈕群組 (直向) */
-        .right-action-group { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; margin-left: 4px; justify-content: flex-start; padding-top: 2px;} 
-        
-        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
-        body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
-        .action-box:active { transform: scale(0.9); } 
-        .action-box.has-link { background: #e0f2fe; color: #0284c7; } 
-        body.dark-mode .action-box.has-link { background: rgba(2, 132, 199, 0.2); color: #38bdf8; } 
-        .action-box.has-photo { background: transparent; }
-        
-        .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 14px; height: 14px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.2s var(--spring);}
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
         .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 20px; box-sizing: border-box; }
@@ -216,7 +215,39 @@
         </div>
     </div>
 
-    <!-- 🌟 直接寫死基礎框架，保證 iOS 絕不白畫面 -->
+    <!-- 🌟 重新補回頂部封面區塊與工具列！ -->
+    <div style="position: relative;">
+        <div class="hero" id="hero-container">
+            <h1 class="editable" contenteditable="true">2026 古京阪六天五夜</h1>
+            <p class="editable" contenteditable="true" style="max-width: 75%;">09/25 - 09/30 | 2人同行 | 京都 & 大阪</p>
+        </div>
+        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="position: absolute; right: 16px; bottom: 12px; z-index: 10; font-size: 10px; font-weight: 800; color: white; text-align: right; background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(12px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: 0.3s var(--spring); border: 1px solid rgba(255,255,255,0.2);">
+            <span id="curr-label">JPY</span> <span style="color:#fcd34d; margin-left:4px;" id="rate-num">載入中</span>
+        </div>
+    </div>
+
+    <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 8px 12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
+            <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;">
+                <button id="edit-toggle-btn" class="manual-save-btn always-show" onclick="toggleEditMode()" style="background:var(--primary-color);" data-tip="目前唯讀，點擊解鎖"><span class="material-icons-round" id="edit-toggle-icon" style="font-size:14px;">lock</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="forceManualSave()" style="background:var(--accent-color);" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:14px;">save</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="undoAction()" style="background:#71717a;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:14px;">undo</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="redoAction()" style="background:#a1a1aa;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:14px;">redo</span></button>
+                <button class="manual-save-btn always-show" onclick="location.reload()" style="background:var(--primary-color);" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:14px;">refresh</span></button>
+                <button class="manual-save-btn toggle-more-btn always-show" onclick="toggleMoreOptions()" style="background:#3f3f46;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:14px;">more_vert</span></button>
+            </div>
+            <div id="sync-status" style="font-size: 10px; font-weight:800; color: var(--text-muted); display:flex; align-items:center; gap:2px; white-space:nowrap; padding-left:8px;"><span class="material-icons-round" style="font-size:14px; color: #10b981;">cloud_done</span> <span>已就緒</span></div>
+        </div>
+        <div id="more-options-bar" class="hide-scrollbar" style="display:none; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-top:8px; padding-top:8px; border-top:1px dashed var(--glass-border);">
+            <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">share</span> 分享</button>
+            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#3f3f46;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:14px; margin-right:4px;">dark_mode</span> 夜間</button>
+            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#0d9488;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">picture_as_pdf</span> 列印</button>
+            <button class="manual-save-btn" onclick="exportBackup()" style="background:#d97706;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">download</span> 下載</button>
+            <button class="manual-save-btn edit-only-btn" onclick="triggerImportBackup()" style="background:#ea580c;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">upload</span> 還原</button>
+        </div>
+    </div>
+
+    <!-- 🌟 主內容區塊 -->
     <div class="container" id="main-container">
         <div id="tab-itinerary" class="tab-content active">
             <div id="day-tabs-container" class="day-tabs-wrapper"></div>
@@ -298,6 +329,7 @@
         
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
         
+        // 🌟 防當機機制：讀寫 localStorage 全部加上 try-catch
         let currentTravelCurrency = 'JPY';
         try { currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY'; } catch(e) {}
         
@@ -545,9 +577,12 @@
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideMobileTooltip(); }, {passive: true});
         }
 
-        // 🌟 重新設計防白屏載入機制
+        // 🌟 絕對防白屏載入機制：先建結構，後抓資料
         async function loadData() {
             updateProgress(10, "初始化系統...");
+            
+            let documentBodyReady = document.getElementById('main-container') !== null;
+            if(!documentBodyReady) return; 
 
             try {
                 const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal'); 
@@ -593,7 +628,11 @@
                     if (state && state.html) {
                         if (state.lastModified) lastCloudModifiedTime = state.lastModified;
                         document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
-                        if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                        
+                        // 🌟 防呆：確保如果有 Hero，才重新渲染
+                        let heroEl = document.getElementById('hero-container');
+                        if(state.heroHtml && heroEl) { heroEl.innerHTML = sanitizeHTML(state.heroHtml); }
+                        
                         if(state.payersData) payers = state.payersData;
                         renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
                     } else { 
@@ -611,7 +650,7 @@
             } catch (globalErr) {
                 hideSplashScreen();
                 clearTimeout(forceUnlockTimer);
-                finalizeLoad(); 
+                finalizeLoad();
             }
         }
 
@@ -621,7 +660,14 @@
                 if (saved) {
                     let state = null;
                     try { let parsed = JSON.parse(saved); if (parsed.isCompressed && typeof LZString !== 'undefined') { lastCloudDataHash = parsed.data; state = JSON.parse(LZString.decompressFromUTF16(parsed.data)); } else { state = parsed; } } catch(e) {}
-                    if(state && state.html) { if (state.lastModified) lastCloudModifiedTime = state.lastModified; document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); }
+                    if(state && state.html) { 
+                        if (state.lastModified) lastCloudModifiedTime = state.lastModified; 
+                        document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); 
+                        let heroEl = document.getElementById('hero-container');
+                        if(state.heroHtml && heroEl) { heroEl.innerHTML = sanitizeHTML(state.heroHtml); }
+                        if(state.payersData) payers = state.payersData; 
+                        renderPayerTags(); rebindEvents(); 
+                    }
                 } else { addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); }
             } catch(e) {}
             finalizeLoad();
