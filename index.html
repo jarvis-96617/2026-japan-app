@@ -18,26 +18,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
     <style>
-        /* 🌟 極致灰階色調與縮排設定 */
+        /* 🌟 質感灰階色調與動畫設定 */
         :root {
-            --bg-color: #f4f4f5; /* Zinc 100 */
-            --primary-color: #52525b; /* Zinc 600 */
-            --text-main: #27272a; /* Zinc 800 */
-            --text-muted: #71717a; /* Zinc 500 */
-            --glass-bg: rgba(255, 255, 255, 0.85); 
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04); 
-            --safe-bottom: env(safe-area-inset-bottom, 16px); 
-            --danger-color: #dc2626; /* Red 600 */
-            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --bg-color: #f4f4f5; --primary-color: #52525b; --text-main: #27272a; --text-muted: #71717a;
+            --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04); --safe-bottom: env(safe-area-inset-bottom, 16px); 
+            --danger-color: #dc2626; --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         body.dark-mode {
-            --bg-color: #09090b; /* Zinc 950 */
-            --primary-color: #a1a1aa; /* Zinc 400 */
-            --text-main: #f4f4f5; 
-            --text-muted: #a1a1aa;
-            --glass-bg: rgba(24, 24, 27, 0.75); 
-            --glass-border: rgba(255, 255, 255, 0.05);
+            --bg-color: #09090b; --primary-color: #a1a1aa; --text-main: #f4f4f5; --text-muted: #a1a1aa;
+            --glass-bg: rgba(24, 24, 27, 0.75); --glass-border: rgba(255, 255, 255, 0.05);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -70,7 +60,8 @@
         .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        .timeline-item { display: flex; flex-wrap: nowrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: flex-start; transition: all 0.3s ease;}
+        /* 🌟 重點：恢復 flex-wrap: nowrap 讓右側按鈕不會被擠下去 */
+        .timeline-item { display: flex; flex-wrap: nowrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
         body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.4; filter: grayscale(100%);}
         #tab-transport .timeline-item { padding: 8px 0; } #tab-transport .item-title { font-size: 13px; margin-bottom: 2px; line-height: 1.2;}
@@ -89,15 +80,18 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; pointer-events: none; }
         body.dark-mode #itinerary-days-container .timeline-item::before { color: #52525b; }
         
-        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 42px; flex-shrink: 0; }
+        /* 🌟 左側：時間區塊 */
+        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
         .start-time { font-weight: 800; font-size: 14px; color: var(--primary-color); margin-bottom: 2px; line-height: 1; }
-        .duration-wrap { font-size: 9px; font-weight: 700; color: #71717a; background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); color: #a1a1aa; }
+        .duration-wrap { font-size: 9px; font-weight: 700; color: #71717a; background: rgba(0,0,0,0.04); padding: 2px 4px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); color: #a1a1aa; }
         .duration { font-weight: 800; color: var(--primary-color); min-width: 12px; display: inline-block; text-align: center; } .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
-        .auto-start { font-size: 10px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 10px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
+        .auto-start { font-size: 9px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 9px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
 
-        .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px;}
+        /* 🌟 中間：內容與按鈕區塊 */
+        .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 2px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
         .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 4px; color: #52525b; width: 100%; word-break: break-word; line-height: 1.4; transition: 0.3s;} body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,0.1); }
+        .action-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-top: 2px;}
         
         select, input { transition: 0.3s var(--spring); } body.dark-mode select, body.dark-mode input { background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;}
         .luggage-select { font-size: 11px; padding: 2px 6px; border-radius: 50px; border: 1.5px solid var(--primary-color); color: var(--primary-color); background: rgba(255,255,255,0.5); margin-right: 4px; cursor: pointer; font-weight: 800; outline: none; transition: 0.3s var(--spring);}
@@ -111,13 +105,12 @@
         
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.04); color: var(--primary-color); border: none; border-radius: 50px; font-weight: 800; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.05); color: #a1a1aa;}
         
-        /* 🌟 重大更新：動作按鈕改回水平排列，放在內容區塊最下方，釋放 100% 文字寬度 */
-        .action-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: space-between; margin-top: 2px; width: 100%;}
-        .left-actions { display: flex; gap: 4px; align-items: center; flex-wrap: wrap;}
-        .right-actions { display: flex; gap: 4px; align-items: center;}
+        /* 🌟 右側：操作按鈕群組 (直向疊加) */
+        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 2px; justify-content: flex-start;} 
         
         .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
+        .action-box:active { transform: scale(0.9); } 
         .action-box.has-link { background: #e4e4e7; color: #3f3f46; } 
         body.dark-mode .action-box.has-link { background: rgba(255,255,255,0.1); color: #f4f4f5; } 
         .action-box.has-photo { background: transparent; }
@@ -125,10 +118,10 @@
         .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 14px; height: 14px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.2s var(--spring);}
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 4px; padding-left: 20px; padding-right: 0px; box-sizing: border-box; }
-        .sub-item { display: flex; align-items: stretch; gap: 4px; padding: 4px 6px 4px 16px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid #71717a; transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
+        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 20px; box-sizing: border-box; }
+        .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 16px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid #71717a; transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: #a1a1aa;}
-        .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 14px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
+        .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
         body.dark-mode .sub-item::before { color: #52525b; }
         .sub-item-title { font-size: 12px; font-weight: 800; flex-grow: 1; outline: none; color: #3f3f46;} body.dark-mode .sub-item-title{color: #f4f4f5;}
         .sub-item-note { font-size: 10px; font-weight: 500; color: #71717a; margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
@@ -152,6 +145,7 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(55px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid rgba(255,255,255,0.6); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -8px 30px rgba(0,0,0,0.04); border-radius: 24px 24px 0 0; transition: 0.4s var(--spring); padding-top: 4px;} body.dark-mode .bottom-nav { background: rgba(24, 24, 27, 0.85); border-top-color: rgba(255,255,255,0.05); box-shadow: 0 -8px 30px rgba(0,0,0,0.3);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s var(--spring); } .nav-item.active { color: var(--primary-color); font-weight: 800; transform: translateY(-2px) scale(1.05); } .nav-item .material-icons-round { font-size: 22px; margin-bottom: 2px; }
         .tab-content { display: none; animation: fadeIn 0.3s var(--spring); position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
+        /* 🌟 唯讀保護模式專屬樣式 (排除解鎖密碼框) */
         body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
         body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
         body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
@@ -166,10 +160,10 @@
 
         body.share-mode-active .bottom-nav, body.share-mode-active #tab-transport, body.share-mode-active #tab-hotel, body.share-mode-active #tab-shopping, body.share-mode-active #tab-budget, body.share-mode-active #tab-todo, body.readonly-mode-active .bottom-nav, body.readonly-mode-active #tab-transport, body.readonly-mode-active #tab-hotel, body.readonly-mode-active #tab-shopping, body.readonly-mode-active #tab-budget, body.readonly-mode-active #tab-todo { display: none !important; }
         body.share-mode-active, body.readonly-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
-        body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .action-dash-box, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
+        body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
         body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input:not(#privacy-pwd-input) { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
 
-        /* 隱私解鎖果凍視窗 CSS */
+        /* 🌟 隱私解鎖果凍視窗 CSS */
         #password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s ease; }
         #password-overlay.show { opacity: 1; }
         body.dark-mode #password-overlay { background: rgba(0,0,0,0.5); }
@@ -180,7 +174,7 @@
         body.dark-mode .pwd-icon { background: rgba(255,255,255,0.1); color: #d4d4d8; }
         .pwd-title { font-size: 18px; font-weight: 800; color: #27272a; margin-bottom: 6px; letter-spacing: 0.5px;} body.dark-mode .pwd-title { color: #f4f4f5; }
         .pwd-desc { font-size: 12px; font-weight: 600; color: #71717a; margin-bottom: 20px; line-height: 1.4; } body.dark-mode .pwd-desc { color: #a1a1aa; }
-        .pwd-input { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.04); border: 2px solid transparent; border-radius: 50px; font-size: 16px; text-align: center; outline: none; transition: 0.3s var(--spring); box-sizing: border-box; font-weight: 800; letter-spacing: 3px; -webkit-appearance: none; pointer-events: auto !important; user-select: auto !important; }
+        .pwd-input { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.04); border: 2px solid transparent; border-radius: 50px; font-size: 18px; text-align: center; outline: none; transition: 0.3s var(--spring); box-sizing: border-box; font-weight: 800; letter-spacing: 3px; -webkit-appearance: none; pointer-events: auto !important; user-select: auto !important; }
         .pwd-input:focus { background: white; border-color: #52525b; box-shadow: 0 0 0 4px rgba(82, 82, 91, 0.1); }
         body.dark-mode .pwd-input { background: rgba(0,0,0,0.2); color: white; } body.dark-mode .pwd-input:focus { background: #27272a; border-color: #a1a1aa; }
         .pwd-btn-group { display: flex; gap: 8px; margin-top: 20px; }
@@ -233,7 +227,7 @@
         
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
-        const TAB_PASSWORD = "8888"; 
+        const TAB_PASSWORD = "0719"; 
 
         function parseMins(str) {
             if (!str) return 0;
@@ -280,7 +274,7 @@
         function closePrivacyModal() {
             const overlay = document.getElementById('password-overlay');
             overlay.classList.remove('show');
-            setTimeout(() => { overlay.style.display = 'none'; document.getElementById('privacy-pwd-input').value = ''; }, 300);
+            setTimeout(() => { overlay.style.display = 'none'; document.getElementById('privacy-pwd-input').value = ''; }, 400);
         }
 
         function verifyPrivacyPwd() {
@@ -322,7 +316,7 @@
             let el = document.getElementById('toast-msg');
             if(!el) {
                 el = document.createElement('div'); el.id = 'toast-msg';
-                el.style.cssText = `position:fixed; top:70px; left:50%; transform:translateX(-50%) scale(0.9); background:${isError ? 'rgba(220,38,38,0.95)' : 'rgba(39,39,42,0.9)'}; color:white; padding:10px 20px; border-radius:50px; font-size:12px; font-weight:800; z-index:10000; opacity:0; pointer-events:none; transition:all 0.3s var(--spring); box-shadow:0 8px 24px rgba(0,0,0,0.15); white-space:nowrap;`;
+                el.style.cssText = `position:fixed; top:85px; left:50%; transform:translateX(-50%) scale(0.9); background:${isError ? 'rgba(220,38,38,0.95)' : 'rgba(39,39,42,0.9)'}; color:white; padding:10px 20px; border-radius:50px; font-size:12px; font-weight:800; z-index:10000; opacity:0; pointer-events:none; transition:all 0.3s var(--spring); box-shadow:0 8px 24px rgba(0,0,0,0.15); white-space:nowrap;`;
                 document.body.appendChild(el);
             }
             el.style.background = isError ? 'rgba(220,38,38,0.95)' : 'rgba(39,39,42,0.9)';
@@ -651,7 +645,7 @@
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
                 container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span>`; } });
-                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">add_a_photo</span>`; } });
+                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; } });
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
@@ -809,110 +803,74 @@
 
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
                     let contentBox = item.querySelector('.content-box');
+                    
+                    // 🌟 自動相容轉換：確保右側按鈕變回原本的三欄直向排列
+                    let rightGroup = Array.from(item.children).find(c => c.classList && c.classList.contains('right-action-group'));
+                    if (!rightGroup) {
+                        rightGroup = document.createElement('div');
+                        rightGroup.className = 'right-action-group';
+                        item.appendChild(rightGroup);
+                    }
+                    rightGroup.style.cssText = 'display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: flex-start; flex-shrink: 0; margin-left: 2px;';
+
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
                         
-                        // 🌟 自動相容轉換：把舊的垂直排列，轉換成水平排列！
-                        if (!actionRow) {
-                            actionRow = document.createElement('div');
-                            actionRow.className = 'action-row';
-                            actionRow.style.cssText = 'margin-top:2px; display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:space-between; width:100%;';
+                        // 處理之前被塞進行內的按鈕，把它們拔出來放回最右邊直列
+                        if (actionRow) {
+                            let linkBox = actionRow.querySelector('.link-box');
+                            let photoBox = actionRow.querySelector('.photo-box');
+                            let delBox = actionRow.querySelector('.delete-box') || actionRow.querySelector('.delete-btn:not(.add-sub-btn)');
                             
-                            let subCont = contentBox.querySelector('.sub-items-container');
-                            if (subCont) contentBox.insertBefore(actionRow, subCont);
-                            else contentBox.appendChild(actionRow);
-                        }
-
-                        let leftActions = actionRow.querySelector('.left-actions');
-                        if (!leftActions) {
-                            leftActions = document.createElement('div');
-                            leftActions.className = 'left-actions';
-                            leftActions.style.cssText = 'display:flex; gap:4px; align-items:center; flex-wrap:wrap;';
-                            // 把原本 actionRow 裡面的導航/增加按鈕移進去
-                            while(actionRow.firstChild) { leftActions.appendChild(actionRow.firstChild); }
-                            actionRow.appendChild(leftActions);
-                        }
-                        
-                        // 確保必備按鈕存在
-                        if (!leftActions.querySelector('.add-sub-btn')) {
-                            let btn = document.createElement('button');
-                            btn.className = 'btn-nav btn-circle add-sub-btn';
-                            btn.setAttribute('onclick', 'addSubItem(this, event)');
-                            btn.setAttribute('title', '新增子地點');
-                            btn.style.background = 'var(--primary-color)';
-                            btn.innerHTML = '<span class="material-icons-round" style="font-size:14px;">add_location_alt</span>';
-                            leftActions.insertBefore(btn, leftActions.children[1] || leftActions.firstChild);
-                        }
-
-                        let rightActions = actionRow.querySelector('.right-actions');
-                        if (!rightActions) {
-                            rightActions = document.createElement('div');
-                            rightActions.className = 'right-actions';
-                            rightActions.style.cssText = 'display:flex; gap:4px; align-items:center;';
-                            actionRow.appendChild(rightActions);
-                        }
-
-                        // 把舊版的右側直列 action 搬到水平的 rightActions 裡
-                        let oldRightGroup = item.querySelector('.right-action-group');
-                        if (oldRightGroup && oldRightGroup.parentNode !== actionRow) {
-                            let linkBox = oldRightGroup.querySelector('.link-box');
-                            let photoBox = oldRightGroup.querySelector('.photo-box');
-                            let delBox = oldRightGroup.querySelector('.delete-box, .delete-btn');
-                            
-                            if (linkBox) {
-                                let oldIcon = linkBox.querySelector('span');
-                                if (oldIcon) oldIcon.style.fontSize = '14px';
-                                rightActions.appendChild(linkBox);
-                            }
-                            if (photoBox) {
-                                let oldIcon = photoBox.querySelector('span:not(.img-add-badge)');
-                                if (oldIcon) oldIcon.style.fontSize = '14px';
-                                rightActions.appendChild(photoBox);
-                            }
-                            if (delBox) {
-                                delBox.className = 'action-box delete-box'; 
+                            if (linkBox) rightGroup.appendChild(linkBox);
+                            if (photoBox) rightGroup.appendChild(photoBox);
+                            if (delBox && !delBox.classList.contains('add-sub-btn')) {
+                                delBox.className = 'action-box delete-box';
                                 delBox.innerHTML = '<span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span>';
-                                rightActions.appendChild(delBox);
+                                rightGroup.appendChild(delBox);
                             }
-                            oldRightGroup.remove();
-                        }
-                        
-                        let subCont = item.querySelector('.sub-items-container');
-                        if (subCont && subCont.parentNode === contentBox) { item.appendChild(subCont); }
-                    } else if (item.querySelector('.right-action-group') && !item.closest('#itinerary-days-container')) {
-                        // 處理非行程分頁（交通、清單等）的按鈕橫向化
-                        let contentBox = item.querySelector('.content-box');
-                        if (contentBox) {
-                            let actionRow = document.createElement('div');
-                            actionRow.className = 'action-row';
-                            actionRow.style.cssText = 'margin-top:2px; display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:flex-end; width:100%;';
-                            contentBox.appendChild(actionRow);
                             
-                            let oldRightGroup = item.querySelector('.right-action-group');
-                            if (oldRightGroup) {
-                                let linkBox = oldRightGroup.querySelector('.link-box');
-                                let photoBox = oldRightGroup.querySelector('.photo-box');
-                                let delBox = oldRightGroup.querySelector('.delete-box, .delete-btn');
-                                if(linkBox) actionRow.appendChild(linkBox);
-                                if(photoBox) actionRow.appendChild(photoBox);
-                                if(delBox) {
-                                    delBox.className = 'action-box delete-box'; 
-                                    delBox.innerHTML = '<span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span>';
-                                    actionRow.appendChild(delBox);
-                                }
-                                oldRightGroup.remove();
+                            // 恢復左側按鈕區塊
+                            let leftActionsWrap = actionRow.querySelector('.left-actions');
+                            if (leftActionsWrap) {
+                                while(leftActionsWrap.firstChild) actionRow.appendChild(leftActionsWrap.firstChild);
+                                leftActionsWrap.remove();
+                            }
+                            let rightActionsWrap = actionRow.querySelector('.right-actions');
+                            if (rightActionsWrap) rightActionsWrap.remove();
+                            
+                            actionRow.style.cssText = 'margin-top:4px; display:flex; gap:4px; align-items:center;';
+                            if (!actionRow.querySelector('.add-sub-btn')) {
+                                let btn = document.createElement('button');
+                                btn.className = 'btn-nav btn-circle add-sub-btn';
+                                btn.setAttribute('onclick', 'addSubItem(this, event)');
+                                btn.setAttribute('title', '新增子地點');
+                                btn.style.background = '#0284c7';
+                                btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">add_location_alt</span>';
+                                actionRow.insertBefore(btn, actionRow.children[1] || actionRow.firstChild);
                             }
                         }
+
+                        let subCont = item.querySelector('.sub-items-container');
+                        if (subCont && subCont.parentNode !== contentBox) { contentBox.appendChild(subCont); }
                     }
 
-                    // 處理連結
-                    let oldLinkBox = item.querySelector('.action-box.has-link span');
-                    if (oldLinkBox && oldLinkBox.getAttribute('onclick') && oldLinkBox.getAttribute('onclick').includes('window.open')) {
-                        let match = oldLinkBox.getAttribute('onclick').match(/window\.open\('([^']+)'/);
-                        if (match && match[1]) {
-                            oldLinkBox.removeAttribute('onclick'); let parentBox = oldLinkBox.closest('.action-box');
-                            parentBox.setAttribute('data-href', match[1]); parentBox.setAttribute('onclick', 'openStoredLink(this, event)');
-                            oldLinkBox.style.pointerEvents = 'none';
+                    // 清理舊的 action-dash-box
+                    let dashBox = rightGroup.querySelector('.action-dash-box');
+                    if (dashBox) {
+                        while(dashBox.firstChild) rightGroup.appendChild(dashBox.firstChild);
+                        dashBox.remove();
+                    }
+
+                    let linkBox = rightGroup.querySelector('.link-box');
+                    if (linkBox && linkBox.classList.contains('has-link')) {
+                        let span = linkBox.querySelector('span');
+                        if (span && span.getAttribute('onclick') && span.getAttribute('onclick').includes('window.open')) {
+                            let match = span.getAttribute('onclick').match(/window\.open\('([^']+)'/);
+                            if (match && match[1]) {
+                                linkBox.setAttribute('data-href', match[1]); linkBox.setAttribute('onclick', 'openStoredLink(this, event)');
+                                span.removeAttribute('onclick'); span.style.pointerEvents = 'none';
+                            }
                         }
                     }
                 });
@@ -964,7 +922,7 @@
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
-                setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } 
+                setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); } 
                 isInitializing = false; 
                 
                 if (!hasShownStartupToast && lastCloudModifiedTime > 0) {
@@ -1009,7 +967,7 @@
             if(!container) { 
                 container = document.createElement('div'); 
                 container.className = 'sub-items-container'; 
-                timelineItem.appendChild(container); 
+                timelineItem.querySelector('.content-box').appendChild(container); 
             }
             
             let sub = document.createElement('div');
@@ -1023,7 +981,7 @@
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
                 </div>
-                <div class="right-action-group" style="flex-direction:row; margin-left:auto; gap:4px; align-items:center;">
+                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:4px; align-items:center;">
                     <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">image</span></div>
                     <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--danger-color);">close</span></div>
                 </div>
@@ -1061,56 +1019,50 @@
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
-                    <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
-                        <div class="left-actions" style="display:flex; gap:4px; align-items:center; flex-wrap:wrap;">
-                            <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:14px;">place</span></button>
-                            <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:var(--primary-color);"><span class="material-icons-round" style="font-size:14px;">add_location_alt</span></button>
-                            <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
-                        </div>
-                        <div class="right-actions" style="display:flex; gap:4px; align-items:center;">
-                            <div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div>
-                            <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div>
-                            <div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div>
-                        </div>
+                    <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center;">
+                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:16px;">place</span></button>
+                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add_location_alt</span></button>
+                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
                     </div>
                 </div>
+                <div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
         }
 
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div><div class="action-row" style="margin-top:2px; display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:flex-end; width:100%;"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
 
         function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="action-row" style="display:flex; gap:4px; align-items:center; justify-content:flex-end;"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: 800; font-size: 14px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:4px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 8px; width: fit-content; padding: 4px 10px; border-radius: 50px;"><span class="material-icons-round" style="font-size:12px;">place</span> 導航至飯店</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group" style="flex-direction:row;"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: 800; font-size: 14px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 50px;"><span class="material-icons-round" style="font-size:12px;">place</span> 導航至飯店</button>`;
             container.appendChild(div); saveData();
         }
 
         function addGeneralItemWithNote(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div><div class="action-row" style="margin-top:2px; display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:flex-end; width:100%;"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             document.getElementById('shopping-list').appendChild(newItem); saveData();
         }
 
         function addTodoItemToContainer(containerId) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div><div class="action-row" style="margin-top:2px; display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:flex-end; width:100%;"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             document.getElementById(containerId).appendChild(newItem); saveData();
         }
 
         function addTodoCategory(btnElement) {
             const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
-            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div class="action-row" style="display:flex; gap:4px; align-items:center;"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color); background:transparent;"><span class="material-icons-round" style="font-size:16px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)" style="background:transparent; border:none;"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
+            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div class="right-action-group" style="flex-direction:row; gap:4px;"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; background:transparent;"><span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)" style="border:none; background:transparent;"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div>`;
             btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
         }
 
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
@@ -1187,8 +1139,8 @@
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"></div>`; 
                         saveData(); isImageProcessing = false;
-                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
-                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
+                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
+                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
             }
         }
 
@@ -1248,7 +1200,17 @@
         function addNewTodoPerson() { let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return; if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; } let currentTemplateName = document.getElementById('todo-person-select').value; let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`); let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none'; newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed')); document.getElementById('person-todo-container').appendChild(newList); let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); }
         function deleteTodoPerson() { let select = document.getElementById('todo-person-select'); let personName = select.value; if (personName === '預設範本') { alert('「預設範本」無法被刪除喔！'); return; } if (confirm(`確定要刪除人員「${personName}」的所有清單嗎？`)) { Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); }); let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove(); select.value = '預設範本'; switchTodoPerson('預設範本'); } }
         
-        function toggleTransportMode(iconEl, event) { event.stopPropagation(); let modes = ['directions_transit', 'directions_walk', 'directions_car']; let current = iconEl.innerText.trim(); iconEl.innerText = modes[(modes.indexOf(current) + 1) % modes.length]; let card = iconEl.closest('.day-card'); if(card) recalculateDayTime(card); saveData(); }
+        function toggleTransportMode(iconEl, event) { 
+            event.stopPropagation(); 
+            // 🌟 交通切換陣列加入飛機與機車
+            let modes = ['directions_transit', 'flight', 'two_wheeler', 'directions_walk', 'directions_car']; 
+            let current = iconEl.innerText.trim(); 
+            let nextIndex = (modes.indexOf(current) + 1) % modes.length;
+            iconEl.innerText = modes[nextIndex >= 0 ? nextIndex : 0]; 
+            let card = iconEl.closest('.day-card'); 
+            if(card) recalculateDayTime(card); 
+            saveData(); 
+        }
         
         function recalculateDayTime(dayCardElement) {
             let items = dayCardElement.querySelectorAll('.timeline-item'); if (items.length === 0) return;
@@ -1308,7 +1270,17 @@
             let origin = ''; let dest = title; let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
             if (match) { origin = match[1].trim(); dest = match[2].trim(); } 
             else { let prevItem = currentItem.previousElementSibling; while(prevItem && !prevItem.classList.contains('timeline-item')) { prevItem = prevItem.previousElementSibling; } if (prevItem && prevItem.querySelector('.item-name-target')) { let prevTitle = prevItem.querySelector('.item-name-target').innerText.trim(); let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i); origin = prevMatch ? prevMatch[2].trim() : prevTitle; } }
-            let mode = 'transit'; let iconEl = currentItem.querySelector('.transport-icon'); if (iconEl) { let t = iconEl.innerText.trim(); if (t === 'directions_walk') mode = 'walking'; if (t === 'directions_car') mode = 'driving'; }
+            
+            let mode = 'transit'; 
+            let iconEl = currentItem.querySelector('.transport-icon'); 
+            if (iconEl) { 
+                let t = iconEl.innerText.trim(); 
+                if (t === 'directions_walk') mode = 'walking'; 
+                if (t === 'directions_car') mode = 'driving'; 
+                if (t === 'two_wheeler') mode = 'driving'; // Google maps 導航機車可直接代入 driving 路線
+                if (t === 'flight') mode = 'transit'; // Google maps 導航無 flight 參數，改用 transit
+            }
+            
             let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`; if (origin && origin !== '輸入行程名稱') mapUrl += `&origin=${encodeURIComponent(origin)}`;
             
             let a = document.createElement('a'); a.href = mapUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
