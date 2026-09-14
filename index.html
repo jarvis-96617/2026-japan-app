@@ -35,8 +35,13 @@
 
         #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e4e4e7 0%, #d4d4d8 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
         #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.6; filter: grayscale(50%); }
-        #splash-screen .splash-text { position: absolute; bottom: 10%; z-index: 10; background: rgba(255,255,255,0.9); padding: 12px 30px; border-radius: 50px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); text-align: center; backdrop-filter: blur(10px); }
-        #splash-screen h2 { color: #3f3f46; font-size: 20px; margin-bottom: 2px; font-weight: 800;} #splash-screen p { color: #71717a; font-size: 12px; font-weight: 700; }
+        #splash-screen .splash-text { position: absolute; bottom: 10%; z-index: 10; background: rgba(255,255,255,0.9); padding: 16px 30px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); text-align: center; backdrop-filter: blur(10px); width: 220px; }
+        #splash-screen h2 { color: #3f3f46; font-size: 18px; margin-bottom: 6px; font-weight: 800;} 
+        #splash-screen p { color: #71717a; font-size: 11px; font-weight: 700; margin-bottom: 8px;}
+        
+        /* 🌟 新增進度條樣式 */
+        .progress-container { width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-bar { width: 0%; height: 100%; background: var(--primary-color); border-radius: 10px; transition: width 0.4s ease; }
 
         .hero { background: linear-gradient(to bottom, rgba(39,39,42,0.3), rgba(39,39,42,0.85)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 120px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); border-radius: 0 0 24px 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); margin-bottom: 6px; overflow: hidden;}
         .hero h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.4); } .hero p { font-size: 11px; opacity: 0.9; font-weight: 600;}
@@ -60,7 +65,6 @@
         .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🌟 重點：恢復 flex-wrap: nowrap 讓右側按鈕不會被擠下去 */
         .timeline-item { display: flex; flex-wrap: nowrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
         body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.4; filter: grayscale(100%);}
@@ -90,7 +94,9 @@
         /* 🌟 中間：內容與按鈕區塊 */
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 2px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
-        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 4px; color: #52525b; width: 100%; word-break: break-word; line-height: 1.4; transition: 0.3s;} body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,0.1); }
+        
+        /* 🌟 修正疊圖問題：加入 min-height 與 word-break: break-all */
+        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 6px; color: #52525b; width: 100%; word-break: break-all; min-height: 18px; line-height: 1.4; transition: 0.3s;} body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,0.1); }
         .action-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-top: 2px;}
         
         select, input { transition: 0.3s var(--spring); } body.dark-mode select, body.dark-mode input { background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;}
@@ -191,7 +197,10 @@
         <img id="splash-bg-img" src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
         <div class="splash-text">
             <h2>2026 古京阪之旅</h2>
-            <p>行程載入中...</p>
+            <p id="splash-msg">行程載入中...</p>
+            <div class="progress-container">
+                <div id="splash-progress" class="progress-bar"></div>
+            </div>
         </div>
     </div>
     <div id="mobile-tooltip"></div>
@@ -216,6 +225,7 @@
         let lastCloudModifiedTime = 0;
         let hasShownStartupToast = false;
         let needsSaveAfterFetch = false;
+        let allRatesToTWD = {}; /* 🌟 修正：補上全域匯率變數宣告，避免 ReferenceError */
         window.sortableInstances = [];
         
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
@@ -228,6 +238,14 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
         const TAB_PASSWORD = "0719"; 
+
+        /* 🌟 更新進度條 UI 的輔助函數 */
+        function updateProgress(percent, msg) {
+            let pBar = document.getElementById('splash-progress');
+            let pMsg = document.getElementById('splash-msg');
+            if (pBar) pBar.style.width = percent + '%';
+            if (pMsg && msg) pMsg.innerText = msg;
+        }
 
         function parseMins(str) {
             if (!str) return 0;
@@ -446,7 +464,7 @@
                 if (rawData && rawData.isCompressed && rawData.data) {
                     if (rawData.data !== lastCloudDataHash) {
                         isAppReady = false; const splash = document.getElementById('splash-screen');
-                        if (splash) { let msgEl = splash.querySelector('.splash-text p'); if(msgEl) msgEl.innerText = '載入最新資料...'; splash.style.display = 'flex'; splash.style.opacity = '1'; }
+                        if (splash) { updateProgress(50, '載入最新資料...'); splash.style.display = 'flex'; splash.style.opacity = '1'; }
                         lastCloudDataHash = rawData.data; let state = null;
                         try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
                         if(state && state.html) {
@@ -495,7 +513,6 @@
         </div>
     </div>
 
-    <!-- 控制列 -->
     <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 8px 12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
             <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;">
@@ -726,18 +743,24 @@
             }, isManual ? 0 : 1500); 
         }
 
+        /* 🌟 修正載入函數並綁定進度條 */
         function loadData() {
+            updateProgress(20, '初始化系統環境...');
             let isLoaded = false;
             const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 20000);
             const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 22000);
 
             if (typeof LZString === 'undefined') return;
+            
+            updateProgress(40, '載入本機快取...');
             const template = document.getElementById('default-template'); if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
             const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal'); if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
             if(!API_URL.startsWith("https://script.google.com")) { if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '本機模式', true); } return; }
             
+            updateProgress(60, '正在與雲端同步資料...');
             fetch(API_URL).then(res => res.json()).then(rawData => {
                 if(isLoaded) return; isLoaded = true; clearTimeout(fallbackTimeout);
+                updateProgress(80, '解析雲端資料...');
                 let state = rawData;
                 if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') { try { lastCloudDataHash = rawData.data; state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {} }
                 if (state && state.html) {
@@ -752,6 +775,7 @@
         }
 
         function loadFromLocal() {
+            updateProgress(80, '套用本機備份...');
             const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
             if (saved) {
                 let state = null;
@@ -781,6 +805,7 @@
         }
 
         function finalizeLoad() {
+            updateProgress(100, '準備就緒！');
             isInitializing = true; 
             try {
                 let shoppingList = document.getElementById('shopping-list');
@@ -804,7 +829,6 @@
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
                     let contentBox = item.querySelector('.content-box');
                     
-                    // 🌟 自動相容轉換：確保右側按鈕變回原本的三欄直向排列
                     let rightGroup = Array.from(item.children).find(c => c.classList && c.classList.contains('right-action-group'));
                     if (!rightGroup) {
                         rightGroup = document.createElement('div');
@@ -816,7 +840,6 @@
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
                         
-                        // 處理之前被塞進行內的按鈕，把它們拔出來放回最右邊直列
                         if (actionRow) {
                             let linkBox = actionRow.querySelector('.link-box');
                             let photoBox = actionRow.querySelector('.photo-box');
@@ -830,7 +853,6 @@
                                 rightGroup.appendChild(delBox);
                             }
                             
-                            // 恢復左側按鈕區塊
                             let leftActionsWrap = actionRow.querySelector('.left-actions');
                             if (leftActionsWrap) {
                                 while(leftActionsWrap.firstChild) actionRow.appendChild(leftActionsWrap.firstChild);
@@ -855,7 +877,6 @@
                         if (subCont && subCont.parentNode !== contentBox) { contentBox.appendChild(subCont); }
                     }
 
-                    // 清理舊的 action-dash-box
                     let dashBox = rightGroup.querySelector('.action-dash-box');
                     if (dashBox) {
                         while(dashBox.firstChild) rightGroup.appendChild(dashBox.firstChild);
@@ -1202,7 +1223,6 @@
         
         function toggleTransportMode(iconEl, event) { 
             event.stopPropagation(); 
-            // 🌟 交通切換陣列加入飛機與機車
             let modes = ['directions_transit', 'flight', 'two_wheeler', 'directions_walk', 'directions_car']; 
             let current = iconEl.innerText.trim(); 
             let nextIndex = (modes.indexOf(current) + 1) % modes.length;
@@ -1277,8 +1297,8 @@
                 let t = iconEl.innerText.trim(); 
                 if (t === 'directions_walk') mode = 'walking'; 
                 if (t === 'directions_car') mode = 'driving'; 
-                if (t === 'two_wheeler') mode = 'driving'; // Google maps 導航機車可直接代入 driving 路線
-                if (t === 'flight') mode = 'transit'; // Google maps 導航無 flight 參數，改用 transit
+                if (t === 'two_wheeler') mode = 'driving'; 
+                if (t === 'flight') mode = 'transit'; 
             }
             
             let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`; if (origin && origin !== '輸入行程名稱') mapUrl += `&origin=${encodeURIComponent(origin)}`;
