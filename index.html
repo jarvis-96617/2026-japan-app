@@ -632,10 +632,11 @@
             }, isManual ? 0 : 1500); 
         }
 
-        function loadData() {
+ function loadData() {
             let isLoaded = false;
-            const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 10000);
-            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 12000);
+            // 🌟 升級：把耐心從 10 秒 (10000) 延長到 20 秒 (20000)，適應手機網路與 Google 伺服器休眠
+            const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 20000);
+            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 22000);
 
             if (typeof LZString === 'undefined') return;
             const template = document.getElementById('default-template'); if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
