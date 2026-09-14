@@ -18,119 +18,130 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
     <style>
+        /* 🌟 全局設計語彙定義：加入果凍回彈參數 var(--spring) */
         :root {
-            --bg-color: #f4f7f6; --primary-color: #4a6fa5; --text-main: #333333; --text-muted: #888888;
-            --glass-bg: rgba(255, 255, 255, 0.75); --glass-border: rgba(255, 255, 255, 0.4);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.05); --safe-bottom: env(safe-area-inset-bottom, 20px); --danger-color: #e57373;
+            --bg-color: #f2f5f8; --primary-color: #4a6fa5; --text-main: #2d3748; --text-muted: #718096;
+            --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.8);
+            --shadow: 0 16px 40px rgba(0, 0, 0, 0.06); --safe-bottom: env(safe-area-inset-bottom, 20px); --danger-color: #e53e3e;
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         body.dark-mode {
-            --bg-color: #121212; --primary-color: #7ba3d8; --text-main: #e0e0e0; --text-muted: #aaaaaa;
-            --glass-bg: rgba(30, 30, 30, 0.85); --glass-border: rgba(255, 255, 255, 0.1);
+            --bg-color: #111827; --primary-color: #60a5fa; --text-main: #f3f4f6; --text-muted: #9ca3af;
+            --glass-bg: rgba(30, 41, 59, 0.7); --glass-border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(85px + var(--safe-bottom)); overflow-x: hidden; transition: 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(95px + var(--safe-bottom)); overflow-x: hidden; transition: 0.4s var(--spring); }
 
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #eef2f5 0%, #d4e0eb 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.3s ease; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #eef2f5 0%, #d4e0eb 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
         #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.85; }
-        #splash-screen .splash-text { position: absolute; bottom: 12%; z-index: 10; background: rgba(255,255,255,0.9); padding: 15px 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: center; }
-        #splash-screen h2 { color: #4a6fa5; font-size: 26px; margin-bottom: 8px;} #splash-screen p { color: #555; font-size: 14px; font-weight: bold; }
+        #splash-screen .splash-text { position: absolute; bottom: 12%; z-index: 10; background: rgba(255,255,255,0.95); padding: 15px 35px; border-radius: 50px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); text-align: center; backdrop-filter: blur(10px); }
+        #splash-screen h2 { color: #4a6fa5; font-size: 22px; margin-bottom: 4px; font-weight: 800;} #splash-screen p { color: #555; font-size: 13px; font-weight: bold; }
 
-        .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 130px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 15px 20px; padding-top: max(20px, env(safe-area-inset-top)); }
-        .hero h1 { font-size: 22px; font-weight: 700; margin-bottom: 5px; } .hero p { font-size: 13px; opacity: 0.9; }
-        .hero .editable { padding: 2px 6px; margin-left: -6px; border-radius: 6px; transition: background 0.2s; width: fit-content; max-width: 100%; }
-        .hero .editable:focus { background: rgba(255, 255, 255, 0.2); outline: none; }
+        /* 🌟 頂部 Hero 圖片改為超大圓角底 */
+        .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 140px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); border-radius: 0 0 36px 36px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 8px; overflow: hidden;}
+        .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); } .hero p { font-size: 13px; opacity: 0.95; font-weight: 500;}
+        .hero .editable { padding: 4px 8px; margin-left: -8px; border-radius: 12px; transition: background 0.3s; width: fit-content; max-width: 100%; }
+        .hero .editable:focus { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); outline: none; }
 
-        .global-controls { display: flex; flex-direction: column; align-items: stretch; padding: 8px 15px 6px 15px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 0px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 5px rgba(0,0,0,0.05); transition: 0.3s; }
-        body.dark-mode .global-controls { background: rgba(18, 18, 18, 0.95); }
+        /* 🌟 控制列：改為懸浮果凍膠囊 (Dynamic Island 風格) */
+        .global-controls { display: flex; flex-direction: column; align-items: stretch; padding: 12px 16px; background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); margin: 12px 15px; position: sticky; top: 12px; z-index: 30; box-shadow: 0 12px 32px rgba(0,0,0,0.08), inset 0 0 0 1px var(--glass-border); border-radius: 36px; transition: all 0.4s var(--spring); }
         .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .manual-save-btn { background: var(--primary-color); color: white; border: none; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; white-space: nowrap; flex-shrink: 0; padding: 6px 10px; user-select: none !important; touch-action: manipulation; }
-        .manual-save-btn * { pointer-events: none; } .manual-save-btn:active { transform: scale(0.92); }
-        #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 6px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap;}
+        /* 🌟 所有按鈕升級為極致圓角 (Pill-shape) 與果凍點擊特效 */
+        .manual-save-btn { background: var(--primary-color); color: white; border: none; border-radius: 50px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s var(--spring); white-space: nowrap; flex-shrink: 0; padding: 8px 14px; user-select: none !important; touch-action: manipulation; }
+        .manual-save-btn * { pointer-events: none; } 
+        .manual-save-btn:active, .add-btn:active, .btn-nav:active, .action-box:active, .day-tab:active, .receipt-box:active { transform: scale(0.9); }
+        
+        #mobile-tooltip { display: none; position: fixed; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 12px; padding: 8px 14px; border-radius: 50px; z-index: 9999; pointer-events: none; opacity: 0; transition: 0.3s var(--spring); box-shadow: 0 8px 24px rgba(0,0,0,0.2); white-space: nowrap; font-weight: bold;}
         body.dark-mode #mobile-tooltip { background: rgba(255, 255, 255, 0.95); color: #121212; }
 
         .container { padding: 0 15px; }
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px; margin-bottom: 16px; box-shadow: var(--shadow); transition: 0.3s; }
-        .section-title { font-size: 18px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;}
-        .editable { padding: 2px 4px; border-radius: 4px; transition: background 0.2s; min-height: 1.2em; }
-        .editable:focus { background: rgba(0,0,0,0.05); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
+        /* 🌟 卡片升級：大圓角、深層霧化 */
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); border-radius: 32px; padding: 18px 16px; margin-bottom: 20px; box-shadow: var(--shadow); transition: all 0.4s var(--spring); }
+        .section-title { font-size: 19px; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 8px; margin-bottom: 12px;}
+        .editable { padding: 4px 6px; border-radius: 8px; transition: background 0.3s var(--spring); min-height: 1.2em; margin-left: -4px;}
+        .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        .timeline-item { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 4px 10px 0; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
-        body.dark-mode .timeline-item { border-bottom-color: #333; }
-        .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.35; }
-        #tab-transport .timeline-item { padding: 6px 4px 6px 0; } #tab-transport .item-title { font-size: 14px; margin-bottom: 2px; line-height: 1.2;}
-        #tab-todo .timeline-item, #tab-shopping .timeline-item { padding: 4px 4px 4px 0; }
+        .timeline-item { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 14px 4px 14px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: flex-start; transition: all 0.3s var(--spring);}
+        body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
+        .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.4; }
+        #tab-transport .timeline-item { padding: 8px 4px 8px 0; } #tab-transport .item-title { font-size: 15px; margin-bottom: 2px; line-height: 1.2;}
+        #tab-todo .timeline-item, #tab-shopping .timeline-item { padding: 6px 4px 6px 0; }
         
-        .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px;}
-        body.dark-mode .todo-category-header { color: #ddd; border-bottom-color: #444; }
+        .todo-category-header { font-size: 15px; font-weight: 800; color: #4a5568; margin: 12px 0 6px; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 4px;}
+        body.dark-mode .todo-category-header { color: #e2e8f0; border-bottom-color: rgba(255,255,255,0.05); }
         .checkbox-wrapper { flex-shrink: 0; padding-top: 2px; }
-        .custom-checkbox { width: 20px; height: 20px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
-        .completed .custom-checkbox { background: var(--primary-color); } .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 13px; }
+        .custom-checkbox { width: 22px; height: 22px; border: 2.5px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s var(--spring); }
+        .completed .custom-checkbox { background: var(--primary-color); transform: scale(1.1); } .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 14px; font-weight: bold;}
         
-        .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; } body.dark-mode .sortable-ghost { background-color: #333 !important; }
-        .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; } body.dark-mode .sortable-drag { background-color: #1e1e1e !important; }
+        .sortable-ghost { opacity: 0.4; background-color: rgba(0,0,0,0.03) !important; border-radius: 16px; } body.dark-mode .sortable-ghost { background-color: rgba(255,255,255,0.05) !important; }
+        .sortable-drag { background-color: var(--glass-bg) !important; backdrop-filter: blur(20px); box-shadow: 0 16px 40px rgba(0,0,0,0.15) !important; transform: scale(1.03); z-index: 1000; border-radius: 20px; border: 1px solid var(--glass-border); } body.dark-mode .sortable-drag { background-color: #1e293b !important; }
         #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 24px !important; }
         
-        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 22px; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
+        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 26px; transform: translateY(-50%); color: #cbd5e1; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
         
-        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 46px; flex-shrink: 0; }
-        .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); margin-bottom: 3px; line-height: 1; }
-        .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; } body.dark-mode .duration-wrap { background: #2a2a2a; border-color: #444; color: #aaa; }
-        .duration { font-weight: bold; color: var(--primary-color); min-width: 14px; display: inline-block; text-align: center; } .end-time { font-size: 11px; color: #aaa; font-weight: 500; line-height: 1; }
-        .auto-start { font-size: 10px; color: #888; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 10px; color: #ba68c8; font-weight: bold; line-height: 1.2; text-align: center; background: #f3e5f5; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(186, 104, 200, 0.15); color: #ce93d8; }
+        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
+        .start-time { font-weight: 800; font-size: 16px; color: var(--primary-color); margin-bottom: 4px; line-height: 1; }
+        .duration-wrap { font-size: 10px; font-weight: 700; color: #64748b; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 50px; margin-bottom: 4px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); color: #94a3b8; }
+        .duration { font-weight: 800; color: var(--primary-color); min-width: 14px; display: inline-block; text-align: center; } .end-time { font-size: 12px; color: #94a3b8; font-weight: 700; line-height: 1; }
+        .auto-start { font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 8px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 11px; color: #9f7aea; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(159, 122, 234, 0.1); padding: 4px 8px; border-radius: 50px; margin-top: 4px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(159, 122, 234, 0.15); color: #d6bcfa; }
 
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px;}
-        .item-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
-        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid #ccc; font-size: 12px; margin-bottom: 2px; color: #666; width: 100%; word-break: break-word; line-height: 1.4; transition: 0.3s;} body.dark-mode .item-note { color: #aaa; border-left-color: #555; }
+        .item-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
+        .item-note { display: block; background: transparent; padding: 0 0 0 8px; border-left: 3px solid rgba(0,0,0,0.1); font-size: 13px; margin-bottom: 4px; color: #4a5568; width: 100%; word-break: break-word; line-height: 1.5; transition: 0.3s;} body.dark-mode .item-note { color: #cbd5e1; border-left-color: rgba(255,255,255,0.1); }
         
-        select, input { transition: 0.3s; } body.dark-mode select, body.dark-mode input { background: #2a2a2a; color: #e0e0e0; border: 1px solid #444;}
-        .luggage-select { font-size: 11px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: white; margin-right: 5px; cursor: pointer; font-weight: bold; outline: none; transition: 0.2s;}
+        select, input { transition: 0.3s var(--spring); } body.dark-mode select, body.dark-mode input { background: #1e293b; color: #f8fafc; border: 1px solid #334155;}
+        .luggage-select { font-size: 12px; padding: 4px 8px; border-radius: 50px; border: 1.5px solid var(--primary-color); color: var(--primary-color); background: rgba(255,255,255,0.5); margin-right: 5px; cursor: pointer; font-weight: 800; outline: none; transition: 0.3s var(--spring);}
         
-        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px 10px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 45px; z-index: 15; background: var(--bg-color); transition: 0.3s; } .day-tabs-wrapper::-webkit-scrollbar { display: none; }
-        .day-tab { flex: 0 0 auto; width: 52px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: 0.3s; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.05); } .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74, 111, 165, 0.3); } .day-tab .day-num { font-size: 16px; font-weight: 700; line-height: 1.1; } .day-tab .day-date { font-size: 10px; opacity: 0.85; margin-top: 2px; font-weight: 500; }
+        .day-tabs-wrapper { display: flex; overflow-x: auto; gap: 10px; padding: 10px 15px 15px 15px; margin-left: -15px; margin-right: -15px; margin-bottom: 4px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; position: sticky; top: 76px; z-index: 15; background: var(--bg-color); transition: 0.3s; } .day-tabs-wrapper::-webkit-scrollbar { display: none; }
+        .day-tab { flex: 0 0 auto; width: 56px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; cursor: pointer; transition: all 0.4s var(--spring); scroll-snap-align: start; box-shadow: 0 4px 12px rgba(0,0,0,0.04); } .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-4px); box-shadow: 0 8px 20px rgba(74, 111, 165, 0.3); } .day-tab .day-num { font-size: 18px; font-weight: 800; line-height: 1.1; } .day-tab .day-date { font-size: 11px; opacity: 0.9; margin-top: 2px; font-weight: 600; }
 
-        .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; white-space: nowrap; } .btn-nav:active { transform: scale(0.95); } .btn-circle { width: 30px; height: 30px; padding: 0; border-radius: 50%; gap: 0; }
-        .travel-time-wrap { font-size:11px; color:#555; background:#f0f0f0; padding:3px 8px 3px 4px; border-radius:15px; display:inline-flex; align-items:center; gap:4px; border: 1px solid #e0e0e0; white-space: nowrap; flex-shrink: 0; height: 30px; box-sizing: border-box;} body.dark-mode .travel-time-wrap { background: #2a2a2a; border-color: #444; color: #ccc;}
-        .transport-icon { font-size: 15px !important; background: #ffffff; color: var(--primary-color); border: 1px solid #4a6fa5; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;} body.dark-mode .transport-icon { background: #1e1e1e; border-color: var(--primary-color);}
+        .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 8px 16px; border-radius: 50px; font-size: 13px; font-weight: 800; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 4px 12px rgba(74, 111, 165, 0.2); transition: all 0.3s var(--spring); white-space: nowrap; } .btn-circle { width: 34px; height: 34px; padding: 0; }
+        .travel-time-wrap { font-size:12px; font-weight: 700; color:#4a5568; background:rgba(0,0,0,0.04); padding:4px 10px 4px 4px; border-radius:50px; display:inline-flex; align-items:center; gap:6px; white-space: nowrap; flex-shrink: 0; height: 34px; box-sizing: border-box;} body.dark-mode .travel-time-wrap { background: rgba(255,255,255,0.05); color: #cbd5e1;}
+        .transport-icon { font-size: 16px !important; background: #ffffff; color: var(--primary-color); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.3s var(--spring);} body.dark-mode .transport-icon { background: #1e293b; }
         
-        .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px; transition: 0.3s;} body.dark-mode .add-btn { background: rgba(74, 111, 165, 0.2); color: #90caf9;}
+        .add-btn { width: 100%; padding: 14px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 50px; font-weight: 800; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 10px; margin-bottom: 5px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(74, 111, 165, 0.2); color: #93c5fd;}
         
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 2px; } 
-        .action-dash-box { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0; border: none; background: transparent; } 
+        .right-action-group { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; margin-left: 4px; } 
+        .action-dash-box { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; border: none; background: transparent; } 
         
-        .action-box { width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 6px; transition: 0.2s; background: #f8f9fa; border: 1px solid #e0e0e0; position: relative; user-select: none; } 
-        body.dark-mode .action-box { background: #333; border-color: #444; } 
-        .action-box:active { transform: scale(0.9); } 
-        .action-box.has-link { background: #e3f2fd; border-color: #bbdefb; } 
-        body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; } 
-        .action-box.has-photo { border: none; background: transparent; }
+        .action-box { width: 30px; height: 30px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 12px; transition: all 0.3s var(--spring); background: rgba(0,0,0,0.03); position: relative; user-select: none; } 
+        body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
+        .action-box.has-link { background: #e0f2fe; color: #0284c7; } 
+        body.dark-mode .action-box.has-link { background: rgba(2, 132, 199, 0.2); color: #38bdf8; } 
+        .action-box.has-photo { background: transparent; }
         
-        .img-delete-badge { position: absolute; top: -6px; right: -6px; background: var(--danger-color); color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10; cursor: pointer; pointer-events: auto; }
+        .img-delete-badge { position: absolute; top: -6px; right: -6px; background: var(--danger-color); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.3s var(--spring);}
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 4px; padding-left: 36px; padding-right: 0px; box-sizing: border-box; }
-        .sub-item { display: flex; align-items: stretch; gap: 6px; padding: 6px 6px 6px 20px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 3px solid #0284c7; transition: 0.2s; position: relative; width: 100%; box-sizing: border-box; }
-        body.dark-mode .sub-item { background: rgba(255,255,255,0.05); }
-        .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #cfcfcf; font-size: 13px; letter-spacing: -1px; pointer-events: none; }
-        .sub-item-title { font-size: 13px; font-weight: bold; flex-grow: 1; outline: none; }
-        .sub-item-note { font-size: 11px; color: #666; margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
-        body.dark-mode .sub-item-note { color: #aaa; }
-        .sub-item .action-box { width: 24px; height: 24px; border: 1px solid #e0e0e0; background: rgba(255,255,255,0.8); }
-        body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); border-color: #444; }
+        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 6px; padding-left: 38px; padding-right: 0px; box-sizing: border-box; }
+        .sub-item { display: flex; align-items: stretch; gap: 8px; padding: 8px 8px 8px 22px; background: rgba(0,0,0,0.02); border-radius: 20px; border-left: 4px solid #38bdf8; transition: all 0.4s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
+        body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: #0284c7;}
+        .sub-item::before { content: '⋮⋮'; position: absolute; left: 6px; top: 20px; transform: translateY(-50%); color: #cbd5e1; font-size: 14px; letter-spacing: -1px; pointer-events: none; }
+        .sub-item-title { font-size: 14px; font-weight: 800; flex-grow: 1; outline: none; color: #334155;} body.dark-mode .sub-item-title{color: #f1f5f9;}
+        .sub-item-note { font-size: 12px; font-weight: 500; color: #64748b; margin-top: 4px; display: block; outline: none; line-height: 1.5; word-break: break-word;}
+        body.dark-mode .sub-item-note { color: #94a3b8; }
+        .sub-item .action-box { width: 26px; height: 26px; background: rgba(255,255,255,0.8); border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);}
+        body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); }
 
-        #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;} #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; } body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;} #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;} body.dark-mode #budget-table td { border-bottom-color: #333; }
-        #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } #budget-table th:nth-child(2) { width: 10%; } #budget-table th:nth-child(3) { width: 10%; } #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 4px;} #budget-table th:nth-child(5) { width: 8%; } #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
+        #budget-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; table-layout: fixed; word-break: break-word; margin-bottom: 8px;} #budget-table th { padding: 4px 0px; font-size: 11px; color: #64748b; text-align: center; font-weight: 800; transition: 0.3s; position: relative; } body.dark-mode #budget-table th { color: #94a3b8; } #budget-table td { padding: 8px 0px; font-size: 13px; font-weight: 600; text-align: center; vertical-align: middle; transition: 0.3s; background: rgba(0,0,0,0.02);} body.dark-mode #budget-table td { background: rgba(255,255,255,0.03); }
+        #budget-table td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; } #budget-table td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+        #budget-table th:nth-child(1) { width: 40%; text-align: left; padding-left: 8px; } #budget-table th:nth-child(2) { width: 12%; } #budget-table th:nth-child(3) { width: 10%; } #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 8px;} #budget-table th:nth-child(5) { width: 8%; } #budget-table td:nth-child(1) { text-align: left; padding-left: 8px; } #budget-table td:nth-child(4) { text-align: right; padding-right: 8px; }
 
-        .resizer { position: absolute; top: 0; right: -8px; width: 16px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(180, 180, 180, 0.4); border-radius: 2px; transition: 0.2s; } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 5px rgba(74, 111, 165, 0.5); }
-        .amount-input { width: 72%; box-sizing: border-box; font-size: 13px; text-align: right; border: none; background: transparent; color: var(--primary-color); font-weight: bold; padding: 2px 0; display: inline-block;} .curr-select { width: 28%; font-size: 11px; padding: 0px; box-sizing: border-box; text-align: left; text-align-last: left; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit; display: inline-block; font-weight: bold;} .payer-select, .split-select { font-size: 11px; padding: 0px; max-width: 100%; width: 100%; box-sizing: border-box; text-align: center; text-align-last: center; border: none; background: transparent; appearance: none; -webkit-appearance: none; color: inherit; font-family: inherit;}
-        .payer-tag { display: inline-flex; align-items: center; background: #eef2f5; color: var(--primary-color); padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 0px; transition: 0.3s;} body.dark-mode .payer-tag { background: #333; color: #90caf9;}
-        .receipt-box { width: 26px; height: 26px; border: 1px dashed #ccc; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: #fafafa; transition: 0.2s; margin: 0 auto; flex-shrink: 0;} body.dark-mode .receipt-box { background: #222; border-color: #555; } .receipt-thumb-wrap { position: relative; width: 26px; height: 26px; margin: 0 auto; flex-shrink: 0;} .receipt-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .resizer { position: absolute; top: 0; right: -8px; width: 16px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 3px; height: 40%; background: rgba(0, 0, 0, 0.1); border-radius: 4px; transition: 0.2s var(--spring); } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 5px; box-shadow: 0 0 8px rgba(74, 111, 165, 0.4); }
+        .amount-input, .curr-select, .payer-select, .split-select { background: rgba(0,0,0,0.04); border-radius: 50px; padding: 6px 10px; font-family: inherit; font-weight: 800; border: none; outline: none; appearance: none; -webkit-appearance: none; transition: all 0.3s var(--spring); text-align: center; text-align-last: center;} 
+        .amount-input { width: 68%; font-size: 14px; text-align: right; color: var(--primary-color); background: transparent; padding: 4px 0;} .curr-select { width: 32%; font-size: 11px; padding: 4px 6px; text-align: left; text-align-last: left; }
+        .payer-select, .split-select { font-size: 12px; padding: 6px 4px; width: 100%; box-sizing: border-box; }
+        body.dark-mode .amount-input, body.dark-mode .curr-select, body.dark-mode .payer-select, body.dark-mode .split-select { background: rgba(255,255,255,0.06); color: #f8fafc;} body.dark-mode .amount-input { background: transparent; color: #93c5fd; }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;} body.dark-mode .bottom-nav { background: rgba(30,30,30,0.85); border-top-color: #444; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; } .nav-item.active { color: var(--primary-color); font-weight: 700; transform: translateY(-2px); } .nav-item .material-icons-round { font-size: 24px; margin-bottom: 2px; }
-        .tab-content { display: none; animation: fadeIn 0.3s; position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .payer-tag { display: inline-flex; align-items: center; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); padding: 6px 12px; border-radius: 50px; font-size: 13px; font-weight: 800; margin-bottom: 0px; transition: 0.3s;} body.dark-mode .payer-tag { background: rgba(96, 165, 250, 0.15); color: #93c5fd;}
+        .receipt-box { width: 28px; height: 28px; border-radius: 10px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; background: rgba(0,0,0,0.04); transition: 0.3s var(--spring); margin: 0 auto; flex-shrink: 0;} body.dark-mode .receipt-box { background: rgba(255,255,255,0.06); } .receipt-thumb-wrap { position: relative; width: 28px; height: 28px; margin: 0 auto; flex-shrink: 0;} .receipt-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -10px 40px rgba(0,0,0,0.06); border-radius: 36px 36px 0 0; transition: 0.4s var(--spring); padding-top: 6px;} body.dark-mode .bottom-nav { background: rgba(15, 23, 42, 0.85); border-top-color: rgba(255,255,255,0.05); box-shadow: 0 -10px 40px rgba(0,0,0,0.4);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.4s var(--spring); } .nav-item.active { color: var(--primary-color); font-weight: 800; transform: translateY(-4px) scale(1.05); } .nav-item .material-icons-round { font-size: 26px; margin-bottom: 2px; }
+        .tab-content { display: none; animation: fadeIn 0.4s var(--spring); position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* 🌟 重大更新：唯讀保護模式 (View Mode) 專屬樣式，並排除密碼輸入框避免被鎖定 */
         body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
         body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
         body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
@@ -148,28 +159,27 @@
         body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .action-dash-box, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
         body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input:not(#privacy-pwd-input) { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
 
-        /* 🌟 新增：隱私解鎖果凍視窗 CSS */
-        #password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
+        /* 🌟 隱私解鎖果凍視窗 CSS */
+        #password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s ease; }
         #password-overlay.show { opacity: 1; }
-        body.dark-mode #password-overlay { background: rgba(0,0,0,0.5); }
-        .pwd-modal { background: rgba(255,255,255,0.95); padding: 30px 25px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.5) inset; text-align: center; width: 85%; max-width: 320px; transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        body.dark-mode .pwd-modal { background: rgba(30,30,30,0.95); box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset; }
+        body.dark-mode #password-overlay { background: rgba(0,0,0,0.6); }
+        .pwd-modal { background: rgba(255,255,255,0.9); padding: 32px 28px; border-radius: 40px; box-shadow: 0 24px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8); text-align: center; width: 85%; max-width: 320px; transform: translateY(30px) scale(0.9); transition: all 0.5s var(--spring); }
+        body.dark-mode .pwd-modal { background: rgba(30,41,59,0.9); box-shadow: 0 24px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
         #password-overlay.show .pwd-modal { transform: translateY(0) scale(1); }
-        .pwd-icon { width: 60px; height: 60px; background: #e0f2fe; color: #0284c7; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; box-shadow: 0 8px 16px rgba(2, 132, 199, 0.15); }
+        .pwd-icon { width: 64px; height: 64px; background: #e0f2fe; color: #0284c7; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 16px auto; box-shadow: 0 12px 24px rgba(2, 132, 199, 0.15); }
         body.dark-mode .pwd-icon { background: rgba(2, 132, 199, 0.2); color: #38bdf8; }
-        .pwd-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; } body.dark-mode .pwd-title { color: #e0e0e0; }
-        .pwd-desc { font-size: 12px; color: #666; margin-bottom: 20px; line-height: 1.5; } body.dark-mode .pwd-desc { color: #aaa; }
-        /* 強制密碼框擁有最高互動權限，不受鎖定模式干擾 */
-        .pwd-input { width: 100%; padding: 12px 20px; border: 2px solid #e5e7eb; border-radius: 50px; font-size: 16px; text-align: center; outline: none; transition: 0.3s; box-sizing: border-box; font-weight: bold; letter-spacing: 2px; -webkit-appearance: none; pointer-events: auto !important; user-select: auto !important; }
-        .pwd-input:focus { border-color: #0284c7; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1); }
-        body.dark-mode .pwd-input { background: #222; border-color: #444; color: white; }
-        .pwd-btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .pwd-btn { flex: 1; padding: 12px 0; border-radius: 50px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; pointer-events: auto !important; }
-        .pwd-btn-cancel { background: #f3f4f6; color: #555; } body.dark-mode .pwd-btn-cancel { background: #444; color: #ddd; }
-        .pwd-btn-confirm { background: #0284c7; color: white; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
-        .pwd-btn:active { transform: scale(0.95); }
-        @keyframes shake-anim { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
-        .shake-err { animation: shake-anim 0.4s ease-in-out; }
+        .pwd-title { font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 8px; letter-spacing: 0.5px;} body.dark-mode .pwd-title { color: #f8fafc; }
+        .pwd-desc { font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 24px; line-height: 1.5; } body.dark-mode .pwd-desc { color: #94a3b8; }
+        .pwd-input { width: 100%; padding: 14px 20px; background: rgba(0,0,0,0.04); border: 2px solid transparent; border-radius: 50px; font-size: 18px; text-align: center; outline: none; transition: 0.3s var(--spring); box-sizing: border-box; font-weight: 800; letter-spacing: 3px; -webkit-appearance: none; pointer-events: auto !important; user-select: auto !important; }
+        .pwd-input:focus { background: white; border-color: #0284c7; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15); }
+        body.dark-mode .pwd-input { background: rgba(0,0,0,0.2); color: white; } body.dark-mode .pwd-input:focus { background: #1e293b; border-color: #38bdf8; }
+        .pwd-btn-group { display: flex; gap: 12px; margin-top: 24px; }
+        .pwd-btn { flex: 1; padding: 14px 0; border-radius: 50px; border: none; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.3s var(--spring); pointer-events: auto !important; }
+        .pwd-btn-cancel { background: rgba(0,0,0,0.05); color: #475569; } body.dark-mode .pwd-btn-cancel { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+        .pwd-btn-confirm { background: #0ea5e9; color: white; box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3); }
+        .pwd-btn:active { transform: scale(0.92); }
+        @keyframes shake-anim { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+        .shake-err { animation: shake-anim 0.4s cubic-bezier(.36,.07,.19,.97) both; }
     </style>
 </head>
 <body>
@@ -182,16 +192,15 @@
     </div>
     <div id="mobile-tooltip"></div>
     
-    <!-- 🌟 新增：隱私解鎖視窗 HTML -->
     <div id="password-overlay">
         <div class="pwd-modal">
-            <div class="pwd-icon"><span class="material-icons-round" style="font-size:30px;">lock</span></div>
+            <div class="pwd-icon"><span class="material-icons-round" style="font-size:32px;">lock</span></div>
             <div class="pwd-title">隱私保護</div>
             <div class="pwd-desc">票券與記帳內容已上鎖，<br>請輸入密碼以檢視完整資訊。</div>
             <input type="password" id="privacy-pwd-input" class="pwd-input" placeholder="輸入密碼" inputmode="numeric">
             <div class="pwd-btn-group">
-                <button class="pwd-btn pwd-btn-cancel" onclick="closePrivacyModal()">取消</button>
-                <button class="pwd-btn pwd-btn-confirm" onclick="verifyPrivacyPwd()">解鎖</button>
+                <button class="pwd-btn pwd-btn-cancel" onclick="closePrivacyModal()">返回</button>
+                <button class="pwd-btn pwd-btn-confirm" onclick="verifyPrivacyPwd()">安全解鎖</button>
             </div>
         </div>
     </div>
@@ -212,9 +221,7 @@
         
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
-        
-        // 🔒 [隱私設定] 進入其他分頁的解鎖密碼 (你可以自行修改這個數字)
-        const TAB_PASSWORD = "0719"; 
+        const TAB_PASSWORD = "8888"; 
 
         function parseMins(str) {
             if (!str) return 0;
@@ -249,7 +256,6 @@
             }
         });
 
-        // 🌟 隱私解鎖視窗邏輯
         let pendingTabId = null; let pendingTabElement = null;
         function openPrivacyModal(tabId, element) {
             pendingTabId = tabId; pendingTabElement = element;
@@ -262,17 +268,15 @@
         function closePrivacyModal() {
             const overlay = document.getElementById('password-overlay');
             overlay.classList.remove('show');
-            setTimeout(() => { overlay.style.display = 'none'; document.getElementById('privacy-pwd-input').value = ''; }, 300);
+            setTimeout(() => { overlay.style.display = 'none'; document.getElementById('privacy-pwd-input').value = ''; }, 400);
         }
 
         function verifyPrivacyPwd() {
             const input = document.getElementById('privacy-pwd-input');
             if (input.value === TAB_PASSWORD) {
-                sessionStorage.setItem('travelTabsUnlocked', 'true'); // 存入 Session，關閉分頁前免重複輸入
+                sessionStorage.setItem('travelTabsUnlocked', 'true');
                 closePrivacyModal();
-                if (pendingTabId && pendingTabElement) {
-                    switchTab(pendingTabId, pendingTabElement);
-                }
+                if (pendingTabId && pendingTabElement) { switchTab(pendingTabId, pendingTabElement); }
             } else {
                 const modal = document.querySelector('.pwd-modal');
                 modal.classList.add('shake-err');
@@ -281,39 +285,30 @@
             }
         }
 
-        // 監聽 Enter 鍵直接送出密碼
         document.getElementById('privacy-pwd-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') verifyPrivacyPwd();
         });
 
-        // 🌟 更新版 switchTab：加入隱私檢查
         function switchTab(tabId, element) {
-            // 若非行程頁且未解鎖，阻擋並彈出密碼框
             if (tabId !== 'tab-itinerary' && sessionStorage.getItem('travelTabsUnlocked') !== 'true') {
-                openPrivacyModal(tabId, element);
-                return;
+                openPrivacyModal(tabId, element); return;
             }
-
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); 
-            document.getElementById(tabId).classList.add('active'); 
-            element.classList.add('active'); 
-            window.scrollTo(0,0); 
-            
-            if(tabId === 'tab-budget') calcBudget(); 
-            if(tabId === 'tab-itinerary') adjustStickyTabs(); 
+            document.getElementById(tabId).classList.add('active'); element.classList.add('active'); window.scrollTo(0,0); 
+            if(tabId === 'tab-budget') calcBudget(); if(tabId === 'tab-itinerary') adjustStickyTabs(); 
         }
 
         function showToast(msg, isError = false) {
             let el = document.getElementById('toast-msg');
             if(!el) {
                 el = document.createElement('div'); el.id = 'toast-msg';
-                el.style.cssText = `position:fixed; top:70px; left:50%; transform:translateX(-50%); background:${isError ? 'rgba(229,115,115,0.95)' : 'rgba(0,0,0,0.85)'}; color:white; padding:10px 20px; border-radius:24px; font-size:13px; font-weight:bold; z-index:10000; opacity:0; pointer-events:none; transition:0.3s; box-shadow:0 4px 12px rgba(0,0,0,0.2); white-space:nowrap;`;
+                el.style.cssText = `position:fixed; top:85px; left:50%; transform:translateX(-50%) scale(0.9); background:${isError ? 'rgba(229,62,62,0.95)' : 'rgba(15,23,42,0.9)'}; color:white; padding:12px 24px; border-radius:50px; font-size:14px; font-weight:800; z-index:10000; opacity:0; pointer-events:none; transition:all 0.4s var(--spring); box-shadow:0 8px 24px rgba(0,0,0,0.15); white-space:nowrap;`;
                 document.body.appendChild(el);
             }
-            el.style.background = isError ? 'rgba(229,115,115,0.95)' : 'rgba(0,0,0,0.85)';
-            el.innerText = msg; el.style.opacity = '1';
-            setTimeout(() => { el.style.opacity = '0'; }, 4000);
+            el.style.background = isError ? 'rgba(229,62,62,0.95)' : 'rgba(15,23,42,0.9)';
+            el.innerText = msg; el.style.opacity = '1'; el.style.transform = 'translateX(-50%) scale(1)';
+            setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) scale(0.9)'; }, 3500);
         }
 
         function toggleEditMode() {
@@ -359,7 +354,7 @@
             const existingBtn = document.querySelector('.viewer-custom-delete'); if (existingBtn) existingBtn.remove();
             const deleteBtn = document.createElement('div'); deleteBtn.className = 'viewer-custom-delete';
             deleteBtn.innerHTML = '<span class="material-icons-round" style="color:white; font-size:24px;">delete</span>';
-            deleteBtn.style.cssText = 'position:absolute; top:20px; left:20px; z-index:9999; cursor:pointer; background:rgba(229, 115, 115, 0.9); width:44px; height:44px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,0.3);';
+            deleteBtn.style.cssText = 'position:absolute; top:20px; left:20px; z-index:9999; cursor:pointer; background:rgba(229, 62, 62, 0.95); width:48px; height:48px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow:0 8px 24px rgba(0,0,0,0.3); backdrop-filter:blur(10px); transition:0.3s var(--spring);';
             deleteBtn.onclick = function(e) {
                 e.stopPropagation();
                 if(confirm("確定要刪除這張照片嗎？")) {
@@ -370,8 +365,8 @@
                         if (isReceipt || containerElement.querySelectorAll('img').length === 0) {
                             viewer.hide();
                             if (parentBox) {
-                                if (parentBox.classList.contains('receipt-thumb-wrap')) { parentBox.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div>`; } 
-                                else if (parentBox.classList.contains('action-box')) { parentBox.className = 'action-box photo-box'; parentBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
+                                if (parentBox.classList.contains('receipt-thumb-wrap')) { parentBox.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">add_a_photo</span></div>`; } 
+                                else if (parentBox.classList.contains('action-box')) { parentBox.className = 'action-box photo-box'; parentBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span>`; }
                             }
                         } else {
                             viewer.update();
@@ -407,21 +402,21 @@
             if (img.dataset.failed === 'true') return;
             let retryCount = parseInt(img.dataset.retryCount || '0'); let originalSrc = img.dataset.originalSrc || img.src; if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
             if (retryCount < 4) {
-                img.dataset.retryCount = retryCount + 1; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23888888'>載入中...</text></svg>";
+                img.dataset.retryCount = retryCount + 1; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f2f5f8'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%2394a3b8' font-weight='bold'>載入中...</text></svg>";
                 setTimeout(() => { let separator = originalSrc.includes('?') ? '&' : '?'; img.src = originalSrc + separator + 'retry=' + Date.now(); }, 1500); return;
             }
             if (!img.dataset.proxied) {
                 img.dataset.proxied = 'true'; let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
                 if (match && match[1]) { img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`; return; }
             }
-            img.dataset.failed = 'true'; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f7f6'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e57373'>無法載入</text></svg>";
+            img.dataset.failed = 'true'; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f2f5f8'/><text x='50%' y='50%' font-size='12' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23e53e3e' font-weight='bold'>無法載入</text></svg>";
         }
         
         function hideMobileTooltip() { const tip = document.getElementById('mobile-tooltip'); if(tip) { tip.style.opacity = '0'; setTimeout(() => { if(tip.style.opacity === '0') tip.style.display = 'none'; }, 200); } }
         function initMobileTooltips() {
             if (window._tooltipsInitialized) return; window._tooltipsInitialized = true; let holdTimer = null; const tip = document.getElementById('mobile-tooltip');
             document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
-                const showTip = () => { let rect = btn.getBoundingClientRect(); tip.innerText = btn.getAttribute('data-tip'); tip.style.display = 'block'; tip.style.left = (rect.left + (rect.width / 2)) + 'px'; tip.style.top = (rect.bottom + 8) + 'px'; tip.style.transform = 'translateX(-50%)'; setTimeout(() => tip.style.opacity = '1', 10); };
+                const showTip = () => { let rect = btn.getBoundingClientRect(); tip.innerText = btn.getAttribute('data-tip'); tip.style.display = 'block'; tip.style.left = (rect.left + (rect.width / 2)) + 'px'; tip.style.top = (rect.bottom + 8) + 'px'; tip.style.transform = 'translateX(-50%) scale(1)'; setTimeout(() => tip.style.opacity = '1', 10); };
                 btn.addEventListener('touchstart', (e) => { clearTimeout(holdTimer); holdTimer = setTimeout(showTip, 400); }, {passive: true});
                 btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideMobileTooltip(); }); btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideMobileTooltip(); });
                 btn.addEventListener('mouseenter', showTip); btn.addEventListener('mouseleave', hideMobileTooltip);
@@ -478,32 +473,31 @@
             <h1 class="editable" contenteditable="true">2026 古京阪六天五夜</h1>
             <p class="editable" contenteditable="true" style="max-width: 75%;">09/25 - 09/30 | 2人同行 | 京都 & 大阪</p>
         </div>
-        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="position: absolute; right: 15px; bottom: 15px; z-index: 10; font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.9); text-align: right; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; border: 1px solid rgba(255,255,255,0.2);">
-            <span id="curr-label">JPY</span> 匯率 <span style="font-size:14px; color:#ffca28; margin-left:2px;" id="rate-num">載入中</span>
+        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="position: absolute; right: 20px; bottom: 16px; z-index: 10; font-size: 12px; font-weight: 800; color: white; text-align: right; background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(12px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: 0.3s var(--spring); border: 1px solid rgba(255,255,255,0.2);">
+            <span id="curr-label">JPY</span> 匯率 <span style="font-size:15px; color:#fcd34d; margin-left:4px;" id="rate-num">載入中</span>
         </div>
     </div>
 
-    <!-- 控制列 -->
-    <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 8px 15px 6px 15px;">
+    <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 10px 16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
-            <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto;">
-                <button id="edit-toggle-btn" class="manual-save-btn always-show" onclick="toggleEditMode()" style="background:#059669;" data-tip="目前唯讀，點擊解鎖"><span class="material-icons-round" id="edit-toggle-icon" style="font-size:16px;">lock</span></button>
+            <div class="hide-scrollbar" style="display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;">
+                <button id="edit-toggle-btn" class="manual-save-btn always-show" onclick="toggleEditMode()" style="background:#059669;" data-tip="目前唯讀，點擊解鎖"><span class="material-icons-round" id="edit-toggle-icon" style="font-size:18px;">lock</span></button>
                 
-                <button class="manual-save-btn edit-only-btn" onclick="forceManualSave()" style="background:#1e3a8a;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:16px;">save</span></button>
-                <button class="manual-save-btn edit-only-btn" onclick="undoAction()" style="background:#1e40af;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:16px;">undo</span></button>
-                <button class="manual-save-btn edit-only-btn" onclick="redoAction()" style="background:#2563eb;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:16px;">redo</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="forceManualSave()" style="background:#2563eb;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:18px;">save</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="undoAction()" style="background:#3b82f6;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:18px;">undo</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="redoAction()" style="background:#60a5fa;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:18px;">redo</span></button>
                 
-                <button class="manual-save-btn always-show" onclick="location.reload()" style="background:#3b82f6;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:16px;">refresh</span></button>
-                <button class="manual-save-btn toggle-more-btn always-show" onclick="toggleMoreOptions()" style="background:#4b5563;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:16px;">more_vert</span></button>
+                <button class="manual-save-btn always-show" onclick="location.reload()" style="background:#64748b;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:18px;">refresh</span></button>
+                <button class="manual-save-btn toggle-more-btn always-show" onclick="toggleMoreOptions()" style="background:#475569;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:18px;">more_vert</span></button>
             </div>
-            <div id="sync-status" style="font-size: 11px; color: var(--text-muted); display:flex; align-items:center; gap:4px; white-space:nowrap;"><span class="material-icons-round" style="font-size:14px; color: #4CAF50;">cloud_done</span> <span>已就緒</span></div>
+            <div id="sync-status" style="font-size: 11px; font-weight:800; color: var(--text-muted); display:flex; align-items:center; gap:4px; white-space:nowrap; padding-left:12px;"><span class="material-icons-round" style="font-size:16px; color: #10b981;">cloud_done</span> <span>已就緒</span></div>
         </div>
-        <div id="more-options-bar" class="hide-scrollbar" style="display:none; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-top:8px; padding-top:6px; border-top:1px dashed var(--glass-border);">
-            <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">share</span> 分享</button>
-            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#374151;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:15px; margin-right:4px;">dark_mode</span> 夜間</button>
-            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#00897b;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">picture_as_pdf</span> 列印</button>
-            <button class="manual-save-btn" onclick="exportBackup()" style="background:#f59e0b;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">download</span> 下載</button>
-            <button class="manual-save-btn edit-only-btn" onclick="triggerImportBackup()" style="background:#ea580c;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:15px; margin-right:4px;">upload</span> 還原</button>
+        <div id="more-options-bar" class="hide-scrollbar" style="display:none; gap:8px; flex-wrap:nowrap; overflow-x:auto; margin-top:12px; padding-top:10px; border-top:1px dashed var(--glass-border);">
+            <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">share</span> 分享</button>
+            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#334155;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:16px; margin-right:4px;">dark_mode</span> 夜間</button>
+            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#0d9488;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">picture_as_pdf</span> 列印</button>
+            <button class="manual-save-btn" onclick="exportBackup()" style="background:#d97706;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">download</span> 下載</button>
+            <button class="manual-save-btn edit-only-btn" onclick="triggerImportBackup()" style="background:#ea580c;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">upload</span> 還原</button>
         </div>
     </div>
 
@@ -564,18 +558,18 @@
             <div class="glass-card" style="padding: 12px 10px;">
                 <h2 class="section-title" style="margin-bottom: 4px;"><span class="material-icons-round">receipt_long</span> 記帳與分帳系統</h2>
                 <div style="margin-bottom: 6px; padding: 0px;">
-                    <div style="font-size: 12px; color: #555; margin-bottom: 4px; font-weight: bold;">建立與管理付款人清單：</div>
-                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
-                        <div id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:5px;"></div>
-                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.2); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 20px; box-shadow: none;">+ 新增付款人</button>
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 800;">建立與管理付款人清單：</div>
+                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">
+                        <div id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:6px;"></div>
+                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(74, 111, 165, 0.15); color: var(--primary-color); width: fit-content; padding: 6px 12px; border-radius: 50px; box-shadow: none;">+ 新增付款人</button>
                     </div>
                 </div>
                 <table id="budget-table">
                     <thead><tr><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr></thead>
                     <tbody id="budget-tbody"></tbody>
                 </table>
-                <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 4px;">+ 新增記帳項目</button>
-                <div id="budget-result" style="margin-top:8px; padding-top:8px; border-top:1px dashed #ccc; line-height: 1.6;"></div>
+                <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 8px;">+ 新增記帳項目</button>
+                <div id="budget-result" style="margin-top:12px; padding-top:12px; border-top:2px dashed rgba(0,0,0,0.05); line-height: 1.6;"></div>
             </div>
         </div>
         <div id="tab-todo" class="tab-content">
@@ -585,11 +579,11 @@
                 <button class="add-btn" onclick="addTodoItemToContainer('booking-list')">+ 新增預訂項目</button>
             </div>
             <div class="glass-card">
-                <div class="flex-between" style="margin-bottom: 10px;">
+                <div class="flex-between" style="margin-bottom: 12px;">
                     <h2 class="section-title" style="margin-bottom: 0;"><span class="material-icons-round">luggage</span> 事前準備類</h2>
-                    <div class="person-select-wrapper" style="display:flex; align-items:center; gap:5px;">
-                        <select id="todo-person-select" onchange="switchTodoPerson(this.value)" style="border:2px solid var(--primary-color); color:var(--primary-color); font-weight:bold; border-radius:6px; padding:2px;"><option value="預設範本" selected>預設範本</option></select>
-                        <span class="material-icons-round delete-btn" style="padding:0; font-size: 20px; cursor: pointer;" onclick="deleteTodoPerson()">delete_outline</span>
+                    <div class="person-select-wrapper" style="display:flex; align-items:center; gap:8px;">
+                        <select id="todo-person-select" onchange="switchTodoPerson(this.value)" style="border:2px solid var(--primary-color); color:var(--primary-color); font-weight:800; border-radius:50px; padding:4px 10px;"><option value="預設範本" selected>預設範本</option></select>
+                        <span class="material-icons-round delete-btn" style="padding:0; font-size: 24px; color:var(--danger-color); cursor: pointer;" onclick="deleteTodoPerson()">delete</span>
                     </div>
                 </div>
                 <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷貝建立新人員清單</button>
@@ -597,7 +591,7 @@
                     <div class="person-todo-list" data-person="預設範本" style="display: block;">
                         <div class="todo-category-header flex-between">
                             <span class="editable" contenteditable="true"> 確認行李重量</span>
-                            <div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color);" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle_outline</span></span></div>
+                            <div style="display:flex; gap:8px;"><span class="cat-action-icon" style="color:var(--primary-color); cursor:pointer;" onclick="addTodoItemHere(this)"><span class="material-icons-round">add_circle</span></span></div>
                         </div>
                         <div class="flex-between" style="gap:10px; margin-top:15px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
                     </div>
@@ -632,8 +626,8 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
-                container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; } });
-                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; } });
+                container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#94a3b8;">image</span>`; } });
+                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">add_a_photo</span>`; } });
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
@@ -747,7 +741,7 @@
             finalizeLoad();
         }
 
-        function setStatus(icon, text, isError = false) { const statusEl = document.getElementById('sync-status'); if(statusEl) { statusEl.innerHTML = `<span class="material-icons-round" style="font-size:14px; color: ${isError ? '#e57373' : '#4CAF50'};">${icon}</span> <span>${text}</span>`; } }
+        function setStatus(icon, text, isError = false) { const statusEl = document.getElementById('sync-status'); if(statusEl) { statusEl.innerHTML = `<span class="material-icons-round" style="font-size:16px; color: ${isError ? '#e53e3e' : '#10b981'};">${icon}</span> <span>${text}</span>`; } }
 
         function makeTableResizable() {
             const table = document.getElementById('budget-table'); if (!table) return;
@@ -792,7 +786,7 @@
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
                         if (actionRow) {
-                            actionRow.style.display = 'flex'; actionRow.style.gap = '4px'; actionRow.style.alignItems = 'center';
+                            actionRow.style.display = 'flex'; actionRow.style.gap = '6px'; actionRow.style.alignItems = 'center';
                             if (!actionRow.querySelector('.add-sub-btn')) {
                                 let btn = document.createElement('button');
                                 btn.className = 'btn-nav btn-circle add-sub-btn';
@@ -837,17 +831,17 @@
                     let linkBox = document.createElement('div');
                     if (oldLinkUrl) {
                         linkBox.className = 'action-box has-link link-box'; linkBox.setAttribute('data-href', oldLinkUrl); linkBox.setAttribute('onclick', 'openStoredLink(this, event)');
-                        linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888; pointer-events:auto;">×</div>`;
-                    } else { linkBox.className = 'action-box link-box'; linkBox.setAttribute('onclick', 'handleItemLink(this, event)'); linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`; }
+                        linkBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#0284c7; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#e53e3e; pointer-events:auto;">×</div>`;
+                    } else { linkBox.className = 'action-box link-box'; linkBox.setAttribute('onclick', 'handleItemLink(this, event)'); linkBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span>`; }
                     dashBox.appendChild(linkBox);
                     
                     let photoBox = document.createElement('div'); photoBox.className = oldImgSrc ? 'action-box has-photo photo-box' : 'action-box photo-box'; photoBox.setAttribute('onclick', 'triggerItemUpload(this, event)');
                     if (oldImgSrc) { 
-                        photoBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>`; 
-                    } else { photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
+                        photoBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:20px; height:20px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:800; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`; 
+                    } else { photoBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span>`; }
                     dashBox.appendChild(photoBox);
                     
-                    let delBox = document.createElement('div'); delBox.className = 'action-box delete-box'; delBox.setAttribute('onclick', item.classList.contains('hotel-card') ? 'deleteHotelCard(this, event)' : 'deleteItem(this, event)'); delBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span>`; dashBox.appendChild(delBox);
+                    let delBox = document.createElement('div'); delBox.className = 'action-box delete-box'; delBox.setAttribute('onclick', item.classList.contains('hotel-card') ? 'deleteHotelCard(this, event)' : 'deleteItem(this, event)'); delBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span>`; dashBox.appendChild(delBox);
                     group.appendChild(dashBox);
                     if (item.classList.contains('hotel-card') || item.classList.contains('todo-category-header')) { let fb = item.querySelector('.flex-between'); if(fb) fb.appendChild(group); else item.appendChild(group); } else { item.appendChild(group); }
                     if (oldDel) oldDel.remove();
@@ -862,7 +856,7 @@
                         let img = box.querySelector('img');
                         if (img) {
                             let imgSrc = img.getAttribute('src');
-                            box.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
+                            box.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:20px; height:20px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:800; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
                         }
                     }
                 });
@@ -888,6 +882,7 @@
                 switchDayCard(startDayIdx); 
                 updateDayTabs();
                 
+                // 強制每次重啟 App 都回到行程分頁
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
                 document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                 const itTab = document.getElementById('tab-itinerary'); 
@@ -900,7 +895,7 @@
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
-                setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); } 
+                setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); } 
                 isInitializing = false; 
                 
                 if (!hasShownStartupToast && lastCloudModifiedTime > 0) {
@@ -919,7 +914,7 @@
                 box.className = 'action-box link-box';
                 box.removeAttribute('data-href');
                 box.setAttribute('onclick', 'handleItemLink(this, event)');
-                box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`;
+                box.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span>`;
                 saveData();
             }
         }
@@ -933,7 +928,7 @@
                 btn.removeAttribute('onclick'); 
                 btn.setAttribute('data-href', url);
                 btn.setAttribute('onclick', 'openStoredLink(this, event)');
-                btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888; pointer-events:auto;">×</div>`;
+                btn.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#0ea5e9; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#e53e3e; pointer-events:auto;">×</div>`;
                 saveData();
             } else if (url) { alert("請輸入有效的網址 (需包含 http 或 https)！"); }
         }
@@ -952,16 +947,16 @@
             sub.className = 'sub-item';
             sub.innerHTML = `
                 <div style="flex-grow:1; display:flex; flex-direction:column; min-width:0;">
-                    <div style="display:flex; align-items:center; gap:4px;">
-                        <span class="material-icons-round" style="font-size:14px; color:var(--primary-color);">subdirectory_arrow_right</span>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">subdirectory_arrow_right</span>
                         <span class="editable sub-item-title" contenteditable="true">輸入子地點/店名</span>
-                        <span class="material-icons-round" style="font-size:14px; color:#1976d2; cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
+                        <span class="material-icons-round" style="font-size:16px; color:#0ea5e9; cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
                 </div>
-                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:4px;">
-                    <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
-                    <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">close</span></div>
+                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:6px;">
+                    <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div>
+                    <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">close</span></div>
                 </div>
             `;
             container.appendChild(sub);
@@ -997,13 +992,13 @@
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
-                    <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center;">
-                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add_location_alt</span></button>
-                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
+                    <div class="action-row" style="margin-top:4px; display:flex; gap:6px; align-items:center;">
+                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:18px;">place</span></button>
+                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:18px;">add_location_alt</span></button>
+                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed rgba(0,0,0,0.1); padding:0 2px; text-align:center;">15分</span></div>
                     </div>
                 </div>
-                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>
                 <div class="sub-items-container"></div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
@@ -1011,37 +1006,37 @@
 
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
 
         function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 12px; width: fit-content; padding: 6px 14px; border-radius: 50px;"><span class="material-icons-round" style="font-size:16px;">place</span> 導航至飯店</button>`;
             container.appendChild(div); saveData();
         }
 
         function addGeneralItemWithNote(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
             document.getElementById('shopping-list').appendChild(newItem); saveData();
         }
 
         function addTodoItemToContainer(containerId) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
             document.getElementById(containerId).appendChild(newItem); saveData();
         }
 
         function addTodoCategory(btnElement) {
             const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
-            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div class="right-action-group"><div class="action-dash-box"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color);"><span class="material-icons-round" style="font-size:16px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div class="right-action-group"><div class="action-dash-box"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color);"><span class="material-icons-round" style="font-size:18px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
             btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
         }
 
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group"><div class="action-dash-box"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group"><div class="action-dash-box"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
@@ -1088,20 +1083,20 @@
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
                 isImageProcessing = true; let originalHTML = currentItemThumbBox.innerHTML; let isNew = !currentItemThumbBox.classList.contains('has-photo');
-                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; }
+                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:16px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:12px;">sync</span>`; }
 
                 compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         if (isNew) {
                             currentItemThumbBox.className = 'action-box has-photo photo-box';
-                            currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:4px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:18px; height:18px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:bold; box-shadow:0 1px 3px rgba(0,0,0,0.3); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
+                            currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:20px; height:20px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:800; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
                         } else {
                             let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = '+';
                             let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
                             if (albumContainer) {
                                 let newImg = document.createElement('img'); newImg.src = driveUrl; newImg.style.display = 'none'; newImg.setAttribute('onerror', 'handleImageError(this)'); albumContainer.appendChild(newImg);
                                 let countBadge = albumContainer.querySelector('.album-count-badge'); let imgCount = albumContainer.querySelectorAll('img').length;
-                                if (!countBadge) { countBadge = document.createElement('div'); countBadge.className = 'album-count-badge'; countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:10px; padding:0px 4px; border-radius:6px; font-weight:bold; pointer-events:none; line-height:1.2;'; albumContainer.appendChild(countBadge); }
+                                if (!countBadge) { countBadge = document.createElement('div'); countBadge.className = 'album-count-badge'; countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:11px; padding:2px 6px; border-radius:10px; font-weight:800; pointer-events:none; line-height:1.2;'; albumContainer.appendChild(countBadge); }
                                 countBadge.innerText = '+' + (imgCount - 1);
                             }
                         } saveData(); isImageProcessing = false;
@@ -1113,13 +1108,13 @@
         function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (file && currentReceiptBox) {
-                isImageProcessing = true; currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
+                isImageProcessing = true; currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:16px; color:var(--primary-color);">sync</span>`;
                 compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
                         currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"></div>`; 
                         saveData(); isImageProcessing = false;
-                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; isImageProcessing = false; });
-                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#aaa;">add_a_photo</span>`; isImageProcessing = false; });
+                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">add_a_photo</span>`; isImageProcessing = false; });
+                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">add_a_photo</span>`; isImageProcessing = false; });
             }
         }
 
@@ -1131,7 +1126,7 @@
             let currencyOpts = opts.map(c => `<option value="${c}" ${c===currency?'selected':''}>${c}</option>`).join('');
             let formattedAmt = Number(String(amount).replace(/,/g, '') || 0).toLocaleString('en-US');
             
-            tr.innerHTML = `<td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td><td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td><td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${split==='平分'?'selected':''}>平分</option><option value="個人" ${split==='個人'?'selected':''}>個人</option></select></td><td style="white-space:nowrap;"><select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();">${currencyOpts}</select><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();"></td><td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>`;
+            tr.innerHTML = `<td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td><td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td><td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${split==='平分'?'selected':''}>平分</option><option value="個人" ${split==='個人'?'selected':''}>個人</option></select></td><td style="white-space:nowrap;"><select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();">${currencyOpts}</select><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();"></td><td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #cbd5e1; border-radius:12px; background:rgba(0,0,0,0.02); white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:18px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>`;
             tbody.appendChild(tr); calcBudget(); saveData();
         }
 
@@ -1159,18 +1154,18 @@
             let transfers = []; let i = 0, j = 0;
             while (i < debtors.length && j < creditors.length) {
                 let debtor = debtors[i]; let creditor = creditors[j]; let amount = Math.min(debtor.amount, creditor.amount);
-                transfers.push(`${debtor.name} <span class="material-icons-round" style="font-size:12px; vertical-align:middle; color:#888;">arrow_forward</span> ${creditor.name}：NT$${Math.round(amount).toLocaleString('en-US')}`);
+                transfers.push(`${debtor.name} <span class="material-icons-round" style="font-size:14px; vertical-align:middle; color:#94a3b8;">arrow_forward</span> ${creditor.name}：<span style="color:var(--primary-color);">NT$${Math.round(amount).toLocaleString('en-US')}</span>`);
                 debtor.amount -= amount; creditor.amount -= amount; if (debtor.amount < 0.5) i++; if (creditor.amount < 0.5) j++;
             }
             
-            let resHTML = `<div class="flex-between" style="font-weight:bold; color:var(--primary-color); font-size:16px; border-bottom:1px dashed #ccc; padding-bottom:8px; margin-bottom:8px;"><span> 旅程總花費：</span><span>NT$${Math.round(grandTotal).toLocaleString('en-US')}</span></div><div style="font-size:12px; font-weight:bold; margin-bottom:6px; color:#555;"> 各自應付總額 (含個人與共同)：</div>`;
-            for(let p in totalsOwed) { resHTML += `<div class="flex-between" style="font-size:13px; margin-bottom:4px; color:#444;"><span> ${p}</span><span>NT$${Math.round(totalsOwed[p]).toLocaleString('en-US')}</span></div>`; }
-            resHTML += `<div style="font-size:13px; font-weight:bold; margin-top:12px; margin-bottom:6px; color:#d32f2f; background:#ffebee; padding:4px 8px; border-radius:4px; display:inline-block;"> 💰 結算：誰該給誰錢？</div>`;
-            if (transfers.length > 0) { transfers.forEach(t => { resHTML += `<div style="font-size:14px; font-weight:bold; margin-bottom:6px; padding-left:4px;">${t}</div>`; }); } else { resHTML += `<div style="font-size:13px; color:#777; padding-left:4px;">目前帳目平衡，無需給錢。</div>`; }
+            let resHTML = `<div class="flex-between" style="font-weight:800; color:var(--primary-color); font-size:18px; border-bottom:2px dashed rgba(0,0,0,0.05); padding-bottom:12px; margin-bottom:12px;"><span> 旅程總花費：</span><span>NT$${Math.round(grandTotal).toLocaleString('en-US')}</span></div><div style="font-size:13px; font-weight:800; margin-bottom:8px; color:#64748b;"> 各自應付總額 (含個人與共同)：</div>`;
+            for(let p in totalsOwed) { resHTML += `<div class="flex-between" style="font-size:14px; margin-bottom:6px; color:#334155; font-weight:600;"><span> ${p}</span><span>NT$${Math.round(totalsOwed[p]).toLocaleString('en-US')}</span></div>`; }
+            resHTML += `<div style="font-size:14px; font-weight:800; margin-top:16px; margin-bottom:8px; color:#e53e3e; background:rgba(229,62,62,0.1); padding:6px 12px; border-radius:50px; display:inline-block;"> 💰 結算：誰該給誰錢？</div>`;
+            if (transfers.length > 0) { transfers.forEach(t => { resHTML += `<div style="font-size:15px; font-weight:800; margin-bottom:8px; padding-left:8px; color:#1e293b;">${t}</div>`; }); } else { resHTML += `<div style="font-size:14px; font-weight:600; color:#94a3b8; padding-left:8px;">目前帳目平衡，無需給錢。</div>`; }
             let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
         }
 
-        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">×</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
+        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:6px; font-size:18px; color:var(--danger-color); line-height:1;" onclick="deletePayer(${idx})">×</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
         function updatePayerDropdowns() { let options = payers.map(p => `<option value="${p}">${p}</option>`).join(''); document.querySelectorAll('.payer-select').forEach(sel => { let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options; if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; } }); }
         function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
         function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
@@ -1178,101 +1173,6 @@
         function switchTodoPerson(personName) { document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none'); let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block'; let select = document.getElementById('todo-person-select'); Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); saveData(); }
         function addNewTodoPerson() { let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return; if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; } let currentTemplateName = document.getElementById('todo-person-select').value; let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`); let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none'; newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed')); document.getElementById('person-todo-container').appendChild(newList); let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); }
         function deleteTodoPerson() { let select = document.getElementById('todo-person-select'); let personName = select.value; if (personName === '預設範本') { alert('「預設範本」無法被刪除喔！'); return; } if (confirm(`確定要刪除人員「${personName}」的所有清單嗎？`)) { Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); }); let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove(); select.value = '預設範本'; switchTodoPerson('預設範本'); } }
-        
-        function toggleTransportMode(iconEl, event) { event.stopPropagation(); let modes = ['directions_transit', 'directions_walk', 'directions_car']; let current = iconEl.innerText.trim(); iconEl.innerText = modes[(modes.indexOf(current) + 1) % modes.length]; let card = iconEl.closest('.day-card'); if(card) recalculateDayTime(card); saveData(); }
-        
-        function recalculateDayTime(dayCardElement) {
-            let items = dayCardElement.querySelectorAll('.timeline-item'); if (items.length === 0) return;
-            let prevEndTimeMins = null; let prevTravelMins = null; let prevTimeCol = null;
-            items.forEach((item, index) => {
-                let timeCol = item.querySelector('.time-column'); if (!timeCol) return; 
-                let startEl = item.querySelector('.start-time'); let durationEl = item.querySelector('.duration');
-                let endEl = item.querySelector('.end-time'); let travelEl = item.querySelector('.travel-time');
-                let oldAuto = timeCol.querySelector('.auto-start'); let oldGap = timeCol.querySelector('.gap-text');
-                if (oldAuto) oldAuto.remove(); if (oldGap) oldGap.remove();
-                if (!startEl || !durationEl || !endEl) return;
-                
-                let startMins = 0; let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
-                if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
-                
-                let duration = parseMins(durationEl.innerText);
-                if (document.activeElement !== durationEl) durationEl.innerText = formatMins(duration);
-                
-                let endMins = startMins + duration;
-                endEl.innerText = `${String(Math.floor(endMins / 60) % 24).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
-                
-                if (index > 0 && prevTimeCol) {
-                    let expMins = prevEndTimeMins + (prevTravelMins || 0); let gap = startMins - expMins; if (gap < -300) gap += 24 * 60; 
-                    let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start'; autoStartEl.innerText = `預計 ${String(Math.floor(expMins / 60) % 24).padStart(2, '0')}:${String(expMins % 60).padStart(2, '0')}`;
-                    let gapEl = document.createElement('div'); gapEl.className = 'gap-text'; 
-                    if (gap < 0) { gapEl.style.color = '#e57373'; gapEl.innerText = `重疊 ${formatMins(Math.abs(gap))}`; } else { gapEl.innerText = `隔 ${formatMins(gap)}`; }
-                    prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
-                }
-                prevEndTimeMins = endMins; 
-                if(travelEl) {
-                    prevTravelMins = parseMins(travelEl.innerText);
-                    if(document.activeElement !== travelEl) travelEl.innerText = formatMins(prevTravelMins);
-                } else { prevTravelMins = 0; }
-                prevTimeCol = timeCol;
-            });
-        }
-
-        function adjustStickyTabs() { let gc = document.querySelector('.global-controls'); let tabs = document.getElementById('day-tabs-container'); if (tabs) tabs.style.top = (gc && gc.style.display !== 'none') ? gc.offsetHeight + 'px' : '0px'; }
-        window.addEventListener('resize', adjustStickyTabs);
-
-        function initSortable() {
-            if (typeof Sortable === 'undefined') return;
-            window.sortableInstances.forEach(s => s.destroy()); window.sortableInstances = [];
-            const sortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } };
-            document.querySelectorAll('.day-card').forEach(card => { window.sortableInstances.push(Sortable.create(card, sortableOptions)); });
-            const lists = ['transport-text-list', 'shopping-list', 'booking-list']; lists.forEach(id => { let el = document.getElementById(id); if(el) window.sortableInstances.push(Sortable.create(el, sortableOptions)); });
-            document.querySelectorAll('.person-todo-list').forEach(list => { window.sortableInstances.push(Sortable.create(list, sortableOptions)); });
-            const subSortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.sub-item', filter: '.editable, img, .action-box, .material-icons-round', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function () { saveData(); } };
-            document.querySelectorAll('.sub-items-container').forEach(cont => { window.sortableInstances.push(Sortable.create(cont, subSortableOptions)); });
-        }
-
-        function toggleComplete(element, event) { if (!event.target.closest('.custom-checkbox')) return; element.classList.toggle('completed'); saveData(); }
-
-        function autoNavigate(btn, event) {
-            event.preventDefault(); let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card'); if (!currentItem) return;
-            let titleEl = currentItem.querySelector('.item-name-target'); let title = titleEl ? titleEl.innerText.trim() : ''; if (!title) { alert('請先輸入地點名稱！'); return; }
-            let origin = ''; let dest = title; let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
-            if (match) { origin = match[1].trim(); dest = match[2].trim(); } 
-            else { let prevItem = currentItem.previousElementSibling; while(prevItem && !prevItem.classList.contains('timeline-item')) { prevItem = prevItem.previousElementSibling; } if (prevItem && prevItem.querySelector('.item-name-target')) { let prevTitle = prevItem.querySelector('.item-name-target').innerText.trim(); let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i); origin = prevMatch ? prevMatch[2].trim() : prevTitle; } }
-            let mode = 'transit'; let iconEl = currentItem.querySelector('.transport-icon'); if (iconEl) { let t = iconEl.innerText.trim(); if (t === 'directions_walk') mode = 'walking'; if (t === 'directions_car') mode = 'driving'; }
-            let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`; if (origin && origin !== '輸入行程名稱') mapUrl += `&origin=${encodeURIComponent(origin)}`;
-            
-            let a = document.createElement('a'); a.href = mapUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
-        function updateDayTabs() {
-            let container = document.getElementById('day-tabs-container'); if (!container) return; 
-            let shareMatch = window.location.href.match(/[?&](share|readonly)=([0-9,，、]+)/); let allowedIndexes = shareMatch ? shareMatch[2].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d)) : null;
-            let cards = document.querySelectorAll('#itinerary-days-container .day-card'); let html = ''; let activeIndex = -1;
-            cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; }); if (allowedIndexes && !allowedIndexes.includes(activeIndex)) activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
-            cards.forEach((card, index) => { if (allowedIndexes && !allowedIndexes.includes(index)) return; let title = card.querySelector('.section-title') ? card.querySelector('.section-title').innerText : ''; let dateStr = title.match(/\d{1,2}\/\d{1,2}/) ? title.match(/\d{1,2}\/\d{1,2}/)[0] : '日期'; html += `<div class="day-tab ${index === activeIndex ? 'active' : ''}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`; });
-            container.innerHTML = html;
-            if (cards.length > 0) { if (activeIndex === -1 || activeIndex >= cards.length) activeIndex = allowedIndexes ? allowedIndexes[0] : 0; switchDayCard(activeIndex); }
-            setTimeout(adjustStickyTabs, 50);
-        }
-
-        function switchDayCard(targetIndex) { document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => { let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`); if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); } }); saveData(); }
-        function addNewDayCard() { let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1; let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`; container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); }
-        function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
-
-        function rebindEvents() {
-            document.querySelectorAll('.photo-box img').forEach(img => { 
-                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
-                if (!img.closest('.photo-album-container')) { img.onclick = function(e) { openImageModal(this, e); }; }
-            });
-            document.querySelectorAll('.receipt-thumb-wrap img').forEach(img => { 
-                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
-                img.onclick = function(e) { openImageModal(this, e); };
-            });
-            document.querySelectorAll('.photo-album-container img').forEach(img => { img.onclick = null; });
-        }
-        
-        window.onload = loadData;
     </script>
 </body>
 </html>
