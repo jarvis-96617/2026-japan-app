@@ -24,22 +24,24 @@
             --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.9);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.04); --safe-bottom: env(safe-area-inset-bottom, 16px); 
             --danger-color: #dc2626; --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --accent-color: #0284c7; /* 質感藍色點綴 */
+            --accent-color: #3b82f6;
         }
         body.dark-mode {
             --bg-color: #09090b; --primary-color: #a1a1aa; --text-main: #f4f4f5; --text-muted: #a1a1aa;
             --glass-bg: rgba(24, 24, 27, 0.75); --glass-border: rgba(255, 255, 255, 0.05);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --accent-color: #38bdf8;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --accent-color: #60a5fa;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(75px + var(--safe-bottom)); overflow-x: hidden; transition: 0.3s ease; }
 
-        /* 🌟 起始載入畫面：100% 恢復原本的圖片與排版 */
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e4e4e7 0%, #d4d4d8 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
-        #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.95; filter: none; }
-        #splash-screen .splash-text { position: absolute; bottom: 12%; z-index: 10; background: rgba(255,255,255,0.9); padding: 15px 35px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); text-align: center; backdrop-filter: blur(10px); }
-        #splash-screen h2 { color: var(--primary-color); font-size: 24px; margin-bottom: 6px; font-weight: 800;} 
-        #splash-screen p { color: var(--text-muted); font-size: 14px; font-weight: 700; margin-bottom: 0; transition: 0.3s;}
+        /* 🌟 起始載入畫面 */
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f4f5; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
+        #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 1; filter: none; }
+        #splash-screen .splash-text { position: absolute; bottom: 8%; z-index: 10; background: rgba(255,255,255,0.95); padding: 16px 40px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; backdrop-filter: blur(12px); width: auto; min-width: 260px;}
+        #splash-screen h2 { color: #27272a; font-size: 20px; margin-bottom: 4px; font-weight: 800; letter-spacing: 0.5px;} 
+        #splash-screen p { color: #71717a; font-size: 12px; font-weight: 700; margin-bottom: 0; transition: 0.3s;}
+        .progress-container { width: 100%; height: 4px; background: rgba(0,0,0,0.08); border-radius: 10px; margin-top: 10px; overflow: hidden; position: relative; }
+        .progress-bar { width: 0%; height: 100%; background: var(--primary-color); border-radius: 10px; transition: width 0.4s var(--spring); }
 
         .hero { background: linear-gradient(to bottom, rgba(24,24,27,0.2), rgba(24,24,27,0.9)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 120px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); border-radius: 0 0 24px 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); margin-bottom: 6px; overflow: hidden;}
         .hero h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.4); } .hero p { font-size: 11px; opacity: 0.9; font-weight: 600;}
@@ -63,7 +65,6 @@
         .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🌟 左中右三欄排版，精準對齊 */
         .timeline-item { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 0px; position: relative; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
         body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.4; filter: grayscale(100%);}
@@ -83,7 +84,7 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; pointer-events: none; }
         body.dark-mode #itinerary-days-container .timeline-item::before { color: #52525b; }
         
-        /* 1. 左邊時間區塊 */
+        /* 🌟 左側：時間區塊 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
         .start-time { font-weight: 800; font-size: 14px; color: var(--accent-color); margin-bottom: 2px; line-height: 1; }
         .duration-wrap { font-size: 9px; font-weight: 700; color: var(--text-muted); background: rgba(0,0,0,0.04); padding: 2px 4px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); }
@@ -91,30 +92,14 @@
         .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
         .auto-start { font-size: 9px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 9px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
 
-        /* 2. 中間內容區塊 (撐開最大空間) */
+        /* 🌟 中間：內容與按鈕區塊 */
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 0px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
-        
-        /* 3. 備註加大間距，避免疊圖 */
-        .item-note { display: block; background: transparent; padding: 0 0 6px 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 6px; color: var(--text-muted); width: 100%; word-break: break-word; white-space: pre-wrap; line-height: 1.5; transition: 0.3s; min-height: 20px;} 
+        .item-note { display: block; background: transparent; padding: 0 0 4px 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 2px; color: var(--text-muted); width: 100%; word-break: break-word; white-space: pre-wrap; line-height: 1.5; transition: 0.3s; min-height: 16px;} 
         body.dark-mode .item-note { border-left-color: rgba(255,255,255,0.1); }
         
-        /* 4. 底部交通按鈕區塊 */
         .action-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; width: 100%;}
         
-        /* 5. 右側直列操作按鈕區塊 */
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 4px; justify-content: flex-start; padding-top: 2px;} 
-        
-        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
-        body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
-        .action-box:active { transform: scale(0.9); } 
-        .action-box.has-link { background: #e0f2fe; color: #0284c7; } 
-        body.dark-mode .action-box.has-link { background: rgba(2, 132, 199, 0.2); color: #38bdf8; } 
-        .action-box.has-photo { background: transparent; }
-        
-        .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 14px; height: 14px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.2s var(--spring);}
-        @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
-
         select, input { transition: 0.3s var(--spring); } body.dark-mode select, body.dark-mode input { background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;}
         .luggage-select { font-size: 11px; padding: 2px 6px; border-radius: 50px; border: 1.5px solid var(--primary-color); color: var(--primary-color); background: rgba(255,255,255,0.5); margin-right: 4px; cursor: pointer; font-weight: 800; outline: none; transition: 0.3s var(--spring);}
         
@@ -126,15 +111,27 @@
         .transport-icon { font-size: 13px !important; background: #ffffff; color: var(--primary-color); border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s var(--spring);} body.dark-mode .transport-icon { background: #27272a; }
         
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.03); color: var(--primary-color); border: 1px dashed rgba(0,0,0,0.1); border-radius: 50px; font-weight: 800; font-size: 12px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #a1a1aa;}
+        
+        /* 🌟 右側操作按鈕群組 (直向) */
+        .right-action-group { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; margin-left: 4px; justify-content: flex-start; padding-top: 2px;} 
+        
+        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
+        body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
+        .action-box:active { transform: scale(0.9); } 
+        .action-box.has-link { background: #e0f2fe; color: #0284c7; } 
+        body.dark-mode .action-box.has-link { background: rgba(2, 132, 199, 0.2); color: #38bdf8; } 
+        .action-box.has-photo { background: transparent; }
+        
+        .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 14px; height: 14px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.2s var(--spring);}
+        @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        /* 子地點設計，移到中間靠上 */
-        .sub-items-container { width: 100%; display: flex; flex-direction: column; gap: 4px; margin-top: 4px; margin-bottom: 8px; box-sizing: border-box; }
-        .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 6px 8px 6px 14px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid var(--accent-color); transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
+        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 20px; box-sizing: border-box; }
+        .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 16px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid var(--accent-color); transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: var(--accent-color);}
-        .sub-item::before { content: '⋮⋮'; position: absolute; left: 2px; top: 16px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
+        .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 14px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
         body.dark-mode .sub-item::before { color: #52525b; }
-        .sub-item-title { font-size: 12px; font-weight: 800; flex-grow: 1; outline: none; color: var(--text-main); margin-bottom:2px;} 
-        .sub-item-note { font-size: 10px; font-weight: 500; color: var(--text-muted); display: block; outline: none; line-height: 1.4; word-break: break-word; white-space: pre-wrap; min-height: 14px;}
+        .sub-item-title { font-size: 12px; font-weight: 800; flex-grow: 1; outline: none; color: #3f3f46;} body.dark-mode .sub-item-title{color: #f4f4f5;}
+        .sub-item-note { font-size: 10px; font-weight: 500; color: var(--text-muted); margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
         .sub-item .action-box { width: 22px; height: 22px; background: rgba(255,255,255,0.8); border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);}
         body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); }
 
@@ -195,11 +192,13 @@
     </style>
 </head>
 <body>
+    <!-- 🌟 起始畫面：完全顯示原圖與動態進度條 -->
     <div id="splash-screen">
         <img id="splash-bg-img" src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
         <div class="splash-text">
             <h2>2026 古京阪之旅</h2>
-            <p id="load-text">行程載入中...</p>
+            <p id="load-text">系統連線中...</p>
+            <div class="progress-container"><div class="progress-bar" id="load-progress"></div></div>
         </div>
     </div>
     <div id="mobile-tooltip"></div>
@@ -217,6 +216,7 @@
         </div>
     </div>
 
+    <!-- 🌟 直接寫死基礎框架，保證 iOS 絕不白畫面 -->
     <div class="container" id="main-container">
         <div id="tab-itinerary" class="tab-content active">
             <div id="day-tabs-container" class="day-tabs-wrapper"></div>
@@ -286,23 +286,7 @@
             </div>
         </div>
     </div>
-
-    <template id="default-template"></template>
-
-    <input type="file" id="global-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleImageUpload(event)">
-    <input type="file" id="receipt-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleReceiptUpload(event)">
-    <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleItemUpload(event)">
-    <input type="file" id="backup-file-input" accept=".json,.txt" style="display: none;" onchange="handleBackupUpload(event)">
-
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('tab-itinerary', this)"><span class="material-icons-round">format_list_bulleted</span>行程</div>
-        <div class="nav-item" onclick="switchTab('tab-transport', this)"><span class="material-icons-round">directions_transit</span>交通</div>
-        <div class="nav-item" onclick="switchTab('tab-hotel', this)"><span class="material-icons-round">bed</span>住宿</div>
-        <div class="nav-item" onclick="switchTab('tab-shopping', this)"><span class="material-icons-round">shopping_cart</span>購物</div>
-        <div class="nav-item" onclick="switchTab('tab-budget', this)"><span class="material-icons-round">savings</span>預算</div>
-        <div class="nav-item" onclick="switchTab('tab-todo', this)"><span class="material-icons-round">checklist</span>待辦</div>
-    </nav>
-
+    
     <script>
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
         let isInitializing = true; 
@@ -323,12 +307,11 @@
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
         const TAB_PASSWORD = "0719"; 
 
-        // 🌟 絕對防卡死：確保進度條跑完一定能進畫面
+        // 🌟 絕對防卡死雙保險載入機制
         let loadTriggered = false;
         function triggerLoad() { 
             if (loadTriggered) return; 
             loadTriggered = true; 
-            // 若 LZString 未載入成功，給它一點時間
             waitForLZStringAndLoad(0);
         }
         function waitForLZStringAndLoad(attempts) {
@@ -341,7 +324,12 @@
         
         document.addEventListener('DOMContentLoaded', triggerLoad);
         window.addEventListener('load', triggerLoad);
-        setTimeout(triggerLoad, 3000); 
+        setTimeout(triggerLoad, 2500); 
+
+        function updateProgress(percent, text) {
+            const bar = document.getElementById('load-progress'); const textEl = document.getElementById('load-text');
+            if(bar) bar.style.width = percent + '%'; if(textEl && text) textEl.innerText = text;
+        }
 
         function hideSplashScreen() {
             isAppReady = true; isInitializing = false;
@@ -507,7 +495,7 @@
                                 let badge = parentBox.querySelector('.album-count-badge'); const remaining = containerElement.querySelectorAll('img').length;
                                 if (remaining > 1) badge.innerText = '+' + (remaining - 1); else badge.remove();
                             }
-                        } saveData(false, false, true); // 強制儲存
+                        } saveData(false, false, true); 
                     }
                 }
             };
@@ -557,24 +545,24 @@
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideMobileTooltip(); }, {passive: true});
         }
 
-        // 🌟 絕對防白屏載入機制：先建結構，後抓資料
+        // 🌟 重新設計防白屏載入機制
         async function loadData() {
-            let documentBodyReady = document.getElementById('main-container') !== null;
-            if(!documentBodyReady) return; // 避免在非常極端的環境下報錯
+            updateProgress(10, "初始化系統...");
 
-            // 🌟 讀取暫存
             try {
                 const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal'); 
                 if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
             } catch(e) {}
 
             const forceUnlockTimer = setTimeout(() => {
+                updateProgress(100, "強制進入系統");
                 hideSplashScreen();
                 showToast("⏳ 網路狀態異常，切換至本機模式", true);
-            }, 12000);
+            }, 10000);
 
             try {
                 if (typeof LZString === 'undefined') {
+                    updateProgress(100, "套件載入失敗");
                     loadFromLocal();
                     hideSplashScreen();
                     clearTimeout(forceUnlockTimer);
@@ -582,6 +570,7 @@
                 }
 
                 if(!API_URL.startsWith("https://script.google.com")) { 
+                    updateProgress(100, "進入本機模式...");
                     loadFromLocal(); 
                     setStatus('cloud_off', '本機模式', true); 
                     hideSplashScreen();
@@ -589,11 +578,14 @@
                     return; 
                 }
                 
+                updateProgress(40, "連線至 Google 雲端...");
+                
                 const fetchPromise = fetch(API_URL).then(res => res.json());
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000));
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
 
                 try {
                     const rawData = await Promise.race([fetchPromise, timeoutPromise]);
+                    updateProgress(80, "解析雲端資料...");
                     let state = rawData;
                     if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') { 
                         try { lastCloudDataHash = rawData.data; state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {} 
@@ -607,9 +599,11 @@
                     } else { 
                         addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); setStatus('cloud_done', '建立新存檔'); 
                     }
+                    updateProgress(100, "載入完成！");
                     finalizeLoad();
                     clearTimeout(forceUnlockTimer);
                 } catch (err) {
+                    updateProgress(80, "雲端無回應，讀取本機...");
                     loadFromLocal();
                     setStatus('cloud_off', '離線模式(存本機)', true);
                     clearTimeout(forceUnlockTimer);
@@ -617,7 +611,7 @@
             } catch (globalErr) {
                 hideSplashScreen();
                 clearTimeout(forceUnlockTimer);
-                finalizeLoad();
+                finalizeLoad(); 
             }
         }
 
@@ -654,15 +648,6 @@
 
         function finalizeLoad() {
             try {
-                // 🌟 最先確保 Tab 顯示，杜絕白畫面
-                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                const itTab = document.getElementById('tab-itinerary'); 
-                const firstNav = document.querySelectorAll('.nav-item')[0]; 
-                if(itTab) itTab.classList.add('active'); 
-                if(firstNav) firstNav.classList.add('active');
-                window.scrollTo(0, 0);
-
                 let shoppingList = document.getElementById('shopping-list');
                 if (shoppingList) { let card = shoppingList.closest('.glass-card'); if (card) { Array.from(card.children).forEach(child => { if (child.classList.contains('timeline-item')) { shoppingList.appendChild(child); } }); } }
                 let tabTransport = document.getElementById('tab-transport');
@@ -807,12 +792,20 @@
                 switchDayCard(startDayIdx); 
                 updateDayTabs();
                 
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                const itTab = document.getElementById('tab-itinerary'); 
+                const firstNav = document.querySelectorAll('.nav-item')[0]; 
+                if(itTab) itTab.classList.add('active'); 
+                if(firstNav) firstNav.classList.add('active');
+                window.scrollTo(0, 0);
+
                 if(typeof initHistory === 'function') initHistory(); initSortable(); makeTableResizable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); 
                 
-                setTimeout(hideSplashScreen, 300);
+                setTimeout(hideSplashScreen, 400);
                 
                 if (!hasShownStartupToast && lastCloudModifiedTime > 0) {
                     let diffMins = Math.floor((Date.now() - lastCloudModifiedTime) / 60000);
@@ -911,6 +904,7 @@
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
+                    <div class="sub-items-container"></div>
                     <div class="action-row" style="margin-top:2px; display:flex; gap:6px; align-items:center; width:100%;">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:14px;">place</span></button>
                         <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:var(--accent-color);"><span class="material-icons-round" style="font-size:14px;">add_location_alt</span></button>
