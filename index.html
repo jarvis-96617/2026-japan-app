@@ -130,6 +130,7 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); transition: 0.3s;} body.dark-mode .bottom-nav { background: rgba(30,30,30,0.85); border-top-color: #444; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; cursor: pointer; transition: 0.3s; } .nav-item.active { color: var(--primary-color); font-weight: 700; transform: translateY(-2px); } .nav-item .material-icons-round { font-size: 24px; margin-bottom: 2px; }
         .tab-content { display: none; animation: fadeIn 0.3s; position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* 🌟 重大更新：唯讀保護模式 (View Mode) 專屬樣式，並排除密碼輸入框避免被鎖定 */
         body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
         body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
         body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
@@ -139,13 +140,13 @@
         body.view-mode-active .editable, body.view-mode-active .custom-checkbox, body.view-mode-active #exchange-rate-display,
         body.view-mode-active .transport-icon { pointer-events: none !important; } 
         body.view-mode-active .editable { border: none !important; background: transparent !important; }
-        body.view-mode-active select, body.view-mode-active input { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
+        body.view-mode-active select, body.view-mode-active input:not(#privacy-pwd-input) { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
         body.view-mode-active .action-box.has-photo { pointer-events: auto; }
 
         body.share-mode-active .bottom-nav, body.share-mode-active #tab-transport, body.share-mode-active #tab-hotel, body.share-mode-active #tab-shopping, body.share-mode-active #tab-budget, body.share-mode-active #tab-todo, body.readonly-mode-active .bottom-nav, body.readonly-mode-active #tab-transport, body.readonly-mode-active #tab-hotel, body.readonly-mode-active #tab-shopping, body.readonly-mode-active #tab-budget, body.readonly-mode-active #tab-todo { display: none !important; }
         body.share-mode-active, body.readonly-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
         body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .action-dash-box, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
-        body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
+        body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input:not(#privacy-pwd-input) { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
 
         /* 🌟 新增：隱私解鎖果凍視窗 CSS */
         #password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
@@ -158,11 +159,12 @@
         body.dark-mode .pwd-icon { background: rgba(2, 132, 199, 0.2); color: #38bdf8; }
         .pwd-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; } body.dark-mode .pwd-title { color: #e0e0e0; }
         .pwd-desc { font-size: 12px; color: #666; margin-bottom: 20px; line-height: 1.5; } body.dark-mode .pwd-desc { color: #aaa; }
-        .pwd-input { width: 100%; padding: 12px 20px; border: 2px solid #e5e7eb; border-radius: 50px; font-size: 16px; text-align: center; outline: none; transition: 0.3s; box-sizing: border-box; font-weight: bold; letter-spacing: 2px; -webkit-appearance: none; }
+        /* 強制密碼框擁有最高互動權限，不受鎖定模式干擾 */
+        .pwd-input { width: 100%; padding: 12px 20px; border: 2px solid #e5e7eb; border-radius: 50px; font-size: 16px; text-align: center; outline: none; transition: 0.3s; box-sizing: border-box; font-weight: bold; letter-spacing: 2px; -webkit-appearance: none; pointer-events: auto !important; user-select: auto !important; }
         .pwd-input:focus { border-color: #0284c7; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1); }
         body.dark-mode .pwd-input { background: #222; border-color: #444; color: white; }
         .pwd-btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .pwd-btn { flex: 1; padding: 12px 0; border-radius: 50px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .pwd-btn { flex: 1; padding: 12px 0; border-radius: 50px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; pointer-events: auto !important; }
         .pwd-btn-cancel { background: #f3f4f6; color: #555; } body.dark-mode .pwd-btn-cancel { background: #444; color: #ddd; }
         .pwd-btn-confirm { background: #0284c7; color: white; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
         .pwd-btn:active { transform: scale(0.95); }
@@ -886,7 +888,6 @@
                 switchDayCard(startDayIdx); 
                 updateDayTabs();
                 
-                // 強制每次重啟 App 都回到行程分頁
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
                 document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                 const itTab = document.getElementById('tab-itinerary'); 
