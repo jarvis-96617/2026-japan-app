@@ -198,6 +198,7 @@
         <div class="splash-text">
             <h2>2026 古京阪之旅</h2>
             <p id="splash-msg">行程載入中...</p>
+            <!-- 🌟 加入載入進度條 -->
             <div class="progress-container">
                 <div id="splash-progress" class="progress-bar"></div>
             </div>
@@ -513,6 +514,7 @@
         </div>
     </div>
 
+    <!-- 控制列 -->
     <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 8px 12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
             <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;">
@@ -679,6 +681,7 @@
             return { html: tempMain.innerHTML, heroHtml: tempHero.innerHTML, payersData: JSON.parse(JSON.stringify(payers)), lastModified: Date.now() };
         }
 
+        /* 🌟 版本衝突修復的核心區塊 */
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('readonly')) return;
             if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
@@ -694,38 +697,52 @@
 
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
-            pendingSaveAction = true; let payload;
+            pendingSaveAction = true; 
+            let payload;
+            let newCompressedData; // 🌟 新增：暫存這次的壓縮資料，先不要覆寫全域變數
+
             try {
                 const state = captureState(); 
-                const compressedData = LZString.compressToUTF16(JSON.stringify(state));
+                newCompressedData = LZString.compressToUTF16(JSON.stringify(state));
                 payload = JSON.stringify({ 
                     isCompressed: true, 
-                    data: compressedData, 
+                    data: newCompressedData, 
                     token: APP_TOKEN,
-                    baseHash: lastCloudDataHash 
+                    baseHash: lastCloudDataHash // 🌟 傳送目前的已知伺服器 Hash 作為基準
                 });
-                lastCloudDataHash = compressedData; 
             } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
 
             try {
+                // 本地備份照常執行
                 localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
                 localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
             } catch(e) {}
             
             if(!API_URL.startsWith("https://script.google.com")) { setStatus('cloud_off', '本機模式', true); pendingSaveAction = false; return; }
-            setStatus('sync', '同步壓縮檔中...'); clearTimeout(syncTimeout);
+            
+            setStatus('sync', '同步壓縮檔中...'); 
+            clearTimeout(syncTimeout);
+            
             syncTimeout = setTimeout(() => {
-                pendingSaveAction = false; isSavingToCloud = true;
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).then(res => res.json()).then(data => {
+                pendingSaveAction = false; 
+                isSavingToCloud = true;
+                
+                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+                .then(res => res.json())
+                .then(data => {
                     isSavingToCloud = false; 
                     if(data.status === "success") { 
-                        setStatus('cloud_done', '雲端已同步'); if(isManual) showToast("✅ 同步成功！"); 
+                        // 🌟 修正核心：只有在伺服器明確回傳 success 時，才更新本地的 Hash
+                        lastCloudDataHash = newCompressedData; 
+                        setStatus('cloud_done', '雲端已同步'); 
+                        if(isManual) showToast("✅ 同步成功！"); 
                     } else if (data.status === "conflict") {
                         setStatus('cloud_off', '版本衝突，拒絕存檔', true);
                         alert("🚨 【版本衝突警告】\n\n在你編輯的期間，有人已經存檔了新版本！\n為了避免覆蓋別人的心血，系統已「拒絕」本次存檔。\n\n請點擊上方工具列的「下載」按鈕保留你的修改，然後重新整理頁面。");
                         isEditMode = true; document.body.classList.remove('view-mode-active'); updateEditToggleButton();
                     } else {
-                        setStatus('cloud_off', '上傳失敗', true); if(isManual) alert('失敗：' + (data.message || '未知'));
+                        setStatus('cloud_off', '上傳失敗', true); 
+                        if(isManual) alert('❌ 失敗：' + (data.message || '伺服器未回應'));
                     }
                     
                     if (needsSaveAfterFetch && data.status === "success") {
@@ -738,7 +755,8 @@
                     isSavingToCloud = false; 
                     setStatus('cloud_off', '連線失敗(存本機)', true); 
                     needsSaveAfterFetch = false;
-                    if(isManual) alert("❌ 同步失敗！"); 
+                    // 🌟 若網路斷線或 GAS 回傳錯誤，保留舊的 Hash，讓下次可以安全重試
+                    if(isManual) alert("❌ 同步失敗！請檢查網路連線或稍後再試。"); 
                 });
             }, isManual ? 0 : 1500); 
         }
