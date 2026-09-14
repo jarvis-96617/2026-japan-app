@@ -56,11 +56,11 @@
         .editable:focus { background: rgba(0,0,0,0.05); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        .timeline-item { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0px; position: relative; padding: 10px 4px; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
+        .timeline-item { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 4px 10px 0; border-bottom: 1px solid #f0f0f0; align-items: flex-start; }
         body.dark-mode .timeline-item { border-bottom-color: #333; }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.35; }
-        #tab-transport .timeline-item { padding: 6px 4px; } #tab-transport .item-title { font-size: 14px; margin-bottom: 2px; line-height: 1.2;}
-        #tab-todo .timeline-item, #tab-shopping .timeline-item { padding: 4px 4px; }
+        #tab-transport .timeline-item { padding: 6px 4px 6px 0; } #tab-transport .item-title { font-size: 14px; margin-bottom: 2px; line-height: 1.2;}
+        #tab-todo .timeline-item, #tab-shopping .timeline-item { padding: 4px 4px 4px 0; }
         
         .todo-category-header { font-size: 14px; font-weight: 700; color: #555; margin: 10px 0 4px; border-bottom: 1px solid #eaeaea; padding-bottom: 2px;}
         body.dark-mode .todo-category-header { color: #ddd; border-bottom-color: #444; }
@@ -70,11 +70,11 @@
         
         .sortable-ghost { opacity: 0.4; background-color: #eef2f5 !important; border-radius: 8px; } body.dark-mode .sortable-ghost { background-color: #333 !important; }
         .sortable-drag { background-color: #ffffff !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; transform: scale(1.02); z-index: 1000; border-radius: 8px; } body.dark-mode .sortable-drag { background-color: #1e1e1e !important; }
-        #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 24px !important; }
+        #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 20px !important; }
         
-        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 22px; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
+        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 22px; transform: translateY(-50%); color: #cfcfcf; font-size: 15px; letter-spacing: -1.5px; pointer-events: none; }
         
-        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 48px; flex-shrink: 0; }
+        .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 46px; flex-shrink: 0; }
         .start-time { font-weight: 700; font-size: 15px; color: var(--primary-color); margin-bottom: 3px; line-height: 1; }
         .duration-wrap { font-size: 10px; color: #777; background: #fafafa; padding: 2px 4px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid #ddd; } body.dark-mode .duration-wrap { background: #2a2a2a; border-color: #444; color: #aaa; }
         .duration { font-weight: bold; color: var(--primary-color); min-width: 14px; display: inline-block; text-align: center; } .end-time { font-size: 11px; color: #aaa; font-weight: 500; line-height: 1; }
@@ -95,21 +95,32 @@
         .transport-icon { font-size: 15px !important; background: #ffffff; color: var(--primary-color); border: 1px solid #4a6fa5; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); cursor: pointer;} body.dark-mode .transport-icon { background: #1e1e1e; border-color: var(--primary-color);}
         
         .add-btn { width: 100%; padding: 10px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 5px; cursor: pointer; margin-top: 8px; margin-bottom: 5px; transition: 0.3s;} body.dark-mode .add-btn { background: rgba(74, 111, 165, 0.2); color: #90caf9;}
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; } .action-dash-box { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; padding: 4px; border: 1px dashed #ccc; border-radius: 6px; background: #fafafa; white-space: nowrap; } body.dark-mode .action-dash-box { background: #222; border-color: #555; }
         
-        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 4px; transition: 0.2s; background: #fff; border: 1px solid #eee; position: relative; user-select: none; } body.dark-mode .action-box { background: #333; border-color: #444; } .action-box:active { transform: scale(0.9); } .action-box.has-link { background: #e3f2fd; border-color: #1976d2; } body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; } .action-box.has-photo { border: none; background: transparent; }
-        .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10; cursor: pointer; pointer-events: auto; }
+        /* 🌟 重大更新：操作按鈕群組改為直向排列，貼齊右側 */
+        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 2px; } 
+        /* 拿掉原本的 action-dash-box 虛線外框，直接讓按鈕垂直堆疊 */
+        .action-dash-box { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0; border: none; background: transparent; } 
+        
+        .action-box { width: 26px; height: 26px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 6px; transition: 0.2s; background: #f8f9fa; border: 1px solid #e0e0e0; position: relative; user-select: none; } 
+        body.dark-mode .action-box { background: #333; border-color: #444; } 
+        .action-box:active { transform: scale(0.9); } 
+        .action-box.has-link { background: #e3f2fd; border-color: #bbdefb; } 
+        body.dark-mode .action-box.has-link { background: rgba(25, 118, 210, 0.2); border-color: #1976d2; } 
+        .action-box.has-photo { border: none; background: transparent; }
+        
+        /* 微調刪除標籤的位置，避免超出直向排版的邊界 */
+        .img-delete-badge { position: absolute; top: -6px; right: -6px; background: var(--danger-color); color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 10; cursor: pointer; pointer-events: auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 4px; padding-left: 42px; padding-right: 4px; box-sizing: border-box; }
-        .sub-item { display: flex; align-items: flex-start; gap: 6px; padding: 6px 6px 6px 20px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 3px solid #0284c7; transition: 0.2s; position: relative; width: 100%; box-sizing: border-box; }
+        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 4px; padding-left: 36px; padding-right: 0px; box-sizing: border-box; }
+        .sub-item { display: flex; align-items: stretch; gap: 6px; padding: 6px 6px 6px 20px; background: rgba(0,0,0,0.03); border-radius: 6px; border-left: 3px solid #0284c7; transition: 0.2s; position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.05); }
         .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #cfcfcf; font-size: 13px; letter-spacing: -1px; pointer-events: none; }
         .sub-item-title { font-size: 13px; font-weight: bold; flex-grow: 1; outline: none; }
         .sub-item-note { font-size: 11px; color: #666; margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
         body.dark-mode .sub-item-note { color: #aaa; }
-        .sub-item .action-box { width: 22px; height: 22px; border: none; background: rgba(255,255,255,0.5); }
-        body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); }
+        .sub-item .action-box { width: 24px; height: 24px; border: 1px solid #e0e0e0; background: rgba(255,255,255,0.8); }
+        body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); border-color: #444; }
 
         #budget-table { width: 100%; border-collapse: collapse; table-layout: fixed; word-break: break-word; margin-bottom: 5px;} #budget-table th { background: #eef2f5; padding: 4px 0px; font-size: 11px; color: #555; text-align: center; font-weight: bold; transition: background 0.3s, color 0.3s; position: relative; } body.dark-mode #budget-table th { background: #2a2a2a; color: #ccc; border-bottom: 1px solid #444;} #budget-table td { padding: 4px 0px; border-bottom: 1px solid #eee; font-size: 12px; text-align: center; vertical-align: middle; transition: 0.3s;} body.dark-mode #budget-table td { border-bottom-color: #333; }
         #budget-table th:nth-child(1) { width: 42%; text-align: left; padding-left: 4px; } #budget-table th:nth-child(2) { width: 10%; } #budget-table th:nth-child(3) { width: 10%; } #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 4px;} #budget-table th:nth-child(5) { width: 8%; } #budget-table td:nth-child(1) { text-align: left; padding-left: 4px; } #budget-table td:nth-child(4) { text-align: right; padding-right: 4px; }
@@ -342,7 +353,6 @@
         </div>
     </div>
 
-    <!-- 控制列 -->
     <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 8px 15px 6px 15px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
             <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto;">
@@ -525,7 +535,7 @@
                     isCompressed: true, 
                     data: compressedData, 
                     token: APP_TOKEN,
-                    baseHash: lastCloudDataHash // 🌟 傳送目前的基準版本號，供後端防護檢查
+                    baseHash: lastCloudDataHash 
                 });
                 lastCloudDataHash = compressedData; 
             } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
@@ -542,7 +552,6 @@
                     if(data.status === "success") { 
                         setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 同步成功！"); 
                     } else if (data.status === "conflict") {
-                        // 🌟 觸發版本衝突警報
                         setStatus('cloud_off', '版本衝突，拒絕存檔', true);
                         alert("🚨 【版本衝突警告】\n\n在你編輯的期間，有人已經存檔了新版本！\n為了避免覆蓋別人的心血，系統已「拒絕」本次存檔。\n\n請點擊上方工具列的「下載」按鈕保留你的修改，然後重新整理頁面。");
                         isEditMode = true; document.body.classList.remove('view-mode-active'); updateEditToggleButton();
@@ -646,7 +655,15 @@
                         if (subCont && subCont.parentNode === contentBox) { item.appendChild(subCont); }
                     }
 
+                    // 🌟 處理舊版橫向按鈕 -> 新版直向按鈕
                     if (item.querySelector('.right-action-group')) {
+                        let group = item.querySelector('.right-action-group');
+                        let dashBox = group.querySelector('.action-dash-box');
+                        if (dashBox) {
+                            // 舊版 dash-box 有邊框和橫向排列，移除舊 class 以套用新的直向 CSS
+                            dashBox.className = 'action-dash-box'; 
+                        }
+                        
                         let oldLinkBox = item.querySelector('.action-box.has-link span');
                         if (oldLinkBox && oldLinkBox.getAttribute('onclick') && oldLinkBox.getAttribute('onclick').includes('window.open')) {
                             let match = oldLinkBox.getAttribute('onclick').match(/window\.open\('([^']+)'/);
@@ -659,6 +676,7 @@
                         return;
                     }
 
+                    // 如果連 right-action-group 都沒有，則新建（相容極舊版本）
                     let oldDel = item.querySelector('.delete-btn:not(.action-box)');
                     let oldThumb = item.querySelector('.item-thumb-box'); let oldImgSrc = '';
                     if (oldThumb) { let img = oldThumb.querySelector('img'); if (img) oldImgSrc = getReliableDriveUrl(img.src); oldThumb.remove(); }
@@ -671,7 +689,7 @@
                     let linkBox = document.createElement('div');
                     if (oldLinkUrl) {
                         linkBox.className = 'action-box has-link link-box'; linkBox.setAttribute('data-href', oldLinkUrl); linkBox.setAttribute('onclick', 'openStoredLink(this, event)');
-                        linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888; pointer-events:auto;">&times;</div>`;
+                        linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888; pointer-events:auto;">×</div>`;
                     } else { linkBox.className = 'action-box link-box'; linkBox.setAttribute('onclick', 'handleItemLink(this, event)'); linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`; }
                     dashBox.appendChild(linkBox);
                     
@@ -753,7 +771,7 @@
                 btn.removeAttribute('onclick'); 
                 btn.setAttribute('data-href', url);
                 btn.setAttribute('onclick', 'openStoredLink(this, event)');
-                btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888; pointer-events:auto;">&times;</div>`;
+                btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#888; pointer-events:auto;">×</div>`;
                 saveData();
             } else if (url) { alert("請輸入有效的網址 (需包含 http 或 https)！"); }
         }
@@ -779,7 +797,7 @@
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
                 </div>
-                <div class="right-action-group" style="flex-direction:row; margin-left:auto; gap:4px;">
+                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:4px;">
                     <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
                     <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">close</span></div>
                 </div>
@@ -990,7 +1008,7 @@
             let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
         }
 
-        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">&times;</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
+        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:6px; font-size:16px; color:var(--danger-color);" onclick="deletePayer(${idx})">×</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
         function updatePayerDropdowns() { let options = payers.map(p => `<option value="${p}">${p}</option>`).join(''); document.querySelectorAll('.payer-select').forEach(sel => { let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options; if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; } }); }
         function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
         function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
