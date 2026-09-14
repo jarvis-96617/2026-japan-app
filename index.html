@@ -18,35 +18,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
     <style>
-        /* 🌟 質感灰白調美學 (Minimalist Zinc Theme) */
+        /* 🌟 質感灰階色調與動畫設定 */
         :root {
-            --bg-color: #f4f4f5; 
-            --primary-color: #3f3f46; 
-            --accent-color: #3b82f6; 
-            --text-main: #18181b; 
-            --text-muted: #71717a; 
-            --glass-bg: rgba(255, 255, 255, 0.85); 
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.04); 
-            --safe-bottom: env(safe-area-inset-bottom, 16px); 
-            --danger-color: #ef4444; 
-            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --bg-color: #f4f4f5; --primary-color: #52525b; --text-main: #27272a; --text-muted: #71717a;
+            --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04); --safe-bottom: env(safe-area-inset-bottom, 16px); 
+            --danger-color: #dc2626; --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --accent-color: #3b82f6;
         }
         body.dark-mode {
-            --bg-color: #09090b; --primary-color: #a1a1aa; --accent-color: #60a5fa; 
-            --text-main: #f4f4f5; --text-muted: #a1a1aa;
+            --bg-color: #09090b; --primary-color: #a1a1aa; --text-main: #f4f4f5; --text-muted: #a1a1aa;
             --glass-bg: rgba(24, 24, 27, 0.75); --glass-border: rgba(255, 255, 255, 0.05);
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --accent-color: #60a5fa;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(75px + var(--safe-bottom)); overflow-x: hidden; transition: 0.3s ease; }
 
-        /* 🌟 起始載入畫面 (修復：恢復原始圖片，並加入內建進度條) */
+        /* 🌟 起始載入畫面 */
         #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f4f5; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
-        #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 1; filter: none; /* 移除灰階與半透明，完全顯示原圖 */ }
+        #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 1; filter: none; }
         #splash-screen .splash-text { position: absolute; bottom: 8%; z-index: 10; background: rgba(255,255,255,0.95); padding: 16px 40px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; backdrop-filter: blur(12px); width: auto; min-width: 260px;}
         #splash-screen h2 { color: #27272a; font-size: 20px; margin-bottom: 4px; font-weight: 800; letter-spacing: 0.5px;} 
-        #splash-screen p { color: #71717a; font-size: 12px; font-weight: 700; margin-bottom: 0; }
+        #splash-screen p { color: #71717a; font-size: 12px; font-weight: 700; margin-bottom: 0; transition: 0.3s;}
         .progress-container { width: 100%; height: 4px; background: rgba(0,0,0,0.08); border-radius: 10px; margin-top: 10px; overflow: hidden; position: relative; }
         .progress-bar { width: 0%; height: 100%; background: var(--primary-color); border-radius: 10px; transition: width 0.4s var(--spring); }
 
@@ -55,7 +48,7 @@
         .hero .editable { padding: 2px 6px; margin-left: -6px; border-radius: 8px; transition: background 0.3s; width: fit-content; max-width: 100%; }
         .hero .editable:focus { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); outline: none; }
 
-        .global-controls { display: flex; flex-direction: column; align-items: stretch; padding: 8px 12px; background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); margin: 8px 12px; position: sticky; top: 8px; z-index: 30; box-shadow: 0 8px 24px rgba(0,0,0,0.04), inset 0 0 0 1px var(--glass-border); border-radius: 24px; transition: all 0.3s ease; }
+        .global-controls { display: flex; flex-direction: column; align-items: stretch; padding: 8px 12px; background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); margin: 8px 12px; position: sticky; top: 8px; z-index: 30; box-shadow: 0 8px 24px rgba(0,0,0,0.05), inset 0 0 0 1px var(--glass-border); border-radius: 24px; transition: all 0.3s ease; }
         .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .manual-save-btn { background: var(--primary-color); color: white; border: none; border-radius: 50px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s var(--spring); white-space: nowrap; flex-shrink: 0; padding: 6px 12px; height: 28px; user-select: none !important; touch-action: manipulation; }
@@ -91,15 +84,13 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; pointer-events: none; }
         body.dark-mode #itinerary-days-container .timeline-item::before { color: #52525b; }
         
-        /* 左側時間欄位 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
         .start-time { font-weight: 800; font-size: 14px; color: var(--accent-color); margin-bottom: 2px; line-height: 1; }
-        .duration-wrap { font-size: 9px; font-weight: 700; color: var(--text-muted); background: rgba(0,0,0,0.04); padding: 2px 4px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); }
+        .duration-wrap { font-size: 9px; font-weight: 700; color: var(--text-muted); background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); }
         .duration { font-weight: 800; color: var(--primary-color); min-width: 12px; display: inline-block; text-align: center; } 
         .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
         .auto-start { font-size: 9px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 9px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
 
-        /* 中間內容欄位 */
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 0px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
         .item-note { display: block; background: transparent; padding: 0 0 4px 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 2px; color: var(--text-muted); width: 100%; word-break: break-word; white-space: pre-wrap; line-height: 1.5; transition: 0.3s; min-height: 16px;} 
@@ -119,8 +110,7 @@
         
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.03); color: var(--primary-color); border: 1px dashed rgba(0,0,0,0.1); border-radius: 50px; font-weight: 800; font-size: 12px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #a1a1aa;}
         
-        /* 🌟 右側操作按鈕群組 (直向) */
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 4px; justify-content: flex-start; padding-top: 4px;} 
+        .right-action-group { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; margin-left: 4px; justify-content: flex-start; padding-top: 2px;} 
         
         .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
@@ -199,7 +189,7 @@
     </style>
 </head>
 <body>
-    <!-- 🌟 起始畫面：恢復無遮罩純圖片 + 進度條 -->
+    <!-- 🌟 起始畫面：無濾鏡原圖 + 融合式進度條 -->
     <div id="splash-screen">
         <img id="splash-bg-img" src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
         <div class="splash-text">
@@ -222,6 +212,77 @@
             </div>
         </div>
     </div>
+
+    <!-- 🌟 直接將 HTML 結構實體化，防堵 iOS Template 空白問題 -->
+    <div class="container" id="main-container">
+        <div id="tab-itinerary" class="tab-content active">
+            <div id="day-tabs-container" class="day-tabs-wrapper"></div>
+            <div id="itinerary-days-container"></div>
+            <button class="add-btn" onclick="addNewDayCard()" style="background: var(--primary-color); color: white;">+ 新增天數區塊</button>
+        </div>
+        <div id="tab-transport" class="tab-content">
+            <div class="glass-card">
+                <h2 class="section-title"><span class="material-icons-round" style="font-size:18px;">directions_transit</span> 交通票券與指南</h2>
+                <div id="transport-text-list" style="margin-top: 10px;"></div>
+                <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 4px;">+ 新增交通指南</button>
+            </div>
+        </div>
+        <div id="tab-hotel" class="tab-content">
+            <div id="hotel-cards-container"></div>
+            <button class="add-btn" onclick="addHotelCard()" style="background: var(--primary-color); color: white;">+ 新增住宿區塊</button>
+        </div>
+        <div id="tab-shopping" class="tab-content">
+            <div class="glass-card">
+                <h2 class="section-title"><span class="material-icons-round" style="font-size:18px;">shopping_bag</span> 採買清單</h2>
+                <div id="shopping-list"></div>
+                <button class="add-btn" onclick="addGeneralItemWithNote(this)">+ 新增清單項目</button>
+            </div>
+        </div>
+        <div id="tab-budget" class="tab-content">
+            <div class="glass-card" style="padding: 12px 10px;">
+                <h2 class="section-title" style="margin-bottom: 4px;"><span class="material-icons-round" style="font-size:18px;">receipt_long</span> 記帳與分帳系統</h2>
+                <div style="margin-bottom: 6px; padding: 0px;">
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 800;">建立與管理付款人清單：</div>
+                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                        <div id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:4px;"></div>
+                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(0,0,0,0.05); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 50px; box-shadow: none;">+ 新增付款人</button>
+                    </div>
+                </div>
+                <table id="budget-table">
+                    <thead><tr><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr></thead>
+                    <tbody id="budget-tbody"></tbody>
+                </table>
+                <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 6px;">+ 新增記帳項目</button>
+                <div id="budget-result" style="margin-top:10px; padding-top:10px; border-top:2px dashed rgba(0,0,0,0.05); line-height: 1.5;"></div>
+            </div>
+        </div>
+        <div id="tab-todo" class="tab-content">
+            <div class="glass-card">
+                <h2 class="section-title"><span class="material-icons-round" style="font-size:18px;">book_online</span> 預訂類</h2>
+                <div id="booking-list"></div>
+                <button class="add-btn" onclick="addTodoItemToContainer('booking-list')">+ 新增預訂項目</button>
+            </div>
+            <div class="glass-card">
+                <div class="flex-between" style="margin-bottom: 10px;">
+                    <h2 class="section-title" style="margin-bottom: 0;"><span class="material-icons-round" style="font-size:18px;">luggage</span> 事前準備類</h2>
+                    <div class="person-select-wrapper" style="display:flex; align-items:center; gap:4px;">
+                        <select id="todo-person-select" onchange="switchTodoPerson(this.value)" style="border:1px solid var(--primary-color); color:var(--primary-color); font-weight:800; border-radius:50px; padding:2px 8px; font-size:11px;"><option value="預設範本" selected>預設範本</option></select>
+                        <span class="material-icons-round delete-btn" style="padding:0; font-size: 20px; color:var(--danger-color); cursor: pointer;" onclick="deleteTodoPerson()">delete</span>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷貝建立新人員清單</button>
+                <div id="person-todo-container">
+                    <div class="person-todo-list" data-person="預設範本" style="display: block;">
+                        <div class="todo-category-header flex-between">
+                            <span class="editable" contenteditable="true"> 確認行李重量</span>
+                            <div style="display:flex; gap:6px;"><span class="cat-action-icon" style="color:var(--primary-color); cursor:pointer;" onclick="addTodoItemHere(this)"><span class="material-icons-round" style="font-size:16px;">add_circle</span></span></div>
+                        </div>
+                        <div class="flex-between" style="gap:8px; margin-top:12px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <script>
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
@@ -234,6 +295,7 @@
         
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
         
+        // 🌟 防當機機制：讀寫 localStorage 全部加上 try-catch
         let currentTravelCurrency = 'JPY';
         try { currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY'; } catch(e) {}
         
@@ -241,9 +303,9 @@
         
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
-        const TAB_PASSWORD = "8888"; 
+        const TAB_PASSWORD = "0719"; 
 
-        // 🌟 核心修復：強制觸發與多重保險載入機制
+        // 🌟 絕對防卡死：確保進度條跑完一定能進畫面
         let loadTriggered = false;
         function triggerLoad() { 
             if (loadTriggered) return; 
@@ -252,7 +314,7 @@
         }
         document.addEventListener('DOMContentLoaded', triggerLoad);
         window.addEventListener('load', triggerLoad);
-        setTimeout(triggerLoad, 2500); // 絕對觸發，防死鎖
+        setTimeout(triggerLoad, 2500); 
 
         function updateProgress(percent, text) {
             const bar = document.getElementById('load-progress'); const textEl = document.getElementById('load-text');
@@ -473,32 +535,26 @@
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideMobileTooltip(); }, {passive: true});
         }
 
-        // 🌟 核心：防白畫面載入機制
+        // 🌟 防白屏重新設計：確保 DOM 直接顯示，就算報錯也不白屏
         async function loadData() {
             updateProgress(10, "初始化系統...");
             
-            // 防護一：確保 DOM 基本結構建立完成，避免隱藏畫面後變白屏
-            const template = document.getElementById('default-template'); 
-            if(template && document.getElementById('main-container').innerHTML.trim() === '') { 
-                document.getElementById('main-container').innerHTML = template.innerHTML; 
-            }
-            
-            // 讀取暫存的使用者設定
+            // 讀取暫存
             try {
                 const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal'); 
                 if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
             } catch(e) {}
 
-            // 防護二：絕對定時器，10秒不管發生什麼事都要解鎖畫面
+            // 🌟 絕對防卡死：確保 10 秒後一定隱藏載入畫面
             const forceUnlockTimer = setTimeout(() => {
-                updateProgress(100, "系統強制進入");
+                updateProgress(100, "強制進入系統");
                 hideSplashScreen();
-                showToast("⏳ 網路異常，已切換至本機模式", true);
+                showToast("⏳ 網路狀態異常，切換至本機模式", true);
             }, 10000);
 
             try {
                 if (typeof LZString === 'undefined') {
-                    updateProgress(100, "套件載入失敗，啟動備用模式");
+                    updateProgress(100, "套件載入失敗");
                     loadFromLocal();
                     hideSplashScreen();
                     clearTimeout(forceUnlockTimer);
@@ -516,7 +572,6 @@
                 
                 updateProgress(40, "連線至 Google 雲端...");
                 
-                // 設定 Fetch 超時 (8秒)，留2秒給 fallback 處理
                 const fetchPromise = fetch(API_URL).then(res => res.json());
                 const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
 
@@ -548,6 +603,7 @@
             } catch (globalErr) {
                 hideSplashScreen();
                 clearTimeout(forceUnlockTimer);
+                finalizeLoad(); // 確保就算是未知錯誤，也會整理好當前 HTML 的按鈕排版
             }
         }
 
@@ -840,7 +896,6 @@
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
-                    <div class="sub-items-container"></div>
                     <div class="action-row" style="margin-top:2px; display:flex; gap:6px; align-items:center; width:100%;">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:14px;">place</span></button>
                         <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:var(--accent-color);"><span class="material-icons-round" style="font-size:14px;">add_location_alt</span></button>
