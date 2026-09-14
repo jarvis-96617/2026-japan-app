@@ -164,6 +164,7 @@
         let isEditMode = false; 
         let lastCloudModifiedTime = 0;
         let hasShownStartupToast = false;
+        let needsSaveAfterFetch = false;
         window.sortableInstances = [];
         
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
@@ -174,7 +175,6 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
 
-        // 🌟 智慧時間解析：支援 "90", "1.5小時", "1時30分", "1:30" 等格式
         function parseMins(str) {
             if (!str) return 0;
             str = str.toString().replace(/\s/g, '').toLowerCase();
@@ -188,7 +188,6 @@
             let numMatch = str.match(/(\d+)/); return numMatch ? parseInt(numMatch[1]) : 0;
         }
 
-        // 🌟 智慧時間格式化：輸出 "1小時30分" 或 "45分"
         function formatMins(mins) {
             if (isNaN(mins) || mins < 0) mins = 0;
             if (mins >= 60) {
@@ -198,7 +197,6 @@
             return `${mins}分`;
         }
 
-        // 🌟 全域焦點離開監聽：自動格式化時間並存檔
         document.addEventListener('focusout', function(e) {
             if (!isEditMode) return;
             if (e.target.classList.contains('editable') || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
@@ -562,32 +560,54 @@
             if (typeof LZString === 'undefined') return;
             if (!isEditMode && !isManual) return;
             if (isInitializing && !isManual) return;
+            
+            // 🌟 核心修復：如果上一筆存檔還沒完成，先掛起不抓取基準號碼，避免假性衝突
+            if (isSavingToCloud) {
+                needsSaveAfterFetch = true;
+                if (isManual) showToast("⏳ 資料同步中，已加入排程...");
+                return; 
+            }
+
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
-            pendingSaveAction = true; let payload;
-            try {
-                const state = captureState(); 
-                const compressedData = LZString.compressToUTF16(JSON.stringify(state));
-                payload = JSON.stringify({ 
-                    isCompressed: true, 
-                    data: compressedData, 
-                    token: APP_TOKEN,
-                    baseHash: lastCloudDataHash 
-                });
-                lastCloudDataHash = compressedData; 
-            } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
-
-            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
-            localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
-            
-            if(!API_URL.startsWith("https://script.google.com")) { setStatus('cloud_off', '本機模式', true); pendingSaveAction = false; return; }
-            setStatus('sync', '同步壓縮檔中...'); clearTimeout(syncTimeout);
+            pendingSaveAction = true; 
+            clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
-                pendingSaveAction = false; isSavingToCloud = true;
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload }).then(res => res.json()).then(data => {
+                pendingSaveAction = false; 
+                isSavingToCloud = true;
+                
+                let payload;
+                let compressedData;
+                try {
+                    const state = captureState(); 
+                    compressedData = LZString.compressToUTF16(JSON.stringify(state));
+                    payload = JSON.stringify({ 
+                        isCompressed: true, 
+                        data: compressedData, 
+                        token: APP_TOKEN,
+                        baseHash: lastCloudDataHash 
+                    });
+                    // 備份本機
+                    localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
+                    localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+                } catch(e) { console.error("存檔壓縮失敗", e); isSavingToCloud = false; return; }
+
+                if(!API_URL.startsWith("https://script.google.com")) { 
+                    setStatus('cloud_off', '本機模式', true); 
+                    isSavingToCloud = false; 
+                    if (needsSaveAfterFetch) { needsSaveAfterFetch = false; saveData(); }
+                    return; 
+                }
+                
+                setStatus('sync', '同步壓縮檔中...'); 
+                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
+                .then(res => res.json())
+                .then(data => {
                     isSavingToCloud = false; 
                     if(data.status === "success") { 
-                        setStatus('cloud_done', '雲端已同步'); if(isManual) alert("✅ 同步成功！"); 
+                        lastCloudDataHash = compressedData; // 🌟 核心修復：收到伺服器確認成功後，才更新基準版本號
+                        setStatus('cloud_done', '雲端已同步'); 
+                        if(isManual) showToast("✅ 同步成功！"); 
                     } else if (data.status === "conflict") {
                         setStatus('cloud_off', '版本衝突，拒絕存檔', true);
                         alert("🚨 【版本衝突警告】\n\n在你編輯的期間，有人已經存檔了新版本！\n為了避免覆蓋別人的心血，系統已「拒絕」本次存檔。\n\n請點擊上方工具列的「下載」按鈕保留你的修改，然後重新整理頁面。");
@@ -595,7 +615,20 @@
                     } else {
                         setStatus('cloud_off', '上傳失敗', true); if(isManual) alert('失敗：' + (data.message || '未知'));
                     }
-                }).catch(e => { isSavingToCloud = false; setStatus('cloud_off', '連線失敗(存本機)', true); if(isManual) alert("❌ 同步失敗！"); });
+                    
+                    // 🌟 執行排隊中的存檔
+                    if (needsSaveAfterFetch && data.status === "success") {
+                        needsSaveAfterFetch = false;
+                        saveData();
+                    } else {
+                        needsSaveAfterFetch = false;
+                    }
+                }).catch(e => { 
+                    isSavingToCloud = false; 
+                    setStatus('cloud_off', '連線失敗(存本機)', true); 
+                    needsSaveAfterFetch = false;
+                    if(isManual) alert("❌ 同步失敗！"); 
+                });
             }, isManual ? 0 : 1500); 
         }
 
@@ -671,7 +704,6 @@
                     }
                 });
 
-                // 🌟 自動清除舊版「分」字樣
                 document.querySelectorAll('.duration-wrap').forEach(wrap => { Array.from(wrap.childNodes).forEach(node => { if (node.nodeType === 3 && node.nodeValue.includes('分')) { node.nodeValue = node.nodeValue.replace(/分鐘|分/g, '').trim(); } }); });
                 document.querySelectorAll('.travel-time-wrap').forEach(wrap => { Array.from(wrap.childNodes).forEach(node => { if (node.nodeType === 3 && (node.nodeValue.includes('分') || node.nodeValue.includes('鐘'))) { node.nodeValue = node.nodeValue.replace(/分鐘|分/g, '').trim(); } }); });
 
