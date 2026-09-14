@@ -18,40 +18,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
     <style>
-        /* 🌟 質感灰白調美學 (Minimalist Zinc Theme) */
+        /* 🌟 質感灰階色調與動畫設定 */
         :root {
-            --bg-color: #f4f4f5; /* 極淺灰白 */
-            --primary-color: #3f3f46; /* 深鋅灰 (主標題/按鈕) */
-            --accent-color: #3b82f6; /* 天空藍 (導航等點綴) */
-            --text-main: #18181b; /* 近黑色 (主要文字) */
-            --text-muted: #71717a; /* 中灰色 (備註/次要文字) */
-            --glass-bg: rgba(255, 255, 255, 0.85); 
-            --glass-border: rgba(255, 255, 255, 0.9);
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.04); 
-            --safe-bottom: env(safe-area-inset-bottom, 16px); 
-            --danger-color: #ef4444; 
-            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --bg-color: #f4f4f5; --primary-color: #52525b; --text-main: #27272a; --text-muted: #71717a;
+            --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04); --safe-bottom: env(safe-area-inset-bottom, 16px); 
+            --danger-color: #dc2626; --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --accent-color: #3b82f6;
         }
         body.dark-mode {
-            --bg-color: #09090b; --primary-color: #a1a1aa; --accent-color: #60a5fa; 
-            --text-main: #f4f4f5; --text-muted: #a1a1aa;
+            --bg-color: #09090b; --primary-color: #a1a1aa; --text-main: #f4f4f5; --text-muted: #a1a1aa;
             --glass-bg: rgba(24, 24, 27, 0.75); --glass-border: rgba(255, 255, 255, 0.05);
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --accent-color: #60a5fa;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(75px + var(--safe-bottom)); overflow-x: hidden; transition: 0.3s ease; }
 
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
-        #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.5; filter: grayscale(80%); }
-        #splash-screen .splash-text { position: absolute; bottom: 10%; z-index: 10; background: rgba(255,255,255,0.9); padding: 12px 30px; border-radius: 50px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); text-align: center; backdrop-filter: blur(10px); }
-        #splash-screen h2 { color: #27272a; font-size: 20px; margin-bottom: 2px; font-weight: 800;} #splash-screen p { color: #71717a; font-size: 12px; font-weight: 700; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e4e4e7 0%, #d4d4d8 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
+        #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.6; filter: grayscale(50%); }
+        #splash-screen .splash-text { position: absolute; bottom: 10%; z-index: 10; background: rgba(255,255,255,0.9); padding: 12px 30px; border-radius: 50px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); text-align: center; backdrop-filter: blur(10px); }
+        #splash-screen h2 { color: #3f3f46; font-size: 20px; margin-bottom: 2px; font-weight: 800;} #splash-screen p { color: #71717a; font-size: 12px; font-weight: 700; }
 
-        .hero { background: linear-gradient(to bottom, rgba(24,24,27,0.2), rgba(24,24,27,0.9)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 120px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); border-radius: 0 0 24px 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); margin-bottom: 6px; overflow: hidden;}
+        .hero { background: linear-gradient(to bottom, rgba(39,39,42,0.3), rgba(39,39,42,0.85)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 120px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); border-radius: 0 0 24px 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); margin-bottom: 6px; overflow: hidden;}
         .hero h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.4); } .hero p { font-size: 11px; opacity: 0.9; font-weight: 600;}
         .hero .editable { padding: 2px 6px; margin-left: -6px; border-radius: 8px; transition: background 0.3s; width: fit-content; max-width: 100%; }
         .hero .editable:focus { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); outline: none; }
 
-        .global-controls { display: flex; flex-direction: column; align-items: stretch; padding: 8px 12px; background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); margin: 8px 12px; position: sticky; top: 8px; z-index: 30; box-shadow: 0 8px 24px rgba(0,0,0,0.04), inset 0 0 0 1px var(--glass-border); border-radius: 24px; transition: all 0.3s ease; }
+        .global-controls { display: flex; flex-direction: column; align-items: stretch; padding: 8px 12px; background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); margin: 8px 12px; position: sticky; top: 8px; z-index: 30; box-shadow: 0 8px 24px rgba(0,0,0,0.05), inset 0 0 0 1px var(--glass-border); border-radius: 24px; transition: all 0.3s ease; }
         .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .manual-save-btn { background: var(--primary-color); color: white; border: none; border-radius: 50px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s var(--spring); white-space: nowrap; flex-shrink: 0; padding: 6px 12px; height: 28px; user-select: none !important; touch-action: manipulation; }
@@ -68,7 +61,6 @@
         .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        /* 🌟 排版恢復左中右三欄 */
         .timeline-item { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 0px; position: relative; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
         body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.4; filter: grayscale(100%);}
@@ -88,7 +80,7 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; pointer-events: none; }
         body.dark-mode #itinerary-days-container .timeline-item::before { color: #52525b; }
         
-        /* 左側時間欄位 */
+        /* 🌟 左側：時間區塊 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
         .start-time { font-weight: 800; font-size: 14px; color: var(--accent-color); margin-bottom: 2px; line-height: 1; }
         .duration-wrap { font-size: 9px; font-weight: 700; color: var(--text-muted); background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); }
@@ -96,15 +88,15 @@
         .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
         .auto-start { font-size: 9px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 9px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
 
-        /* 中間內容欄位 */
+        /* 🌟 中間：內容與按鈕區塊 */
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 4px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 0px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
         
-        /* 🌟 完美解決備註換行重疊 */
-        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 2px; color: var(--text-muted); width: 100%; word-break: break-word; white-space: pre-wrap; line-height: 1.5; transition: 0.3s; min-height: 16px;} 
+        /* 🌟 完美解決備註換行重疊：加大 margin 與 padding，強制 block 撐開 */
+        .item-note { display: block; background: transparent; padding: 0 0 4px 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 8px; color: var(--text-muted); width: 100%; word-break: break-word; white-space: pre-wrap; line-height: 1.6; transition: 0.3s; min-height: 20px;} 
         body.dark-mode .item-note { border-left-color: rgba(255,255,255,0.1); }
         
-        .action-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; width: 100%;}
+        .action-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 6px; width: 100%;}
         
         select, input { transition: 0.3s var(--spring); } body.dark-mode select, body.dark-mode input { background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;}
         .luggage-select { font-size: 11px; padding: 2px 6px; border-radius: 50px; border: 1.5px solid var(--primary-color); color: var(--primary-color); background: rgba(255,255,255,0.5); margin-right: 4px; cursor: pointer; font-weight: 800; outline: none; transition: 0.3s var(--spring);}
@@ -113,13 +105,13 @@
         .day-tab { flex: 0 0 auto; width: 48px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: all 0.3s var(--spring); scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.03); } .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); } .day-tab .day-num { font-size: 14px; font-weight: 800; line-height: 1.1; } .day-tab .day-date { font-size: 9px; opacity: 0.9; margin-top: 2px; font-weight: 600; }
 
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 800; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s var(--spring); white-space: nowrap; height: 24px; } .btn-circle { width: 24px; height: 24px; padding: 0; }
-        .travel-time-wrap { font-size:10px; font-weight: 700; color:var(--primary-color); background:rgba(0,0,0,0.04); padding:2px 6px 2px 2px; border-radius:50px; display:inline-flex; align-items:center; gap:4px; white-space: nowrap; flex-shrink: 0; height: 24px; box-sizing: border-box;} body.dark-mode .travel-time-wrap { background: rgba(255,255,255,0.05); color: #d4d4d8;}
+        .travel-time-wrap { font-size:10px; font-weight: 700; color:#52525b; background:rgba(0,0,0,0.04); padding:2px 6px 2px 2px; border-radius:50px; display:inline-flex; align-items:center; gap:4px; white-space: nowrap; flex-shrink: 0; height: 24px; box-sizing: border-box;} body.dark-mode .travel-time-wrap { background: rgba(255,255,255,0.05); color: #d4d4d8;}
         .transport-icon { font-size: 13px !important; background: #ffffff; color: var(--primary-color); border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s var(--spring);} body.dark-mode .transport-icon { background: #27272a; }
         
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.03); color: var(--primary-color); border: 1px dashed rgba(0,0,0,0.1); border-radius: 50px; font-weight: 800; font-size: 12px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #a1a1aa;}
         
-        /* 🌟 右側操作按鈕群組 (恢復直向排列) */
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 4px; justify-content: flex-start; padding-top: 4px;} 
+        /* 🌟 右側：操作按鈕群組 (直向疊加) */
+        .right-action-group { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; margin-left: 6px; justify-content: flex-start; padding-top: 2px;} 
         
         .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
@@ -131,13 +123,12 @@
         .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 14px; height: 14px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.2s var(--spring);}
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 20px; box-sizing: border-box; }
-        .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 6px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid var(--accent-color); transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
+        /* 🌟 子地點移到內容區內：寬度 100% */
+        .sub-items-container { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; margin-bottom: 8px; box-sizing: border-box; }
+        .sub-item { display: flex; align-items: flex-start; gap: 6px; padding: 8px 8px 8px 12px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid var(--accent-color); transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: var(--accent-color);}
-        .sub-item::before { content: '⋮⋮'; position: absolute; left: -14px; top: 14px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
-        body.dark-mode .sub-item::before { color: #52525b; }
-        .sub-item-title { font-size: 12px; font-weight: 800; flex-grow: 1; outline: none; color: var(--text-main);} 
-        .sub-item-note { font-size: 10px; font-weight: 500; color: var(--text-muted); margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
+        .sub-item-title { font-size: 13px; font-weight: 800; flex-grow: 1; outline: none; color: var(--text-main); margin-bottom:2px;} 
+        .sub-item-note { font-size: 11px; font-weight: 500; color: var(--text-muted); display: block; outline: none; line-height: 1.4; word-break: break-word; white-space: pre-wrap; min-height: 16px;}
         .sub-item .action-box { width: 22px; height: 22px; background: rgba(255,255,255,0.8); border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);}
         body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); }
 
@@ -147,7 +138,6 @@
 
         .resizer { position: absolute; top: 0; right: -8px; width: 16px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(0, 0, 0, 0.1); border-radius: 4px; transition: 0.2s var(--spring); } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         
-        /* 🌟 優化選單樣式，加入自定義下拉箭頭 */
         .amount-input, .curr-select, .payer-select, .split-select { background: rgba(0,0,0,0.04); border-radius: 50px; padding: 4px 8px; font-family: inherit; font-weight: 800; border: none; outline: none; appearance: none; -webkit-appearance: none; transition: all 0.3s var(--spring); text-align: center; text-align-last: center; color: var(--primary-color);} 
         .curr-select, .payer-select, .split-select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 4px center; background-size: 10px; padding-right: 14px !important;}
         body.dark-mode .curr-select, body.dark-mode .payer-select, body.dark-mode .split-select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
@@ -656,8 +646,8 @@
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
-                container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span>`; } });
-                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; } });
+                container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">image</span>`; } });
+                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">add_a_photo</span>`; } });
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
@@ -679,7 +669,7 @@
             if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
             if (typeof LZString === 'undefined') return;
             
-            // 🌟 加入 forceSave 參數，允許打勾或記帳這類「不用解鎖」的動作直接存檔
+            // 🌟 允許被標記為 forceSave 的動作（打勾、記帳）在鎖定模式下直接儲存
             if (!isEditMode && !isManual && !forceSave) return;
             if (isInitializing && !isManual && !forceSave) return;
             
@@ -775,7 +765,7 @@
             finalizeLoad();
         }
 
-        function setStatus(icon, text, isError = false) { const statusEl = document.getElementById('sync-status'); if(statusEl) { statusEl.innerHTML = `<span class="material-icons-round" style="font-size:16px; color: ${isError ? 'var(--danger-color)' : '#10b981'};">${icon}</span> <span>${text}</span>`; } }
+        function setStatus(icon, text, isError = false) { const statusEl = document.getElementById('sync-status'); if(statusEl) { statusEl.innerHTML = `<span class="material-icons-round" style="font-size:14px; color: ${isError ? 'var(--danger-color)' : '#10b981'};">${icon}</span> <span>${text}</span>`; } }
 
         function makeTableResizable() {
             const table = document.getElementById('budget-table'); if (!table) return;
@@ -818,20 +808,20 @@
                 document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
                     let contentBox = item.querySelector('.content-box');
                     
-                    // 🌟 恢復左中右三欄式，並自動修復舊排版
+                    // 🌟 自動復原為左中右三欄排版，將按鈕群搬回右側直向
                     let rightGroup = Array.from(item.children).find(c => c.classList && c.classList.contains('right-action-group'));
                     if (!rightGroup) {
                         rightGroup = document.createElement('div');
                         rightGroup.className = 'right-action-group';
                         item.appendChild(rightGroup);
                     }
-                    rightGroup.style.cssText = 'display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: flex-start; flex-shrink: 0; margin-left: 4px; padding-top: 4px;';
+                    rightGroup.style.cssText = 'display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: flex-start; flex-shrink: 0; margin-left: 4px; padding-top: 2px;';
 
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
                         
                         if (actionRow) {
-                            // 把舊的底部按鈕移回右側
+                            // 將原本在底部的連結/圖片/刪除按鈕搬回右側
                             let linkBox = actionRow.querySelector('.link-box');
                             let photoBox = actionRow.querySelector('.photo-box');
                             let delBox = actionRow.querySelector('.delete-box') || actionRow.querySelector('.delete-btn:not(.add-sub-btn)');
@@ -844,7 +834,7 @@
                                 rightGroup.appendChild(delBox);
                             }
                             
-                            // 恢復左側按鈕區塊
+                            // 清理舊的分類 wrapper
                             let leftActionsWrap = actionRow.querySelector('.left-actions');
                             if (leftActionsWrap) {
                                 while(leftActionsWrap.firstChild) actionRow.appendChild(leftActionsWrap.firstChild);
@@ -853,7 +843,8 @@
                             let rightActionsWrap = actionRow.querySelector('.right-actions');
                             if (rightActionsWrap) rightActionsWrap.remove();
                             
-                            actionRow.style.cssText = 'margin-top:6px; display:flex; gap:6px; align-items:center; width:100%;';
+                            // 行程卡片專屬的導航操作列 (導航, 新增子項目, 交通)
+                            actionRow.style.cssText = 'margin-top:2px; display:flex; gap:6px; align-items:center; width:100%;';
                             if (!actionRow.querySelector('.add-sub-btn')) {
                                 let btn = document.createElement('button');
                                 btn.className = 'btn-nav btn-circle add-sub-btn';
@@ -865,16 +856,22 @@
                             }
                         }
 
+                        // 🌟 將子項目放置在 contentBox 內部，位於備註下方、操作列上方
                         let subCont = item.querySelector('.sub-items-container');
-                        if (subCont && subCont.parentNode !== contentBox) { contentBox.appendChild(subCont); }
+                        if (subCont) {
+                            if (actionRow) contentBox.insertBefore(subCont, actionRow);
+                            else contentBox.appendChild(subCont);
+                        }
                     }
 
+                    // 清理舊版的 dash-box 外框
                     let dashBox = rightGroup.querySelector('.action-dash-box');
                     if (dashBox) {
                         while(dashBox.firstChild) rightGroup.appendChild(dashBox.firstChild);
                         dashBox.remove();
                     }
 
+                    // 重建事件綁定
                     let linkBox = rightGroup.querySelector('.link-box');
                     if (linkBox && linkBox.classList.contains('has-link')) {
                         let span = linkBox.querySelector('span');
@@ -906,7 +903,6 @@
                 
                 document.querySelectorAll('.payer-tag').forEach(tag => { if(tag.querySelector('span') && !tag.querySelector('.payer-del-btn')) { tag.querySelector('span').className = 'payer-del-btn'; } });
 
-                // 🌟 確保預算表的更動也會觸發「強制存檔 (Travel Mode)」
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => { 
                     if(!tr.querySelector('.split-select')) { 
                         let tds = tr.querySelectorAll('td'); 
@@ -921,8 +917,6 @@
                             tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]); 
                         } 
                     } 
-                    
-                    // 升級舊的 onchange/onblur
                     tr.querySelectorAll('select, input').forEach(el => {
                         let attr = el.getAttribute('onchange');
                         if (attr && attr.includes('saveData()')) { el.setAttribute('onchange', attr.replace('saveData()', 'saveData(false, false, true)')); }
@@ -979,7 +973,7 @@
                 box.removeAttribute('data-href');
                 box.setAttribute('onclick', 'handleItemLink(this, event)');
                 box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span>`;
-                saveData();
+                saveData(false, false, true);
             }
         }
 
@@ -993,18 +987,22 @@
                 btn.setAttribute('data-href', url);
                 btn.setAttribute('onclick', 'openStoredLink(this, event)');
                 btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--accent-color); pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:var(--danger-color); pointer-events:auto;">×</div>`;
-                saveData();
+                saveData(false, false, true);
             } else if (url) { alert("請輸入有效的網址 (需包含 http 或 https)！"); }
         }
 
         function addSubItem(btn, event) {
             event.stopPropagation();
             let timelineItem = btn.closest('.timeline-item');
-            let container = timelineItem.querySelector('.sub-items-container');
+            let contentBox = timelineItem.querySelector('.content-box');
+            let actionRow = contentBox.querySelector('.action-row');
+            let container = contentBox.querySelector('.sub-items-container');
+            
             if(!container) { 
                 container = document.createElement('div'); 
                 container.className = 'sub-items-container'; 
-                timelineItem.querySelector('.content-box').appendChild(container); 
+                if(actionRow) contentBox.insertBefore(container, actionRow);
+                else contentBox.appendChild(container); 
             }
             
             let sub = document.createElement('div');
@@ -1018,14 +1016,14 @@
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
                 </div>
-                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:4px; align-items:center; padding-top:0;">
+                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:4px; align-items:center;">
                     <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">image</span></div>
                     <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--danger-color);">close</span></div>
                 </div>
             `;
             container.appendChild(sub);
             initSortable();
-            saveData();
+            saveData(false, false, true);
         }
 
         function deleteSubItem(btn, event) {
@@ -1035,7 +1033,7 @@
                 let imgs = item.querySelectorAll('img');
                 imgs.forEach(img => { if(img && img.src) deleteImageFromCloud(img.src); });
                 item.remove();
-                saveData();
+                saveData(false, false, true);
             }
         }
 
@@ -1056,7 +1054,8 @@
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
-                    <div class="action-row" style="margin-top:6px; display:flex; gap:6px; align-items:center; width:100%;">
+                    <div class="sub-items-container"></div>
+                    <div class="action-row" style="margin-top:2px; display:flex; gap:6px; align-items:center; width:100%;">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:14px;">place</span></button>
                         <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:var(--accent-color);"><span class="material-icons-round" style="font-size:14px;">add_location_alt</span></button>
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
@@ -1064,43 +1063,43 @@
                 </div>
                 <div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>
             `;
-            btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
+            btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData(false, false, true);
         }
 
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
-            document.getElementById('transport-text-list').appendChild(newItem); saveData();
+            document.getElementById('transport-text-list').appendChild(newItem); saveData(false, false, true);
         }
 
         function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
             div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group" style="flex-direction:row;"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: 800; font-size: 14px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 50px;"><span class="material-icons-round" style="font-size:12px;">place</span> 導航至飯店</button>`;
-            container.appendChild(div); saveData();
+            container.appendChild(div); saveData(false, false, true);
         }
 
         function addGeneralItemWithNote(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
-            document.getElementById('shopping-list').appendChild(newItem); saveData();
+            document.getElementById('shopping-list').appendChild(newItem); saveData(false, false, true);
         }
 
         function addTodoItemToContainer(containerId) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
-            document.getElementById(containerId).appendChild(newItem); saveData();
+            document.getElementById(containerId).appendChild(newItem); saveData(false, false, true);
         }
 
         function addTodoCategory(btnElement) {
             const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
             newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div class="right-action-group" style="flex-direction:row; gap:4px; padding-top:0;"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; background:transparent;"><span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)" style="border:none; background:transparent;"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div>`;
-            btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
+            btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData(false, false, true);
         }
 
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group" style="padding-top:0;"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
-            const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
+            const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData(false, false, true);
         }
 
         function deleteImageFromCloud(imgUrl) {
@@ -1108,8 +1107,8 @@
             if (match && match[1]) { fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteImage', fileId: match[1], token: APP_TOKEN }) }).catch(e => console.log('雲端刪除失敗', e)); }
         }
 
-        function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
-        function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定刪除項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let imgs = item.querySelectorAll('img'); imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(); } }
+        function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(false, false, true); } }
+        function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定刪除項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let imgs = item.querySelectorAll('img'); imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(false, false, true); } }
         
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
@@ -1230,130 +1229,12 @@
 
         function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:4px; font-size:16px; color:var(--danger-color); line-height:1;" onclick="deletePayer(${idx})">×</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
         function updatePayerDropdowns() { let options = payers.map(p => `<option value="${p}">${p}</option>`).join(''); document.querySelectorAll('.payer-select').forEach(sel => { let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options; if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; } }); }
-        function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
-        function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
+        function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(false, false, true); } }
+        function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(false, false, true); } }
 
         function switchTodoPerson(personName) { document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none'); let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block'; let select = document.getElementById('todo-person-select'); Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); saveData(); }
-        function addNewTodoPerson() { let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return; if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; } let currentTemplateName = document.getElementById('todo-person-select').value; let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`); let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none'; newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed')); document.getElementById('person-todo-container').appendChild(newList); let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); }
-        function deleteTodoPerson() { let select = document.getElementById('todo-person-select'); let personName = select.value; if (personName === '預設範本') { alert('「預設範本」無法被刪除喔！'); return; } if (confirm(`確定要刪除人員「${personName}」的所有清單嗎？`)) { Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); }); let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove(); select.value = '預設範本'; switchTodoPerson('預設範本'); } }
-        
-        function toggleComplete(element, event) { 
-            if (!event.target.closest('.custom-checkbox')) return; 
-            element.classList.toggle('completed'); 
-            saveData(false, false, true); // 強制存檔，允許在鎖定狀態下打勾
-        }
-
-        function toggleTransportMode(iconEl, event) { 
-            event.stopPropagation(); 
-            let modes = ['directions_transit', 'flight', 'two_wheeler', 'directions_walk', 'directions_car']; 
-            let current = iconEl.innerText.trim(); 
-            let nextIndex = (modes.indexOf(current) + 1) % modes.length;
-            iconEl.innerText = modes[nextIndex >= 0 ? nextIndex : 0]; 
-            let card = iconEl.closest('.day-card'); 
-            if(card) recalculateDayTime(card); 
-            saveData(); 
-        }
-        
-        function recalculateDayTime(dayCardElement) {
-            let items = dayCardElement.querySelectorAll('.timeline-item'); if (items.length === 0) return;
-            let prevEndTimeMins = null; let prevTravelMins = null; let prevTimeCol = null;
-            items.forEach((item, index) => {
-                let timeCol = item.querySelector('.time-column'); if (!timeCol) return; 
-                let startEl = item.querySelector('.start-time'); let durationEl = item.querySelector('.duration');
-                let endEl = item.querySelector('.end-time'); let travelEl = item.querySelector('.travel-time');
-                let oldAuto = timeCol.querySelector('.auto-start'); let oldGap = timeCol.querySelector('.gap-text');
-                if (oldAuto) oldAuto.remove(); if (oldGap) oldGap.remove();
-                if (!startEl || !durationEl || !endEl) return;
-                
-                let startMins = 0; let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
-                if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
-                
-                let duration = parseMins(durationEl.innerText);
-                if (document.activeElement !== durationEl) durationEl.innerText = formatMins(duration);
-                
-                let endMins = startMins + duration;
-                endEl.innerText = `${String(Math.floor(endMins / 60) % 24).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
-                
-                if (index > 0 && prevTimeCol) {
-                    let expMins = prevEndTimeMins + (prevTravelMins || 0); let gap = startMins - expMins; if (gap < -300) gap += 24 * 60; 
-                    let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start'; autoStartEl.innerText = `預計 ${String(Math.floor(expMins / 60) % 24).padStart(2, '0')}:${String(expMins % 60).padStart(2, '0')}`;
-                    let gapEl = document.createElement('div'); gapEl.className = 'gap-text'; 
-                    if (gap < 0) { gapEl.style.color = 'var(--danger-color)'; gapEl.innerText = `重疊 ${formatMins(Math.abs(gap))}`; } else { gapEl.innerText = `隔 ${formatMins(gap)}`; }
-                    prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
-                }
-                prevEndTimeMins = endMins; 
-                if(travelEl) {
-                    prevTravelMins = parseMins(travelEl.innerText);
-                    if(document.activeElement !== travelEl) travelEl.innerText = formatMins(prevTravelMins);
-                } else { prevTravelMins = 0; }
-                prevTimeCol = timeCol;
-            });
-        }
-
-        function adjustStickyTabs() { let gc = document.querySelector('.global-controls'); let tabs = document.getElementById('day-tabs-container'); if (tabs) tabs.style.top = (gc && gc.style.display !== 'none') ? gc.offsetHeight + 'px' : '0px'; }
-        window.addEventListener('resize', adjustStickyTabs);
-
-        function initSortable() {
-            if (typeof Sortable === 'undefined') return;
-            window.sortableInstances.forEach(s => s.destroy()); window.sortableInstances = [];
-            const sortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box, .custom-checkbox', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } };
-            document.querySelectorAll('.day-card').forEach(card => { window.sortableInstances.push(Sortable.create(card, sortableOptions)); });
-            const lists = ['transport-text-list', 'shopping-list', 'booking-list']; lists.forEach(id => { let el = document.getElementById(id); if(el) window.sortableInstances.push(Sortable.create(el, sortableOptions)); });
-            document.querySelectorAll('.person-todo-list').forEach(list => { window.sortableInstances.push(Sortable.create(list, sortableOptions)); });
-            const subSortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.sub-item', filter: '.editable, img, .action-box, .material-icons-round', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function () { saveData(); } };
-            document.querySelectorAll('.sub-items-container').forEach(cont => { window.sortableInstances.push(Sortable.create(cont, subSortableOptions)); });
-        }
-
-        function autoNavigate(btn, event) {
-            event.preventDefault(); let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card'); if (!currentItem) return;
-            let titleEl = currentItem.querySelector('.item-name-target'); let title = titleEl ? titleEl.innerText.trim() : ''; if (!title) { alert('請先輸入地點名稱！'); return; }
-            let origin = ''; let dest = title; let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
-            if (match) { origin = match[1].trim(); dest = match[2].trim(); } 
-            else { let prevItem = currentItem.previousElementSibling; while(prevItem && !prevItem.classList.contains('timeline-item')) { prevItem = prevItem.previousElementSibling; } if (prevItem && prevItem.querySelector('.item-name-target')) { let prevTitle = prevItem.querySelector('.item-name-target').innerText.trim(); let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i); origin = prevMatch ? prevMatch[2].trim() : prevTitle; } }
-            
-            let mode = 'transit'; 
-            let iconEl = currentItem.querySelector('.transport-icon'); 
-            if (iconEl) { 
-                let t = iconEl.innerText.trim(); 
-                if (t === 'directions_walk') mode = 'walking'; 
-                if (t === 'directions_car') mode = 'driving'; 
-                if (t === 'two_wheeler') mode = 'driving'; 
-                if (t === 'flight') mode = 'transit'; 
-            }
-            
-            let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`; if (origin && origin !== '輸入行程名稱') mapUrl += `&origin=${encodeURIComponent(origin)}`;
-            
-            let a = document.createElement('a'); a.href = mapUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
-        function updateDayTabs() {
-            let container = document.getElementById('day-tabs-container'); if (!container) return; 
-            let shareMatch = window.location.href.match(/[?&](share|readonly)=([0-9,，、]+)/); let allowedIndexes = shareMatch ? shareMatch[2].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d)) : null;
-            let cards = document.querySelectorAll('#itinerary-days-container .day-card'); let html = ''; let activeIndex = -1;
-            cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; }); if (allowedIndexes && !allowedIndexes.includes(activeIndex)) activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
-            cards.forEach((card, index) => { if (allowedIndexes && !allowedIndexes.includes(index)) return; let title = card.querySelector('.section-title') ? card.querySelector('.section-title').innerText : ''; let dateStr = title.match(/\d{1,2}\/\d{1,2}/) ? title.match(/\d{1,2}\/\d{1,2}/)[0] : '日期'; html += `<div class="day-tab ${index === activeIndex ? 'active' : ''}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`; });
-            container.innerHTML = html;
-            if (cards.length > 0) { if (activeIndex === -1 || activeIndex >= cards.length) activeIndex = allowedIndexes ? allowedIndexes[0] : 0; switchDayCard(activeIndex); }
-            setTimeout(adjustStickyTabs, 50);
-        }
-
-        function switchDayCard(targetIndex) { document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => { let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`); if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); } }); saveData(); }
-        function addNewDayCard() { let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1; let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`; container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); }
-        function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
-
-        function rebindEvents() {
-            document.querySelectorAll('.photo-box img').forEach(img => { 
-                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
-                if (!img.closest('.photo-album-container')) { img.onclick = function(e) { openImageModal(this, e); }; }
-            });
-            document.querySelectorAll('.receipt-thumb-wrap img').forEach(img => { 
-                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
-                img.onclick = function(e) { openImageModal(this, e); };
-            });
-            document.querySelectorAll('.photo-album-container img').forEach(img => { img.onclick = null; });
-        }
-        
-        window.onload = loadData;
+        function addNewTodoPerson() { let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return; if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; } let currentTemplateName = document.getElementById('todo-person-select').value; let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`); let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none'; newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed')); document.getElementById('person-todo-container').appendChild(newList); let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); saveData(false, false, true);}
+        function deleteTodoPerson() { let select = document.getElementById('todo-person-select'); let personName = select.value; if (personName === '預設範本') { alert('「預設範本」無法被刪除喔！'); return; } if (confirm(`確定要刪除人員「${personName}」的所有清單嗎？`)) { Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); }); let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove(); select.value = '預設範本'; switchTodoPerson('預設範本'); saveData(false, false, true); } }
     </script>
 </body>
 </html>
