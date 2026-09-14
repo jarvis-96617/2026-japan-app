@@ -430,7 +430,7 @@
             let paramName = (type === "1") ? "share" : "readonly";
             let shareUrl = cleanInput ? baseUrl + "?" + paramName + "=" + cleanInput : baseUrl + "?" + paramName + "=all";
             setStatus('sync', '產生短網址中...');
-            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
+            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
         }
         function exportToPDF() { window.print(); }
         function exportBackup() { let data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
@@ -561,7 +561,6 @@
             if (!isEditMode && !isManual) return;
             if (isInitializing && !isManual) return;
             
-            // 🌟 核心修復：如果上一筆存檔還沒完成，先掛起不抓取基準號碼，避免假性衝突
             if (isSavingToCloud) {
                 needsSaveAfterFetch = true;
                 if (isManual) showToast("⏳ 資料同步中，已加入排程...");
@@ -587,7 +586,6 @@
                         token: APP_TOKEN,
                         baseHash: lastCloudDataHash 
                     });
-                    // 備份本機
                     localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
                     localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
                 } catch(e) { console.error("存檔壓縮失敗", e); isSavingToCloud = false; return; }
@@ -605,7 +603,7 @@
                 .then(data => {
                     isSavingToCloud = false; 
                     if(data.status === "success") { 
-                        lastCloudDataHash = compressedData; // 🌟 核心修復：收到伺服器確認成功後，才更新基準版本號
+                        lastCloudDataHash = compressedData; 
                         setStatus('cloud_done', '雲端已同步'); 
                         if(isManual) showToast("✅ 同步成功！"); 
                     } else if (data.status === "conflict") {
@@ -616,7 +614,6 @@
                         setStatus('cloud_off', '上傳失敗', true); if(isManual) alert('失敗：' + (data.message || '未知'));
                     }
                     
-                    // 🌟 執行排隊中的存檔
                     if (needsSaveAfterFetch && data.status === "success") {
                         needsSaveAfterFetch = false;
                         saveData();
@@ -632,9 +629,8 @@
             }, isManual ? 0 : 1500); 
         }
 
- function loadData() {
+        function loadData() {
             let isLoaded = false;
-            // 🌟 升級：把耐心從 10 秒 (10000) 延長到 20 秒 (20000)，適應手機網路與 Google 伺服器休眠
             const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 20000);
             const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 22000);
 
@@ -797,13 +793,29 @@
                 document.querySelectorAll('.amount-input').forEach(input => { let val = parseFloat(input.value.replace(/,/g, '')) || 0; input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value); });
                 calcBudget();
 
+                // 🌟 新增：強制每次開啟 App 都回到「行程分頁」的第一天
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                 const itTab = document.getElementById('tab-itinerary'); const firstNav = document.querySelectorAll('.nav-item')[0]; if(itTab) itTab.classList.add('active'); if(firstNav) firstNav.classList.add('active');
                 if (itTab && !document.getElementById('day-tabs-container')) { let tabsContainer = document.createElement('div'); tabsContainer.id = 'day-tabs-container'; tabsContainer.className = 'day-tabs-wrapper'; let daysContainer = document.getElementById('itinerary-days-container'); if (daysContainer) { itTab.insertBefore(tabsContainer, daysContainer); } }
                 document.querySelectorAll('.luggage-select').forEach(sel => { let currentVal = sel.value || '背包'; if (currentVal === '手提') currentVal = '背包'; sel.innerHTML = `<option value="背包">背包</option><option value="小包包">小包包</option><option value="託運">託運</option>`; sel.value = currentVal; Array.from(sel.options).forEach(opt => { if (opt.value === currentVal) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); });
                 document.querySelectorAll('.btn-nav').forEach(btn => { btn.style.width = ''; btn.style.height = ''; btn.style.borderRadius = ''; btn.style.padding = ''; if (btn.closest('#itinerary-days-container')) { if (btn.innerText.includes('導航') || btn.innerHTML.includes('place')) { btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">place</span>'; btn.classList.add('btn-circle'); } } else { btn.classList.remove('btn-circle'); } });
 
-                if(typeof updateCurrencyOptionsInTable === 'function') updateCurrencyOptionsInTable(); updateDayTabs(); if(typeof initHistory === 'function') initHistory(); initSortable(); makeTableResizable(); 
+                if(typeof updateCurrencyOptionsInTable === 'function') updateCurrencyOptionsInTable(); 
+                
+                // 🌟 強制切換回 Day 1 (防呆機制)
+                updateDayTabs(); 
+                let startDayIdx = 0;
+                let shareMatch = window.location.href.match(/[?&](share|readonly)=([0-9,，、]+)/);
+                if (shareMatch) {
+                    let allowed = shareMatch[2].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
+                    if (allowed.length > 0) startDayIdx = allowed[0];
+                }
+                switchDayCard(startDayIdx); 
+                updateDayTabs();
+                if(firstNav) switchTab('tab-itinerary', firstNav); 
+                window.scrollTo(0, 0);
+
+                if(typeof initHistory === 'function') initHistory(); initSortable(); makeTableResizable(); 
                 document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
