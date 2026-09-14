@@ -18,7 +18,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
     <style>
-        /* 🌟 全局設計語彙定義：加入果凍回彈參數 var(--spring) */
         :root {
             --bg-color: #f2f5f8; --primary-color: #4a6fa5; --text-main: #2d3748; --text-muted: #718096;
             --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.8);
@@ -38,17 +37,14 @@
         #splash-screen .splash-text { position: absolute; bottom: 12%; z-index: 10; background: rgba(255,255,255,0.95); padding: 15px 35px; border-radius: 50px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); text-align: center; backdrop-filter: blur(10px); }
         #splash-screen h2 { color: #4a6fa5; font-size: 22px; margin-bottom: 4px; font-weight: 800;} #splash-screen p { color: #555; font-size: 13px; font-weight: bold; }
 
-        /* 🌟 頂部 Hero 圖片改為超大圓角底 */
         .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop') center/cover; height: 140px; color: white; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); border-radius: 0 0 36px 36px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 8px; overflow: hidden;}
         .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); } .hero p { font-size: 13px; opacity: 0.95; font-weight: 500;}
         .hero .editable { padding: 4px 8px; margin-left: -8px; border-radius: 12px; transition: background 0.3s; width: fit-content; max-width: 100%; }
         .hero .editable:focus { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); outline: none; }
 
-        /* 🌟 控制列：改為懸浮果凍膠囊 (Dynamic Island 風格) */
         .global-controls { display: flex; flex-direction: column; align-items: stretch; padding: 12px 16px; background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); margin: 12px 15px; position: sticky; top: 12px; z-index: 30; box-shadow: 0 12px 32px rgba(0,0,0,0.08), inset 0 0 0 1px var(--glass-border); border-radius: 36px; transition: all 0.4s var(--spring); }
         .hide-scrollbar::-webkit-scrollbar { display: none; } .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 🌟 所有按鈕升級為極致圓角 (Pill-shape) 與果凍點擊特效 */
         .manual-save-btn { background: var(--primary-color); color: white; border: none; border-radius: 50px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s var(--spring); white-space: nowrap; flex-shrink: 0; padding: 8px 14px; user-select: none !important; touch-action: manipulation; }
         .manual-save-btn * { pointer-events: none; } 
         .manual-save-btn:active, .add-btn:active, .btn-nav:active, .action-box:active, .day-tab:active, .receipt-box:active { transform: scale(0.9); }
@@ -57,7 +53,6 @@
         body.dark-mode #mobile-tooltip { background: rgba(255, 255, 255, 0.95); color: #121212; }
 
         .container { padding: 0 15px; }
-        /* 🌟 卡片升級：大圓角、深層霧化 */
         .glass-card { background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); border-radius: 32px; padding: 18px 16px; margin-bottom: 20px; box-shadow: var(--shadow); transition: all 0.4s var(--spring); }
         .section-title { font-size: 19px; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 8px; margin-bottom: 12px;}
         .editable { padding: 4px 6px; border-radius: 8px; transition: background 0.3s var(--spring); min-height: 1.2em; margin-left: -4px;}
@@ -100,18 +95,19 @@
 
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 8px 16px; border-radius: 50px; font-size: 13px; font-weight: 800; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 4px 12px rgba(74, 111, 165, 0.2); transition: all 0.3s var(--spring); white-space: nowrap; } .btn-circle { width: 34px; height: 34px; padding: 0; }
         .travel-time-wrap { font-size:12px; font-weight: 700; color:#4a5568; background:rgba(0,0,0,0.04); padding:4px 10px 4px 4px; border-radius:50px; display:inline-flex; align-items:center; gap:6px; white-space: nowrap; flex-shrink: 0; height: 34px; box-sizing: border-box;} body.dark-mode .travel-time-wrap { background: rgba(255,255,255,0.05); color: #cbd5e1;}
-        .transport-icon { font-size: 16px !important; background: #ffffff; color: var(--primary-color); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.3s var(--spring);} body.dark-mode .transport-icon { background: #1e293b; }
+        .transport-icon { font-size: 16px !important; background: #ffffff; color: var(--primary-color); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.3s var(--spring);} body.dark-mode .transport-icon { background: #1e293b; border-color: var(--primary-color);}
         
         .add-btn { width: 100%; padding: 14px; background: rgba(74, 111, 165, 0.1); color: var(--primary-color); border: none; border-radius: 50px; font-weight: 800; font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 10px; margin-bottom: 5px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(74, 111, 165, 0.2); color: #93c5fd;}
         
-        .right-action-group { display: flex; flex-direction: column; gap: 8px; align-items: center; flex-shrink: 0; margin-left: 4px; } 
-        .action-dash-box { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; border: none; background: transparent; } 
+        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 2px; } 
+        .action-dash-box { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0; border: none; background: transparent; } 
         
         .action-box { width: 30px; height: 30px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 12px; transition: all 0.3s var(--spring); background: rgba(0,0,0,0.03); position: relative; user-select: none; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
+        .action-box:active { transform: scale(0.9); } 
         .action-box.has-link { background: #e0f2fe; color: #0284c7; } 
         body.dark-mode .action-box.has-link { background: rgba(2, 132, 199, 0.2); color: #38bdf8; } 
-        .action-box.has-photo { background: transparent; }
+        .action-box.has-photo { border: none; background: transparent; }
         
         .img-delete-badge { position: absolute; top: -6px; right: -6px; background: var(--danger-color); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.3s var(--spring);}
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
@@ -142,6 +138,7 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -10px 40px rgba(0,0,0,0.06); border-radius: 36px 36px 0 0; transition: 0.4s var(--spring); padding-top: 6px;} body.dark-mode .bottom-nav { background: rgba(15, 23, 42, 0.85); border-top-color: rgba(255,255,255,0.05); box-shadow: 0 -10px 40px rgba(0,0,0,0.4);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.4s var(--spring); } .nav-item.active { color: var(--primary-color); font-weight: 800; transform: translateY(-4px) scale(1.05); } .nav-item .material-icons-round { font-size: 26px; margin-bottom: 2px; }
         .tab-content { display: none; animation: fadeIn 0.4s var(--spring); position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
+        /* 🌟 唯讀保護模式專屬樣式 (排除解鎖密碼框) */
         body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
         body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
         body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
@@ -215,13 +212,16 @@
         window.sortableInstances = [];
         
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
-        let allRatesToTWD = { TWD: 1, JPY: 0.22, KRW: 0.024, THB: 0.9, USD: 32, EUR: 34 }; 
-        let currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY';
+        
+        // 🌟 Try-Catch 包裝全域 Storage 存取，防止 LINE/FB 等 WebView 阻擋時崩潰
+        let currentTravelCurrency = 'JPY';
+        try { currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY'; } catch(e) {}
+        
         let undoStack = [], redoStack = [];
         
         const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
         const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
-        const TAB_PASSWORD = "8888"; 
+        const TAB_PASSWORD = "0719"; 
 
         function parseMins(str) {
             if (!str) return 0;
@@ -274,7 +274,7 @@
         function verifyPrivacyPwd() {
             const input = document.getElementById('privacy-pwd-input');
             if (input.value === TAB_PASSWORD) {
-                sessionStorage.setItem('travelTabsUnlocked', 'true');
+                try { sessionStorage.setItem('travelTabsUnlocked', 'true'); } catch(e) {}
                 closePrivacyModal();
                 if (pendingTabId && pendingTabElement) { switchTab(pendingTabId, pendingTabElement); }
             } else {
@@ -290,13 +290,20 @@
         });
 
         function switchTab(tabId, element) {
-            if (tabId !== 'tab-itinerary' && sessionStorage.getItem('travelTabsUnlocked') !== 'true') {
+            let unlocked = false;
+            try { unlocked = (sessionStorage.getItem('travelTabsUnlocked') === 'true'); } catch(e) {}
+            if (tabId !== 'tab-itinerary' && !unlocked) {
                 openPrivacyModal(tabId, element); return;
             }
+
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); 
-            document.getElementById(tabId).classList.add('active'); element.classList.add('active'); window.scrollTo(0,0); 
-            if(tabId === 'tab-budget') calcBudget(); if(tabId === 'tab-itinerary') adjustStickyTabs(); 
+            document.getElementById(tabId).classList.add('active'); 
+            element.classList.add('active'); 
+            window.scrollTo(0,0); 
+            
+            if(tabId === 'tab-budget') calcBudget(); 
+            if(tabId === 'tab-itinerary') adjustStickyTabs(); 
         }
 
         function showToast(msg, isError = false) {
@@ -395,7 +402,7 @@
 
         function fetchExchangeRate() { fetch('https://api.exchangerate-api.com/v4/latest/TWD').then(res => res.json()).then(data => { if (data && data.rates) { for (let curr in data.rates) { allRatesToTWD[curr] = 1 / data.rates[curr]; } allRatesToTWD['TWD'] = 1; updateRateDisplay(); } }).catch(e => { console.log('匯率載入失敗'); updateRateDisplay(); }); }
         function updateRateDisplay() { let rate = allRatesToTWD[currentTravelCurrency]; if(rate) document.getElementById('rate-num').innerText = rate.toFixed(4); else document.getElementById('rate-num').innerText = '無資料'; }
-        function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); localStorage.setItem('travelAppCurrency', currentTravelCurrency); document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
+        function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); try { localStorage.setItem('travelAppCurrency', currentTravelCurrency); } catch(e) {} document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
         function getReliableDriveUrl(originalUrl) { if (!originalUrl) return ''; let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/); if (match && match[1]) { return `https://lh3.googleusercontent.com/d/${match[1]}`; } return originalUrl; }
         
         function handleImageError(img) { 
@@ -454,7 +461,11 @@
         window.addEventListener("focus", () => { checkCloudFreshness(); });
         ['touchstart', 'mousemove', 'keydown', 'scroll', 'click'].forEach(evt => { document.addEventListener(evt, () => { if (Date.now() - lastActiveTime > 180000) checkCloudFreshness(); lastActiveTime = Date.now(); }, {passive: true}); });
         if (window.location.search.includes('share=') || window.location.search.includes('readonly=')) { var splashImg = document.getElementById('splash-bg-img'); if (splashImg) splashImg.style.display = 'none'; }
-        if (localStorage.getItem('travelAppDarkMode') === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && localStorage.getItem('travelAppDarkMode') !== 'false')) { document.body.classList.add('dark-mode'); }
+        
+        try {
+            let savedTheme = localStorage.getItem('travelAppDarkMode');
+            if (savedTheme === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && savedTheme !== 'false')) { document.body.classList.add('dark-mode'); }
+        } catch(e) { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('dark-mode'); }
         
         function applyShareMode() { 
             let search = window.location.search; 
@@ -478,6 +489,7 @@
         </div>
     </div>
 
+    <!-- 控制列 -->
     <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 10px 16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
             <div class="hide-scrollbar" style="display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;">
@@ -509,7 +521,7 @@
         function undoAction() { if (undoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); redoStack.push(currentState); restoreState(undoStack.pop()); saveData(false, true); } else { alert("已經是最早的狀態，無法再上一步囉！"); } }
         function redoAction() { if (redoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); undoStack.push(currentState); restoreState(redoStack.pop()); saveData(false, true); } else { alert("沒有可以重做的動作囉！"); } }
         function initHistory() { if (undoStack.length === 0 && isEditMode) recordHistory(); }
-        function toggleDarkMode() { let isDark = document.body.classList.toggle('dark-mode'); localStorage.setItem('travelAppDarkMode', isDark); let icon = document.getElementById('dark-mode-icon'); if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode'; }
+        function toggleDarkMode() { let isDark = document.body.classList.toggle('dark-mode'); try { localStorage.setItem('travelAppDarkMode', isDark); } catch(e){} let icon = document.getElementById('dark-mode-icon'); if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode'; }
         
         function generateShareLink() {
             let type = prompt("請問要產生哪種分享網址？\n\n輸入 1：【協作模式】(旅伴可共同編輯與新增)\n輸入 2：【唯讀模式】(對方只能觀看，無法修改)", "1");
@@ -523,9 +535,9 @@
             fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
         }
         function exportToPDF() { window.print(); }
-        function exportBackup() { let data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+        function exportBackup() { let data = null; try{ data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); }catch(e){} if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
         function triggerImportBackup() { document.getElementById('backup-file-input').click(); }
-        function handleBackupUpload(event) { let file = event.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(e) { try { let content = e.target.result; JSON.parse(content); localStorage.setItem('travelAppSave_Keihan_vCloudFinal', content); alert("✅ 備份檔還原成功！即將重新載入頁面。"); location.reload(); } catch(err) { alert("❌ 備份檔格式不正確，請確認檔案是否有毀損！"); } }; reader.readAsText(file); }
+        function handleBackupUpload(event) { let file = event.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(e) { try { let content = e.target.result; JSON.parse(content); try { localStorage.setItem('travelAppSave_Keihan_vCloudFinal', content); }catch(e){} alert("✅ 備份檔還原成功！即將重新載入頁面。"); location.reload(); } catch(err) { alert("❌ 備份檔格式不正確，請確認檔案是否有毀損！"); } }; reader.readAsText(file); }
     </script>
 
     <div class="container" id="main-container"></div>
@@ -627,7 +639,7 @@
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
                 container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#94a3b8;">image</span>`; } });
-                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">add_a_photo</span>`; } });
+                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:#94a3b8;">add_a_photo</span>`; } });
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 container.querySelectorAll('*').forEach(el => {
                     el.removeAttribute('draggable');
@@ -672,8 +684,10 @@
                 lastCloudDataHash = compressedData; 
             } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
 
-            localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
-            localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+            try {
+                localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
+                localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+            } catch(e) {}
             
             if(!API_URL.startsWith("https://script.google.com")) { setStatus('cloud_off', '本機模式', true); pendingSaveAction = false; return; }
             setStatus('sync', '同步壓縮檔中...'); clearTimeout(syncTimeout);
@@ -708,12 +722,23 @@
 
         function loadData() {
             let isLoaded = false;
-            const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 20000);
-            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 22000);
+            const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 8000);
+            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 10000);
 
-            if (typeof LZString === 'undefined') return;
+            if (typeof LZString === 'undefined') {
+                alert("網路環境異常，無法載入核心套件。請檢查網路或關閉阻擋廣告工具後重整頁面。");
+                isAppReady = true; isInitializing = false;
+                const splash = document.getElementById('splash-screen');
+                if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
+                return;
+            }
+            
             const template = document.getElementById('default-template'); if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
-            const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal'); if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
+            
+            let savedPayers = null;
+            try { savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal'); } catch(e) {}
+            if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
+            
             if(!API_URL.startsWith("https://script.google.com")) { if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '本機模式', true); } return; }
             
             fetch(API_URL).then(res => res.json()).then(rawData => {
@@ -732,7 +757,8 @@
         }
 
         function loadFromLocal() {
-            const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
+            let saved = null;
+            try { saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); } catch(e) {}
             if (saved) {
                 let state = null;
                 try { let parsed = JSON.parse(saved); if (parsed.isCompressed && typeof LZString !== 'undefined') { lastCloudDataHash = parsed.data; state = JSON.parse(LZString.decompressFromUTF16(parsed.data)); } else { state = parsed; } } catch(e) {}
@@ -786,7 +812,7 @@
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
                         if (actionRow) {
-                            actionRow.style.display = 'flex'; actionRow.style.gap = '6px'; actionRow.style.alignItems = 'center';
+                            actionRow.style.display = 'flex'; actionRow.style.gap = '4px'; actionRow.style.alignItems = 'center';
                             if (!actionRow.querySelector('.add-sub-btn')) {
                                 let btn = document.createElement('button');
                                 btn.className = 'btn-nav btn-circle add-sub-btn';
@@ -831,17 +857,17 @@
                     let linkBox = document.createElement('div');
                     if (oldLinkUrl) {
                         linkBox.className = 'action-box has-link link-box'; linkBox.setAttribute('data-href', oldLinkUrl); linkBox.setAttribute('onclick', 'openStoredLink(this, event)');
-                        linkBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#0284c7; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#e53e3e; pointer-events:auto;">×</div>`;
-                    } else { linkBox.className = 'action-box link-box'; linkBox.setAttribute('onclick', 'handleItemLink(this, event)'); linkBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span>`; }
+                        linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#e53e3e; pointer-events:auto;">×</div>`;
+                    } else { linkBox.className = 'action-box link-box'; linkBox.setAttribute('onclick', 'handleItemLink(this, event)'); linkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`; }
                     dashBox.appendChild(linkBox);
                     
                     let photoBox = document.createElement('div'); photoBox.className = oldImgSrc ? 'action-box has-photo photo-box' : 'action-box photo-box'; photoBox.setAttribute('onclick', 'triggerItemUpload(this, event)');
                     if (oldImgSrc) { 
                         photoBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:12px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${oldImgSrc}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-6px; left:-6px; background:var(--primary-color); color:white; width:20px; height:20px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px; font-weight:800; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`; 
-                    } else { photoBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span>`; }
+                    } else { photoBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span>`; }
                     dashBox.appendChild(photoBox);
                     
-                    let delBox = document.createElement('div'); delBox.className = 'action-box delete-box'; delBox.setAttribute('onclick', item.classList.contains('hotel-card') ? 'deleteHotelCard(this, event)' : 'deleteItem(this, event)'); delBox.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span>`; dashBox.appendChild(delBox);
+                    let delBox = document.createElement('div'); delBox.className = 'action-box delete-box'; delBox.setAttribute('onclick', item.classList.contains('hotel-card') ? 'deleteHotelCard(this, event)' : 'deleteItem(this, event)'); delBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span>`; dashBox.appendChild(delBox);
                     group.appendChild(dashBox);
                     if (item.classList.contains('hotel-card') || item.classList.contains('todo-category-header')) { let fb = item.querySelector('.flex-between'); if(fb) fb.appendChild(group); else item.appendChild(group); } else { item.appendChild(group); }
                     if (oldDel) oldDel.remove();
@@ -882,7 +908,6 @@
                 switchDayCard(startDayIdx); 
                 updateDayTabs();
                 
-                // 強制每次重啟 App 都回到行程分頁
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
                 document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                 const itTab = document.getElementById('tab-itinerary'); 
@@ -914,7 +939,7 @@
                 box.className = 'action-box link-box';
                 box.removeAttribute('data-href');
                 box.setAttribute('onclick', 'handleItemLink(this, event)');
-                box.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span>`;
+                box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span>`;
                 saveData();
             }
         }
@@ -928,7 +953,7 @@
                 btn.removeAttribute('onclick'); 
                 btn.setAttribute('data-href', url);
                 btn.setAttribute('onclick', 'openStoredLink(this, event)');
-                btn.innerHTML = `<span class="material-icons-round" style="font-size:16px; color:#0ea5e9; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#e53e3e; pointer-events:auto;">×</div>`;
+                btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:#1976d2; pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:#e53e3e; pointer-events:auto;">×</div>`;
                 saveData();
             } else if (url) { alert("請輸入有效的網址 (需包含 http 或 https)！"); }
         }
@@ -947,16 +972,16 @@
             sub.className = 'sub-item';
             sub.innerHTML = `
                 <div style="flex-grow:1; display:flex; flex-direction:column; min-width:0;">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">subdirectory_arrow_right</span>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <span class="material-icons-round" style="font-size:14px; color:var(--primary-color);">subdirectory_arrow_right</span>
                         <span class="editable sub-item-title" contenteditable="true">輸入子地點/店名</span>
-                        <span class="material-icons-round" style="font-size:16px; color:#0ea5e9; cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
+                        <span class="material-icons-round" style="font-size:14px; color:#1976d2; cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
                 </div>
-                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:6px;">
-                    <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div>
-                    <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">close</span></div>
+                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:4px;">
+                    <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div>
+                    <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">close</span></div>
                 </div>
             `;
             container.appendChild(sub);
@@ -992,13 +1017,13 @@
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
-                    <div class="action-row" style="margin-top:4px; display:flex; gap:6px; align-items:center;">
-                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:18px;">place</span></button>
-                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:18px;">add_location_alt</span></button>
-                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed rgba(0,0,0,0.1); padding:0 2px; text-align:center;">15分</span></div>
+                    <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center;">
+                        <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:16px;">place</span></button>
+                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add_location_alt</span></button>
+                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
                     </div>
                 </div>
-                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>
+                <div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>
                 <div class="sub-items-container"></div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
@@ -1006,37 +1031,37 @@
 
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
 
         function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 12px; width: fit-content; padding: 6px 14px; border-radius: 50px;"><span class="material-icons-round" style="font-size:16px;">place</span> 導航至飯店</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: bold; font-size: 16px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 20px;"><span class="material-icons-round" style="font-size:14px;">place</span> 導航至飯店</button>`;
             container.appendChild(div); saveData();
         }
 
         function addGeneralItemWithNote(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
             document.getElementById('shopping-list').appendChild(newItem); saveData();
         }
 
         function addTodoItemToContainer(containerId) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:16px; color:#94a3b8;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-dash-box"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:#aaa;">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
             document.getElementById(containerId).appendChild(newItem); saveData();
         }
 
         function addTodoCategory(btnElement) {
             const newCat = document.createElement('div'); newCat.className = 'todo-category-header flex-between';
-            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div class="right-action-group"><div class="action-dash-box"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color);"><span class="material-icons-round" style="font-size:18px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newCat.innerHTML = `<span class="editable" contenteditable="true"> 新增分類名稱</span><div class="right-action-group"><div class="action-dash-box"><div class="action-box photo-box" onclick="addTodoItemHere(this)" style="border:none; color:var(--primary-color);"><span class="material-icons-round" style="font-size:16px;">add_circle_outline</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
             btnElement.parentNode.parentNode.insertBefore(newCat, btnElement.parentNode); saveData();
         }
 
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group"><div class="action-dash-box"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:16px; color:var(--danger-color);">delete</span></div></div></div>`;
+            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group"><div class="action-dash-box"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div>`;
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
@@ -1083,7 +1108,7 @@
             const file = event.target.files[0];
             if (file && currentItemThumbBox) {
                 isImageProcessing = true; let originalHTML = currentItemThumbBox.innerHTML; let isNew = !currentItemThumbBox.classList.contains('has-photo');
-                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:16px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:12px;">sync</span>`; }
+                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; }
 
                 compressImage(file, 800, 0.6, function(base64DataUrl) {
                     uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
@@ -1173,6 +1198,101 @@
         function switchTodoPerson(personName) { document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none'); let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block'; let select = document.getElementById('todo-person-select'); Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); saveData(); }
         function addNewTodoPerson() { let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return; if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; } let currentTemplateName = document.getElementById('todo-person-select').value; let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`); let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none'; newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed')); document.getElementById('person-todo-container').appendChild(newList); let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); }
         function deleteTodoPerson() { let select = document.getElementById('todo-person-select'); let personName = select.value; if (personName === '預設範本') { alert('「預設範本」無法被刪除喔！'); return; } if (confirm(`確定要刪除人員「${personName}」的所有清單嗎？`)) { Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); }); let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove(); select.value = '預設範本'; switchTodoPerson('預設範本'); } }
+        
+        function toggleTransportMode(iconEl, event) { event.stopPropagation(); let modes = ['directions_transit', 'directions_walk', 'directions_car']; let current = iconEl.innerText.trim(); iconEl.innerText = modes[(modes.indexOf(current) + 1) % modes.length]; let card = iconEl.closest('.day-card'); if(card) recalculateDayTime(card); saveData(); }
+        
+        function recalculateDayTime(dayCardElement) {
+            let items = dayCardElement.querySelectorAll('.timeline-item'); if (items.length === 0) return;
+            let prevEndTimeMins = null; let prevTravelMins = null; let prevTimeCol = null;
+            items.forEach((item, index) => {
+                let timeCol = item.querySelector('.time-column'); if (!timeCol) return; 
+                let startEl = item.querySelector('.start-time'); let durationEl = item.querySelector('.duration');
+                let endEl = item.querySelector('.end-time'); let travelEl = item.querySelector('.travel-time');
+                let oldAuto = timeCol.querySelector('.auto-start'); let oldGap = timeCol.querySelector('.gap-text');
+                if (oldAuto) oldAuto.remove(); if (oldGap) oldGap.remove();
+                if (!startEl || !durationEl || !endEl) return;
+                
+                let startMins = 0; let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
+                if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
+                
+                let duration = parseMins(durationEl.innerText);
+                if (document.activeElement !== durationEl) durationEl.innerText = formatMins(duration);
+                
+                let endMins = startMins + duration;
+                endEl.innerText = `${String(Math.floor(endMins / 60) % 24).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
+                
+                if (index > 0 && prevTimeCol) {
+                    let expMins = prevEndTimeMins + (prevTravelMins || 0); let gap = startMins - expMins; if (gap < -300) gap += 24 * 60; 
+                    let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start'; autoStartEl.innerText = `預計 ${String(Math.floor(expMins / 60) % 24).padStart(2, '0')}:${String(expMins % 60).padStart(2, '0')}`;
+                    let gapEl = document.createElement('div'); gapEl.className = 'gap-text'; 
+                    if (gap < 0) { gapEl.style.color = '#e57373'; gapEl.innerText = `重疊 ${formatMins(Math.abs(gap))}`; } else { gapEl.innerText = `隔 ${formatMins(gap)}`; }
+                    prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
+                }
+                prevEndTimeMins = endMins; 
+                if(travelEl) {
+                    prevTravelMins = parseMins(travelEl.innerText);
+                    if(document.activeElement !== travelEl) travelEl.innerText = formatMins(prevTravelMins);
+                } else { prevTravelMins = 0; }
+                prevTimeCol = timeCol;
+            });
+        }
+
+        function adjustStickyTabs() { let gc = document.querySelector('.global-controls'); let tabs = document.getElementById('day-tabs-container'); if (tabs) tabs.style.top = (gc && gc.style.display !== 'none') ? gc.offsetHeight + 'px' : '0px'; }
+        window.addEventListener('resize', adjustStickyTabs);
+
+        function initSortable() {
+            if (typeof Sortable === 'undefined') return;
+            window.sortableInstances.forEach(s => s.destroy()); window.sortableInstances = [];
+            const sortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } };
+            document.querySelectorAll('.day-card').forEach(card => { window.sortableInstances.push(Sortable.create(card, sortableOptions)); });
+            const lists = ['transport-text-list', 'shopping-list', 'booking-list']; lists.forEach(id => { let el = document.getElementById(id); if(el) window.sortableInstances.push(Sortable.create(el, sortableOptions)); });
+            document.querySelectorAll('.person-todo-list').forEach(list => { window.sortableInstances.push(Sortable.create(list, sortableOptions)); });
+            const subSortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.sub-item', filter: '.editable, img, .action-box, .material-icons-round', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function () { saveData(); } };
+            document.querySelectorAll('.sub-items-container').forEach(cont => { window.sortableInstances.push(Sortable.create(cont, subSortableOptions)); });
+        }
+
+        function toggleComplete(element, event) { if (!event.target.closest('.custom-checkbox')) return; element.classList.toggle('completed'); saveData(); }
+
+        function autoNavigate(btn, event) {
+            event.preventDefault(); let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card'); if (!currentItem) return;
+            let titleEl = currentItem.querySelector('.item-name-target'); let title = titleEl ? titleEl.innerText.trim() : ''; if (!title) { alert('請先輸入地點名稱！'); return; }
+            let origin = ''; let dest = title; let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+            if (match) { origin = match[1].trim(); dest = match[2].trim(); } 
+            else { let prevItem = currentItem.previousElementSibling; while(prevItem && !prevItem.classList.contains('timeline-item')) { prevItem = prevItem.previousElementSibling; } if (prevItem && prevItem.querySelector('.item-name-target')) { let prevTitle = prevItem.querySelector('.item-name-target').innerText.trim(); let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i); origin = prevMatch ? prevMatch[2].trim() : prevTitle; } }
+            let mode = 'transit'; let iconEl = currentItem.querySelector('.transport-icon'); if (iconEl) { let t = iconEl.innerText.trim(); if (t === 'directions_walk') mode = 'walking'; if (t === 'directions_car') mode = 'driving'; }
+            let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`; if (origin && origin !== '輸入行程名稱') mapUrl += `&origin=${encodeURIComponent(origin)}`;
+            
+            let a = document.createElement('a'); a.href = mapUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function updateDayTabs() {
+            let container = document.getElementById('day-tabs-container'); if (!container) return; 
+            let shareMatch = window.location.href.match(/[?&](share|readonly)=([0-9,，、]+)/); let allowedIndexes = shareMatch ? shareMatch[2].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d)) : null;
+            let cards = document.querySelectorAll('#itinerary-days-container .day-card'); let html = ''; let activeIndex = -1;
+            cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; }); if (allowedIndexes && !allowedIndexes.includes(activeIndex)) activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
+            cards.forEach((card, index) => { if (allowedIndexes && !allowedIndexes.includes(index)) return; let title = card.querySelector('.section-title') ? card.querySelector('.section-title').innerText : ''; let dateStr = title.match(/\d{1,2}\/\d{1,2}/) ? title.match(/\d{1,2}\/\d{1,2}/)[0] : '日期'; html += `<div class="day-tab ${index === activeIndex ? 'active' : ''}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`; });
+            container.innerHTML = html;
+            if (cards.length > 0) { if (activeIndex === -1 || activeIndex >= cards.length) activeIndex = allowedIndexes ? allowedIndexes[0] : 0; switchDayCard(activeIndex); }
+            setTimeout(adjustStickyTabs, 50);
+        }
+
+        function switchDayCard(targetIndex) { document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => { let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`); if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); } }); saveData(); }
+        function addNewDayCard() { let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1; let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`; container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); }
+        function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
+
+        function rebindEvents() {
+            document.querySelectorAll('.photo-box img').forEach(img => { 
+                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
+                if (!img.closest('.photo-album-container')) { img.onclick = function(e) { openImageModal(this, e); }; }
+            });
+            document.querySelectorAll('.receipt-thumb-wrap img').forEach(img => { 
+                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
+                img.onclick = function(e) { openImageModal(this, e); };
+            });
+            document.querySelectorAll('.photo-album-container img').forEach(img => { img.onclick = null; });
+        }
+        
+        window.onload = loadData;
     </script>
 </body>
 </html>
