@@ -101,8 +101,8 @@
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 2px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
         
-        /* 🌟 修正疊圖問題：加入 min-height 與 word-break: break-all */
-        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 6px; color: #52525b; width: 100%; word-break: break-all; min-height: 18px; line-height: 1.4; transition: 0.3s;} body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,0.1); }
+        /* 🌟 修正疊圖問題：加入 min-height 與 word-break: break-all，修改為可自動長高換行 */
+        .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 6px; color: #52525b; width: 100%; word-break: break-all; min-height: 18px; line-height: 1.4; transition: 0.3s; white-space: pre-wrap; height: auto; } body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,0.1); }
         .action-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-top: 2px;}
         
         select, input { transition: 0.3s var(--spring); } body.dark-mode select, body.dark-mode input { background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46;}
@@ -117,8 +117,8 @@
         
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.04); color: var(--primary-color); border: none; border-radius: 50px; font-weight: 800; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.05); color: #a1a1aa;}
         
-        /* 🌟 右側：操作按鈕群組 (直向疊加) */
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 2px; justify-content: flex-start;} 
+        /* 🌟 右側：操作按鈕群組強制直向疊加 */
+        .right-action-group { display: flex; flex-direction: column !important; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 2px; justify-content: flex-start;} 
         
         .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
@@ -157,15 +157,14 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(55px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid rgba(255,255,255,0.6); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -8px 30px rgba(0,0,0,0.04); border-radius: 24px 24px 0 0; transition: 0.4s var(--spring); padding-top: 4px;} body.dark-mode .bottom-nav { background: rgba(24, 24, 27, 0.85); border-top-color: rgba(255,255,255,0.05); box-shadow: 0 -8px 30px rgba(0,0,0,0.3);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s var(--spring); } .nav-item.active { color: var(--primary-color); font-weight: 800; transform: translateY(-2px) scale(1.05); } .nav-item .material-icons-round { font-size: 22px; margin-bottom: 2px; }
         .tab-content { display: none; animation: fadeIn 0.3s var(--spring); position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* 🌟 唯讀保護模式專屬樣式 (排除解鎖密碼框) */
+        /* 🌟 唯讀保護模式專屬樣式 (排除解鎖密碼框) 移除 custom-checkbox 禁止點擊 */
         body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
         body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
         body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
         body.view-mode-active .action-box.delete-box, body.view-mode-active .action-box.photo-box:not(.has-photo), 
         body.view-mode-active .action-box.link-box:not(.has-link), body.view-mode-active .payer-del-btn { display: none !important; }
         
-        body.view-mode-active .editable, body.view-mode-active .custom-checkbox, body.view-mode-active #exchange-rate-display,
-        body.view-mode-active .transport-icon { pointer-events: none !important; } 
+        body.view-mode-active .editable, body.view-mode-active #exchange-rate-display, body.view-mode-active .transport-icon { pointer-events: none !important; } 
         body.view-mode-active .editable { border: none !important; background: transparent !important; }
         body.view-mode-active select, body.view-mode-active input:not(#privacy-pwd-input) { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
         body.view-mode-active .action-box.has-photo { pointer-events: auto; }
@@ -204,7 +203,6 @@
         <div class="splash-text">
             <h2>2026 古京阪之旅</h2>
             <p id="splash-msg">行程載入中...</p>
-            <!-- 🌟 加入載入進度條 -->
             <div class="progress-container">
                 <div id="splash-progress" class="progress-bar"></div>
             </div>
@@ -371,7 +369,6 @@
         // 🌟 監聽 Firebase Lock 變化 (防搶奪機制)
         lockRef.on('value', (snapshot) => {
             const currentLock = snapshot.val();
-            // 如果我正在編輯，但雲端發現鎖不是我的，代表我被接管了
             if (currentLock && currentLock.deviceId !== myDeviceId && isEditMode) {
                 handleLockStolen();
             }
@@ -386,11 +383,10 @@
                 
                 lockRef.transaction((currentLock) => {
                     const now = Date.now();
-                    // 如果沒人鎖，或是鎖本來就我的，或是鎖超過3分鐘沒更新(當作斷線死鎖)，就讓我鎖
                     if (!currentLock || currentLock.deviceId === myDeviceId || (now - currentLock.timestamp > 180000)) {
                         return { deviceId: myDeviceId, timestamp: now };
                     }
-                    return; // 終止交易 (鎖在別人手上)
+                    return; 
                 }, (error, committed, snapshot) => {
                     if (error) {
                         setStatus('cloud_off', '連線失敗', true);
@@ -401,15 +397,14 @@
                             forceTakeoverLock();
                         }
                     } else {
-                        // 🎉 成功拿到鎖
-                        lockRef.onDisconnect().remove(); // 魔法：如果使用者直接關掉網頁，Firebase 自動解除鎖定！
+                        lockRef.onDisconnect().remove(); 
                         enableEditUI();
                     }
                 });
             } else {
                 saveData(true);
                 disableEditUI();
-                lockRef.remove(); // 釋放鎖
+                lockRef.remove(); 
                 lockRef.onDisconnect().cancel();
             }
             adjustStickyTabs();
@@ -451,10 +446,11 @@
         }
 
         function handleLockStolen() {
+            clearInterval(lockHeartbeatTimer);
             disableEditUI();
             setStatus('cloud_off', '權限已被接管', true);
-            alert("⚠️ 【編輯權限已被接管】\n\n您的編輯權限已被其他裝置強制接管！\n為了防止您的心血白費，系統即將為您自動下載實體備份檔，並將畫面恢復為唯讀模式。");
-            if (typeof exportBackup === 'function') exportBackup(); 
+            alert("⚠️ 【編輯權限已被接管】\n\n您的編輯權限已被其他裝置強制接管！系統已將畫面恢復為唯讀模式。\n\n💡 若您剛才有未存檔的重要資料，建議您點擊下方工具列的「更多(⋮) -> 下載」手動備份實體檔案，以免資料遺失。");
+            if (typeof checkCloudFreshness === 'function') checkCloudFreshness(); 
         }
 
         function updateEditToggleButton() {
@@ -612,7 +608,6 @@
         function undoAction() { if (undoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); redoStack.push(currentState); restoreState(undoStack.pop()); saveData(false, true); } else { alert("已經是最早的狀態，無法再上一步囉！"); } }
         function redoAction() { if (redoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); undoStack.push(currentState); restoreState(redoStack.pop()); saveData(false, true); } else { alert("沒有可以重做的動作囉！"); } }
         function initHistory() { if (undoStack.length === 0 && isEditMode) recordHistory(); }
-        function toggleDarkMode() { let isDark = document.body.classList.toggle('dark-mode'); try { localStorage.setItem('travelAppDarkMode', isDark); } catch(e){} let icon = document.getElementById('dark-mode-icon'); if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode'; }
         
         function generateShareLink() {
             let type = prompt("請問要產生哪種分享網址？\n\n輸入 1：【協作模式】(旅伴可共同編輯與新增)\n輸入 2：【唯讀模式】(對方只能觀看，無法修改)", "1");
@@ -623,7 +618,7 @@
             let paramName = (type === "1") ? "share" : "readonly";
             let shareUrl = cleanInput ? baseUrl + "?" + paramName + "=" + cleanInput : baseUrl + "?" + paramName + "=all";
             setStatus('sync', '產生短網址中...');
-            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
+            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
         }
         function exportToPDF() { window.print(); }
         function exportBackup() { let data = null; try{ data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); }catch(e){} if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
@@ -703,9 +698,8 @@
         </div>
     </template>
 
-    <input type="file" id="global-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleImageUpload(event)">
+    <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleItemUpload(event)">
     <input type="file" id="receipt-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleReceiptUpload(event)">
-    <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleItemUpload(event)">
     <input type="file" id="backup-file-input" accept=".json,.txt" style="display: none;" onchange="handleBackupUpload(event)">
 
     <nav class="bottom-nav">
@@ -758,13 +752,12 @@
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
             let newCompressedData; 
-            let payload; // 給本機備份用的
+            let payload; 
 
             try {
                 const state = captureState(); 
                 newCompressedData = LZString.compressToUTF16(JSON.stringify(state));
                 
-                // 智慧攔截：如果目前的資料跟雲端完全一樣，提早結束！
                 if (!isManual && newCompressedData === lastCloudDataHash) return; 
                 
                 payload = JSON.stringify({ 
@@ -774,7 +767,6 @@
             } catch(e) { return; }
 
             try {
-                // 本地備份照常執行
                 localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
                 localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
             } catch(e) {}
@@ -782,13 +774,10 @@
             setStatus('sync', '背景同步中...'); 
             clearTimeout(syncTimeout);
             
-            // 延遲 1.5 秒送出，避免打字卡頓
             syncTimeout = setTimeout(() => {
-                // 先檢查鎖是不是還在我們手上
                 lockRef.once('value').then(snapshot => {
                     const currentLock = snapshot.val();
                     if (currentLock && currentLock.deviceId === myDeviceId) {
-                        // 鎖在手上，大膽存入 Firebase！
                         tripRef.set({
                             compressedData: newCompressedData,
                             lastModified: Date.now()
@@ -801,7 +790,6 @@
                             if(isManual) alert("❌ 存檔失敗，請檢查網路！");
                         });
                     } else {
-                        // 鎖被搶走了！
                         handleLockStolen();
                     }
                 });
@@ -812,12 +800,10 @@
         function loadData() {
             updateProgress(30, '連線至 Firebase 即時資料庫...');
             
-            // 監聽 Firebase 資料庫變化
             tripRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 
                 if (data && data.compressedData) {
-                    // 如果雲端資料跟本地不同，才更新畫面
                     if (data.compressedData !== lastCloudDataHash) {
                         lastCloudDataHash = data.compressedData;
                         
@@ -836,7 +822,6 @@
                             finalizeLoad();
                             isInitializing = false;
                         } else {
-                            // 執行中被別人更新了！
                             try {
                                 let state = JSON.parse(LZString.decompressFromUTF16(data.compressedData));
                                 if(state && state.html) {
@@ -850,14 +835,12 @@
                         }
                     }
                 } else if (!data && isInitializing) {
-                    // 🚀 Firebase 裡面沒東西！觸發【自動搬家精靈】
                     updateProgress(60, '執行舊資料無痛搬家...');
                     const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
                     if (saved) {
                         try {
                             let parsed = JSON.parse(saved);
                             if (parsed.data) {
-                                // 把本機的舊資料直接推上 Firebase
                                 tripRef.set({ compressedData: parsed.data, lastModified: Date.now() });
                                 lastCloudDataHash = parsed.data;
                                 let state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
@@ -877,7 +860,6 @@
                 }
             });
             
-            // 安全機制：萬一網路卡住，5秒後強行關閉 Splash 畫面
             setTimeout(() => {
                 if(isInitializing) {
                     const splash = document.getElementById('splash-screen'); 
@@ -888,7 +870,6 @@
             }, 5000);
         }
 
-        // 🌟 最終版圖片上傳 (直接上傳 Firebase Storage)
         function uploadImageToCloud(base64Str, filename, callback, errorCallback) {
             setStatus('sync', '圖片上傳中...');
             const storageRef = firebase.storage().ref('images/' + Date.now() + '_' + filename);
@@ -911,34 +892,69 @@
             }
         }
 
-        // 替換原本的 handleItemUpload 內容
-        function handleItemUpload(event) {
-            const file = event.target.files[0];
-            if (file && currentItemThumbBox) {
-                isImageProcessing = true; let originalHTML = currentItemThumbBox.innerHTML; let isNew = !currentItemThumbBox.classList.contains('has-photo');
-                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; }
+        async function handleItemUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0 || !currentItemThumbBox) return;
 
-                compressImage(file, 800, 0.6, function(base64DataUrl) {
-                    uploadImageToCloud(base64DataUrl, file.name, function(driveUrl) {
-                        if (isNew) {
-                            currentItemThumbBox.className = 'action-box has-photo photo-box';
-                            currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:8px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-4px; left:-4px; background:var(--primary-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
-                        } else {
-                            let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = '+';
-                            let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
-                            if (albumContainer) {
-                                let newImg = document.createElement('img'); newImg.src = driveUrl; newImg.style.display = 'none'; newImg.setAttribute('onerror', 'handleImageError(this)'); albumContainer.appendChild(newImg);
-                                let countBadge = albumContainer.querySelector('.album-count-badge'); let imgCount = albumContainer.querySelectorAll('img').length;
-                                if (!countBadge) { countBadge = document.createElement('div'); countBadge.className = 'album-count-badge'; countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; line-height:1.2;'; albumContainer.appendChild(countBadge); }
-                                countBadge.innerText = '+' + (imgCount - 1);
-                            }
-                        } saveData(); isImageProcessing = false;
-                    }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
-                }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
+            isImageProcessing = true; 
+            let originalHTML = currentItemThumbBox.innerHTML; 
+            let isNew = !currentItemThumbBox.classList.contains('has-photo');
+
+            if (isNew) { 
+                currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; 
+            } else { 
+                let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); 
+                if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; 
             }
+
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+                try {
+                    let driveUrl = await new Promise((resolve, reject) => {
+                        compressImage(file, 800, 0.6, function(base64DataUrl) {
+                            uploadImageToCloud(base64DataUrl, file.name, resolve, reject);
+                        }, reject);
+                    });
+
+                    if (!currentItemThumbBox.classList.contains('has-photo')) {
+                        currentItemThumbBox.className = 'action-box has-photo photo-box';
+                        currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:8px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-4px; left:-4px; background:var(--primary-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
+                    } else {
+                        let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); 
+                        if(addBadge) addBadge.innerHTML = '+';
+                        let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
+                        if (albumContainer) {
+                            let newImg = document.createElement('img'); 
+                            newImg.src = driveUrl; newImg.style.display = 'none'; 
+                            newImg.setAttribute('onerror', 'handleImageError(this)'); 
+                            albumContainer.appendChild(newImg);
+                            
+                            let countBadge = albumContainer.querySelector('.album-count-badge'); 
+                            let imgCount = albumContainer.querySelectorAll('img').length;
+                            if (!countBadge) { 
+                                countBadge = document.createElement('div'); 
+                                countBadge.className = 'album-count-badge'; 
+                                countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; line-height:1.2;'; 
+                                albumContainer.appendChild(countBadge); 
+                            }
+                            countBadge.innerText = '+' + (imgCount - 1);
+                        }
+                    }
+                } catch (e) { console.log('單張圖片上傳失敗', e); }
+            }
+
+            if (!currentItemThumbBox.classList.contains('has-photo')) {
+                currentItemThumbBox.innerHTML = originalHTML;
+            } else {
+                let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); 
+                if(addBadge) addBadge.innerHTML = '+';
+            }
+
+            saveData(); 
+            isImageProcessing = false;
+            event.target.value = ''; 
         }
 
-        // 替換原本的 handleReceiptUpload 內容
         function handleReceiptUpload(event) {
             const file = event.target.files[0];
             if (file && currentReceiptBox) {
@@ -1248,6 +1264,11 @@
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
+        function deleteImageFromCloud(imgUrl) {
+            if (!imgUrl) return; let match = imgUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+            if (match && match[1]) { fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteImage', fileId: match[1], token: APP_TOKEN }) }).catch(e => console.log('雲端刪除失敗', e)); }
+        }
+
         function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
         function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定刪除項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let imgs = item.querySelectorAll('img'); imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(); } }
         
@@ -1290,6 +1311,33 @@
         function switchDayCard(targetIndex) { document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => { let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`); if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); } }); saveData(); }
         function addNewDayCard() { let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1; let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`; container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); }
         function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
+
+        // 🌟 唯讀背景偷偷存檔的魔法！
+        function toggleComplete(element, event) { 
+            if (!event.target.closest('.custom-checkbox')) return; 
+            element.classList.toggle('completed'); 
+            
+            if (isEditMode) {
+                saveData(); 
+            } else {
+                // 唯讀模式下的背景延遲同步 (等5秒，偷偷去 Firebase 拿鎖 -> 存檔 -> 還鎖)
+                clearTimeout(window.bgSyncTimer);
+                window.bgSyncTimer = setTimeout(() => {
+                    lockRef.once('value').then(snap => {
+                        let currentLock = snap.val();
+                        if (!currentLock || (Date.now() - currentLock.timestamp > 180000)) {
+                            lockRef.set({ deviceId: myDeviceId, timestamp: Date.now() }).then(() => {
+                                let state = captureState();
+                                let bgCompressed = LZString.compressToUTF16(JSON.stringify(state));
+                                tripRef.set({ compressedData: bgCompressed, lastModified: Date.now() }).then(() => {
+                                    lockRef.remove(); // 存完馬上還鎖，不干擾別人
+                                });
+                            });
+                        }
+                    });
+                }, 5000);
+            }
+        }
 
         function rebindEvents() {
             document.querySelectorAll('.photo-box img').forEach(img => { 
