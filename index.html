@@ -220,6 +220,14 @@
     </div>
     
     <script>
+        // 🌟 1. 新增 Device ID 與心跳計時器
+        let myDeviceId = localStorage.getItem('travelAppDeviceId');
+        if (!myDeviceId) {
+            myDeviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('travelAppDeviceId', myDeviceId);
+        }
+        let lockHeartbeatTimer = null;
+
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
         let isInitializing = true; 
         let isEditMode = false; 
@@ -343,23 +351,90 @@
             setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) scale(0.9)'; }, 3500);
         }
 
+// 🌟 重新整理後的解鎖與鎖定邏輯
         function toggleEditMode() {
             if (new URLSearchParams(window.location.search).get('readonly')) { alert("此為專屬唯讀分享連結，無法解鎖編輯。"); return; }
+            
             if (!isEditMode) {
-                let now = Date.now();
-                if (lastCloudModifiedTime > 0) {
-                    let diffMinutes = Math.floor((now - lastCloudModifiedTime) / 60000);
-                    if (diffMinutes < 5 && diffMinutes >= 0) {
-                        if (!confirm(`⚠️ 警告：大約 ${diffMinutes} 分鐘前才剛有人編輯並儲存過這份行程！\n\n如果你的旅伴正在編輯，你現在解鎖並儲存可能會覆蓋他的進度。\n\n確定要解鎖編輯嗎？`)) { return; }
-                    }
-                }
-                isEditMode = true; document.body.classList.remove('view-mode-active'); updateEditToggleButton(); window.sortableInstances.forEach(s => s.option("disabled", false)); showToast("🔓 已解鎖編輯模式");
+                setStatus('sync', '申請編輯權限...');
+                let payload = JSON.stringify({ action: "requestLock", deviceId: myDeviceId, token: APP_TOKEN });
+                
+                fetch(API_URL, { method: 'POST', body: payload })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            enableEditUI(); 
+                        } else if (data.status === "locked") {
+                            setStatus('cloud_off', '有人正在編輯', true);
+                            if (confirm("🚨 目前有其他裝置正在編輯中！\n\n是否要【強制接管】編輯權？\n(這將迫使對方的裝置自動跳回唯讀模式)")) {
+                                forceTakeoverLock();
+                            }
+                        }
+                    }).catch(e => { 
+                        setStatus('cloud_off', '權限確認失敗', true); 
+                        alert("網路錯誤，無法連線確認權限。"); 
+                    });
             } else {
-                saveData(true); isEditMode = false; document.body.classList.add('view-mode-active'); updateEditToggleButton(); window.sortableInstances.forEach(s => s.option("disabled", true)); showToast("🔒 已恢復唯讀模式並自動儲存");
+                saveData(true);
+                disableEditUI();
+                let payload = JSON.stringify({ action: "releaseLock", deviceId: myDeviceId, token: APP_TOKEN });
+                fetch(API_URL, { method: 'POST', body: payload }); 
             }
             adjustStickyTabs();
         }
 
+        function forceTakeoverLock() {
+            setStatus('sync', '強制接管中...');
+            let payload = JSON.stringify({ action: "forceTakeover", deviceId: myDeviceId, token: APP_TOKEN });
+            fetch(API_URL, { method: 'POST', body: payload })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        showToast("⚔️ 已強制接管編輯權限！");
+                        enableEditUI();
+                    }
+                }).catch(e => alert("強制接管失敗，請檢查網路。"));
+        }
+
+        function enableEditUI() {
+            isEditMode = true; 
+            document.body.classList.remove('view-mode-active'); 
+            updateEditToggleButton(); 
+            window.sortableInstances.forEach(s => s.option("disabled", false)); 
+            showToast("🔓 已解鎖編輯模式");
+            setStatus('cloud_done', '編輯中');
+            
+            clearInterval(lockHeartbeatTimer);
+            lockHeartbeatTimer = setInterval(sendHeartbeat, 60000); // 每 60 秒送一次心跳
+        }
+
+        function disableEditUI() {
+            isEditMode = false; 
+            document.body.classList.add('view-mode-active'); 
+            updateEditToggleButton(); 
+            window.sortableInstances.forEach(s => s.option("disabled", true)); 
+            showToast("🔒 已恢復唯讀模式");
+            clearInterval(lockHeartbeatTimer);
+        }
+
+        function sendHeartbeat() {
+            if (!isEditMode) return;
+            let payload = JSON.stringify({ action: "heartbeat", deviceId: myDeviceId, token: APP_TOKEN });
+            fetch(API_URL, { method: 'POST', body: payload })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "locked") handleLockStolen();
+                }).catch(e => console.log("心跳發送失敗"));
+        }
+
+        function handleLockStolen() {
+            clearInterval(lockHeartbeatTimer);
+            disableEditUI();
+            setStatus('cloud_off', '權限已被接管', true);
+            alert("⚠️ 【編輯權限已被接管】\n\n您的編輯權限已被其他裝置強制接管！\n為了防止您的心血白費，系統即將為您自動下載實體備份檔，並將畫面恢復為唯讀模式。");
+            if (typeof exportBackup === 'function') exportBackup(); 
+            if (typeof checkCloudFreshness === 'function') checkCloudFreshness(); 
+        }
         function updateEditToggleButton() {
             let btn = document.getElementById('edit-toggle-btn'); let icon = document.getElementById('edit-toggle-icon'); if (!btn || !icon) return;
             if (isEditMode) { btn.style.background = "#d97706"; btn.setAttribute('data-tip', '編輯中，點擊鎖定並儲存'); icon.innerText = "lock_open"; } 
@@ -681,7 +756,7 @@
             return { html: tempMain.innerHTML, heroHtml: tempHero.innerHTML, payersData: JSON.parse(JSON.stringify(payers)), lastModified: Date.now() };
         }
 
-        /* 🌟 版本衝突修復的核心區塊 */
+/* 🌟 版本衝突修復的核心區塊 (已加入 DeviceID 防護) */
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('readonly')) return;
             if (!isAppReady) { console.warn("系統同步中，阻擋舊資料覆寫"); return; }
@@ -699,7 +774,7 @@
             
             pendingSaveAction = true; 
             let payload;
-            let newCompressedData; // 🌟 新增：暫存這次的壓縮資料，先不要覆寫全域變數
+            let newCompressedData; 
 
             try {
                 const state = captureState(); 
@@ -708,7 +783,8 @@
                     isCompressed: true, 
                     data: newCompressedData, 
                     token: APP_TOKEN,
-                    baseHash: lastCloudDataHash // 🌟 傳送目前的已知伺服器 Hash 作為基準
+                    baseHash: lastCloudDataHash,
+                    deviceId: myDeviceId // 🌟 加入這行，讓後端知道是誰要存檔
                 });
             } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
 
@@ -732,14 +808,17 @@
                 .then(data => {
                     isSavingToCloud = false; 
                     if(data.status === "success") { 
-                        // 🌟 修正核心：只有在伺服器明確回傳 success 時，才更新本地的 Hash
                         lastCloudDataHash = newCompressedData; 
                         setStatus('cloud_done', '雲端已同步'); 
                         if(isManual) showToast("✅ 同步成功！"); 
                     } else if (data.status === "conflict") {
-                        setStatus('cloud_off', '版本衝突，拒絕存檔', true);
-                        alert("🚨 【版本衝突警告】\n\n在你編輯的期間，有人已經存檔了新版本！\n為了避免覆蓋別人的心血，系統已「拒絕」本次存檔。\n\n請點擊上方工具列的「下載」按鈕保留你的修改，然後重新整理頁面。");
-                        isEditMode = true; document.body.classList.remove('view-mode-active'); updateEditToggleButton();
+                        if (data.message === "lock_stolen") {
+                            // 🚨 送出存檔時被後端抓到權限遺失！
+                            handleLockStolen(); // 呼叫保命機制(自動備份+關閉編輯)
+                        } else {
+                            setStatus('cloud_off', '版本衝突，拒絕存檔', true);
+                            alert("🚨 【版本衝突警告】\n\n在你編輯的期間，有人已經存檔了新版本！\n為了避免覆蓋別人的心血，系統已「拒絕」本次存檔。\n\n請點擊上方工具列的「下載」按鈕保留你的修改，然後重新整理頁面。");
+                        }
                     } else {
                         setStatus('cloud_off', '上傳失敗', true); 
                         if(isManual) alert('❌ 失敗：' + (data.message || '伺服器未回應'));
@@ -755,7 +834,6 @@
                     isSavingToCloud = false; 
                     setStatus('cloud_off', '連線失敗(存本機)', true); 
                     needsSaveAfterFetch = false;
-                    // 🌟 若網路斷線或 GAS 回傳錯誤，保留舊的 Hash，讓下次可以安全重試
                     if(isManual) alert("❌ 同步失敗！請檢查網路連線或稍後再試。"); 
                 });
             }, isManual ? 0 : 1500); 
