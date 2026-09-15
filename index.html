@@ -351,7 +351,7 @@
             setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) scale(0.9)'; }, 3500);
         }
 
-// 🌟 重新整理後的解鎖與鎖定邏輯
+// 🌟 重新整理後的解鎖與鎖定邏輯 (💡已修正跨網域 Header 阻擋問題)
         function toggleEditMode() {
             if (new URLSearchParams(window.location.search).get('readonly')) { alert("此為專屬唯讀分享連結，無法解鎖編輯。"); return; }
             
@@ -359,7 +359,11 @@
                 setStatus('sync', '申請編輯權限...');
                 let payload = JSON.stringify({ action: "requestLock", deviceId: myDeviceId, token: APP_TOKEN });
                 
-                fetch(API_URL, { method: 'POST', body: payload })
+                fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 💡 補上這行通關密語
+                    body: payload 
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === "success") {
@@ -378,7 +382,11 @@
                 saveData(true);
                 disableEditUI();
                 let payload = JSON.stringify({ action: "releaseLock", deviceId: myDeviceId, token: APP_TOKEN });
-                fetch(API_URL, { method: 'POST', body: payload }); 
+                fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 💡 補上這行
+                    body: payload 
+                }); 
             }
             adjustStickyTabs();
         }
@@ -386,7 +394,11 @@
         function forceTakeoverLock() {
             setStatus('sync', '強制接管中...');
             let payload = JSON.stringify({ action: "forceTakeover", deviceId: myDeviceId, token: APP_TOKEN });
-            fetch(API_URL, { method: 'POST', body: payload })
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 💡 補上這行
+                body: payload 
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === "success") {
@@ -420,7 +432,11 @@
         function sendHeartbeat() {
             if (!isEditMode) return;
             let payload = JSON.stringify({ action: "heartbeat", deviceId: myDeviceId, token: APP_TOKEN });
-            fetch(API_URL, { method: 'POST', body: payload })
+            fetch(API_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 💡 補上這行
+                body: payload 
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === "locked") handleLockStolen();
