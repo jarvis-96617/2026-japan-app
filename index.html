@@ -12,16 +12,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
+    <!-- 引入外部套件 -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
 
+    <!-- 🚀 引入 Firebase 官方極速套件 -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
     <style>
+        /* 🌟 質感灰階色調與動畫設定 */
         :root {
             --bg-color: #f4f4f5; --primary-color: #52525b; --text-main: #27272a; --text-muted: #71717a;
             --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.9);
@@ -42,6 +45,7 @@
         #splash-screen h2 { color: #3f3f46; font-size: 18px; margin-bottom: 6px; font-weight: 800;} 
         #splash-screen p { color: #71717a; font-size: 11px; font-weight: 700; margin-bottom: 8px;}
         
+        /* 🌟 新增進度條樣式 */
         .progress-container { width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; position: relative; }
         .progress-bar { width: 0%; height: 100%; background: var(--primary-color); border-radius: 10px; transition: width 0.4s ease; }
 
@@ -97,7 +101,7 @@
         .content-box { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 2px;}
         .item-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.3;}
         
-        /* 🌟 修正疊圖問題：加入自動長高與斷行 */
+        /* 🌟 備註自動長高與斷行 */
         .item-note { display: block; background: transparent; padding: 0 0 0 6px; border-left: 2px solid rgba(0,0,0,0.1); font-size: 11px; margin-bottom: 6px; color: #52525b; width: 100%; word-break: break-all; min-height: 18px; line-height: 1.4; transition: 0.3s; white-space: pre-wrap; height: auto; } body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,0.1); }
         .action-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-top: 2px;}
         
@@ -153,7 +157,7 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(55px + var(--safe-bottom)); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid rgba(255,255,255,0.6); display: flex; justify-content: space-around; padding-bottom: var(--safe-bottom); z-index: 1000; box-shadow: 0 -8px 30px rgba(0,0,0,0.04); border-radius: 24px 24px 0 0; transition: 0.4s var(--spring); padding-top: 4px;} body.dark-mode .bottom-nav { background: rgba(24, 24, 27, 0.85); border-top-color: rgba(255,255,255,0.05); box-shadow: 0 -8px 30px rgba(0,0,0,0.3);} .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s var(--spring); } .nav-item.active { color: var(--primary-color); font-weight: 800; transform: translateY(-2px) scale(1.05); } .nav-item .material-icons-round { font-size: 22px; margin-bottom: 2px; }
         .tab-content { display: none; animation: fadeIn 0.3s var(--spring); position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* 🌟 唯讀保護模式專屬樣式 (讓核取方塊可以點擊) */
+        /* 🌟 唯讀保護模式專屬樣式 (排除解鎖密碼框) 移除 custom-checkbox 的指標事件鎖定，讓唯讀可以打勾 */
         body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
         body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
         body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
@@ -168,7 +172,7 @@
         body.share-mode-active .bottom-nav, body.share-mode-active #tab-transport, body.share-mode-active #tab-hotel, body.share-mode-active #tab-shopping, body.share-mode-active #tab-budget, body.share-mode-active #tab-todo, body.readonly-mode-active .bottom-nav, body.readonly-mode-active #tab-transport, body.readonly-mode-active #tab-hotel, body.readonly-mode-active #tab-shopping, body.readonly-mode-active #tab-budget, body.readonly-mode-active #tab-todo { display: none !important; }
         body.share-mode-active, body.readonly-mode-active { padding-bottom: max(20px, env(safe-area-inset-bottom)) !important; }
         body.readonly-mode-active .global-controls, body.readonly-mode-active .add-btn, body.readonly-mode-active .img-delete-badge, body.readonly-mode-active .delete-btn, body.readonly-mode-active .resizer, body.readonly-mode-active .cat-action-icon, body.readonly-mode-active .img-add-badge, body.readonly-mode-active .add-sub-btn { display: none !important; }
-        body.readonly-mode-active .editable, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input:not(#privacy-pwd-input) { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
+        body.readonly-mode-active .editable, body.readonly-mode-active .custom-checkbox, body.readonly-mode-active #exchange-rate-display { pointer-events: none !important; border: none !important; } body.readonly-mode-active select, body.readonly-mode-active input:not(#privacy-pwd-input) { pointer-events: none !important; appearance: none; -webkit-appearance: none; }
 
         /* 🌟 隱私解鎖果凍視窗 CSS */
         #password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 10000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s ease; }
@@ -220,6 +224,7 @@
     </div>
     
     <script>
+        // 🌟 1. 初始化 Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBkpZb1t6YgANh4SlwRsaOY--lDD6R-2b0",
             authDomain: "keihan-2026.firebaseapp.com",
@@ -233,19 +238,23 @@
         const db = firebase.database();
         const storage = firebase.storage();
         
+        // 🌟 資料庫參照點
         const tripRef = db.ref('tripData');
         const lockRef = db.ref('lock');
 
+        // 🌟 產生 Device ID
         let myDeviceId = localStorage.getItem('travelAppDeviceId');
         if (!myDeviceId) {
             myDeviceId = 'device_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('travelAppDeviceId', myDeviceId);
         }
 
+        let lockHeartbeatTimer = null;
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
         let isInitializing = true; 
         let isEditMode = false; 
         let hasShownStartupToast = false;
+        let needsSaveAfterFetch = false;
         let allRatesToTWD = {}; 
         window.sortableInstances = [];
         
@@ -256,6 +265,7 @@
         let undoStack = [], redoStack = [];
         const TAB_PASSWORD = "0719"; 
 
+        /* 🌟 更新進度條 UI 的輔助函數 */
         function updateProgress(percent, msg) {
             let pBar = document.getElementById('splash-progress');
             let pMsg = document.getElementById('splash-msg');
@@ -358,6 +368,7 @@
             setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) scale(0.9)'; }, 3500);
         }
 
+        // 🌟 監聽 Firebase Lock 變化 (防搶奪機制)
         lockRef.on('value', (snapshot) => {
             const currentLock = snapshot.val();
             if (currentLock && currentLock.deviceId !== myDeviceId && isEditMode) {
@@ -365,6 +376,7 @@
             }
         });
 
+        // 🌟 終極 Firebase 解鎖邏輯 (原子操作防衝突)
         function toggleEditMode() {
             if (new URLSearchParams(window.location.search).get('readonly')) { alert("此為專屬唯讀分享連結，無法解鎖編輯。"); return; }
             
@@ -376,3 +388,794 @@
                     if (!currentLock || currentLock.deviceId === myDeviceId || (now - currentLock.timestamp > 180000)) {
                         return { deviceId: myDeviceId, timestamp: now };
                     }
+                    return; 
+                }, (error, committed, snapshot) => {
+                    if (error) {
+                        setStatus('cloud_off', '連線失敗', true);
+                        alert("網路錯誤，無法連線至 Firebase。");
+                    } else if (!committed) {
+                        setStatus('cloud_off', '有人正在編輯', true);
+                        if (confirm("🚨 目前有其他裝置正在編輯中！\n\n是否要【強制接管】編輯權？\n(這將迫使對方的裝置自動跳回唯讀模式)")) {
+                            forceTakeoverLock();
+                        }
+                    } else {
+                        lockRef.onDisconnect().remove(); 
+                        enableEditUI();
+                    }
+                });
+            } else {
+                saveData(true);
+                disableEditUI();
+                lockRef.remove(); 
+                lockRef.onDisconnect().cancel();
+            }
+            adjustStickyTabs();
+        }
+
+        function forceTakeoverLock() {
+            setStatus('sync', '強制接管中...');
+            lockRef.set({ deviceId: myDeviceId, timestamp: Date.now() })
+                .then(() => {
+                    lockRef.onDisconnect().remove();
+                    showToast("⚔️ 已強制接管編輯權限！");
+                    enableEditUI();
+                })
+                .catch(e => alert("強制接管失敗，請檢查網路。"));
+        }
+
+        function enableEditUI() {
+            isEditMode = true; 
+            document.body.classList.remove('view-mode-active'); 
+            updateEditToggleButton(); 
+            window.sortableInstances.forEach(s => s.option("disabled", false)); 
+            showToast("🔓 已解鎖編輯模式");
+            setStatus('cloud_done', '編輯中');
+            
+            clearInterval(lockHeartbeatTimer);
+            lockHeartbeatTimer = setInterval(() => {
+                if (isEditMode) lockRef.update({ timestamp: Date.now() }).catch(e=>console.log(e));
+            }, 60000); 
+        }
+
+        function disableEditUI() {
+            isEditMode = false; 
+            document.body.classList.add('view-mode-active'); 
+            updateEditToggleButton(); 
+            window.sortableInstances.forEach(s => s.option("disabled", true)); 
+            showToast("🔒 已恢復唯讀模式");
+            clearInterval(lockHeartbeatTimer);
+        }
+
+        function handleLockStolen() {
+            clearInterval(lockHeartbeatTimer);
+            disableEditUI();
+            setStatus('cloud_off', '權限已被接管', true);
+            alert("⚠️ 【編輯權限已被接管】\n\n您的編輯權限已被其他裝置強制接管！系統已將畫面恢復為唯讀模式。\n\n💡 若您剛才有未存檔的重要資料，建議您點擊下方工具列的「更多(⋮) -> 下載」手動備份實體檔案，以免資料遺失。");
+        }
+
+        function updateEditToggleButton() {
+            let btn = document.getElementById('edit-toggle-btn'); let icon = document.getElementById('edit-toggle-icon'); if (!btn || !icon) return;
+            if (isEditMode) { btn.style.background = "#d97706"; btn.setAttribute('data-tip', '編輯中，點擊鎖定並儲存'); icon.innerText = "lock_open"; } 
+            else { btn.style.background = "#52525b"; btn.setAttribute('data-tip', '目前唯讀，點擊解鎖'); icon.innerText = "lock"; }
+        }
+
+        function sanitizeHTML(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/<(script|iframe|object|embed|applet|base|meta|link|style)\b[^<]*(?:(?!<\/\1>)<[^<]*)*<\/\1>/gi, '')
+                      .replace(/<(script|iframe|object|embed|applet|base|meta|link|style)\b[^>]*>/gi, '')
+                      .replace(/javascript:/gi, 'about:blank').replace(/srcdoc/gi, '');
+        }
+
+        function openStoredLink(el, event) {
+            event.stopPropagation(); let url = el.getAttribute('data-href');
+            if (url && (url.startsWith('http://') || url.startsWith('https://'))) { 
+                let a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            } else { alert("無效或不安全的連結！"); }
+        }
+
+        function addViewerDeleteBtn(viewer, containerElement, parentBox, isReceipt = false) {
+            if (!isEditMode || document.body.classList.contains('readonly-mode-active')) return;
+            const existingBtn = document.querySelector('.viewer-custom-delete'); if (existingBtn) existingBtn.remove();
+            const deleteBtn = document.createElement('div'); deleteBtn.className = 'viewer-custom-delete';
+            deleteBtn.innerHTML = '<span class="material-icons-round" style="color:white; font-size:20px;">delete</span>';
+            deleteBtn.style.cssText = 'position:absolute; top:20px; left:20px; z-index:9999; cursor:pointer; background:rgba(220, 38, 38, 0.95); width:40px; height:40px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.3); backdrop-filter:blur(10px); transition:0.2s var(--spring);';
+            deleteBtn.onclick = function(e) {
+                e.stopPropagation();
+                if(confirm("確定要刪除這張照片嗎？")) {
+                    const index = viewer.index || 0; let imgToRemove;
+                    if (isReceipt) { imgToRemove = containerElement; } else { const imgs = containerElement.querySelectorAll('img'); imgToRemove = imgs[index]; }
+                    if (imgToRemove) {
+                        deleteImageFromCloud(imgToRemove.src); imgToRemove.remove(); 
+                        if (isReceipt || containerElement.querySelectorAll('img').length === 0) {
+                            viewer.hide();
+                            if (parentBox) {
+                                if (parentBox.classList.contains('receipt-thumb-wrap')) { parentBox.outerHTML = `<div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">add_a_photo</span></div>`; } 
+                                else if (parentBox.classList.contains('action-box')) { parentBox.className = 'action-box photo-box'; parentBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span>`; }
+                            }
+                        } else {
+                            viewer.update();
+                            if (parentBox && parentBox.querySelector('.album-count-badge')) {
+                                let badge = parentBox.querySelector('.album-count-badge'); const remaining = containerElement.querySelectorAll('img').length;
+                                if (remaining > 1) badge.innerText = '+' + (remaining - 1); else badge.remove();
+                            }
+                        } saveData();
+                    }
+                }
+            };
+            document.querySelector('.viewer-container').appendChild(deleteBtn);
+        }
+
+        function openImageModal(imgElement, event) { 
+            if(event) event.stopPropagation(); 
+            const viewer = new Viewer(imgElement, { inline: false, toolbar: false, navbar: false, title: false, button: true, viewed() { addViewerDeleteBtn(viewer, imgElement, imgElement.closest('.receipt-thumb-wrap'), true); }, hidden: function () { viewer.destroy(); } }); 
+            viewer.show(); 
+        }
+
+        function openAlbumModal(containerElement, event) {
+            if(event) event.stopPropagation();
+            const viewer = new Viewer(containerElement, { inline: false, toolbar: 1, navbar: 1, title: false, button: true, viewed() { addViewerDeleteBtn(viewer, containerElement, containerElement.closest('.action-box'), false); }, hidden: function () { viewer.destroy(); } });
+            viewer.show();
+        }
+
+        function fetchExchangeRate() { fetch('https://api.exchangerate-api.com/v4/latest/TWD').then(res => res.json()).then(data => { if (data && data.rates) { for (let curr in data.rates) { allRatesToTWD[curr] = 1 / data.rates[curr]; } allRatesToTWD['TWD'] = 1; updateRateDisplay(); } }).catch(e => { console.log('匯率載入失敗'); updateRateDisplay(); }); }
+        function updateRateDisplay() { let rate = allRatesToTWD[currentTravelCurrency]; if(rate) document.getElementById('rate-num').innerText = rate.toFixed(4); else document.getElementById('rate-num').innerText = '無資料'; }
+        function changeTravelCurrency() { let curr = prompt("請輸入您的主要外幣代碼:", currentTravelCurrency); if(curr && curr.trim().length === 3) { currentTravelCurrency = curr.trim().toUpperCase(); try { localStorage.setItem('travelAppCurrency', currentTravelCurrency); } catch(e) {} document.getElementById('curr-label').innerText = currentTravelCurrency; updateRateDisplay(); updateCurrencyOptionsInTable(); calcBudget(); saveData(); } }
+        function getReliableDriveUrl(originalUrl) { if (!originalUrl) return ''; let match = originalUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/); if (match && match[1]) { return `https://lh3.googleusercontent.com/d/${match[1]}`; } return originalUrl; }
+        
+        function handleImageError(img) { 
+            if (img.dataset.failed === 'true') return;
+            let retryCount = parseInt(img.dataset.retryCount || '0'); let originalSrc = img.dataset.originalSrc || img.src; if (!img.dataset.originalSrc) img.dataset.originalSrc = originalSrc;
+            if (retryCount < 4) {
+                img.dataset.retryCount = retryCount + 1; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f4f5'/><text x='50%' y='50%' font-size='10' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23a1a1aa' font-weight='bold'>載入中...</text></svg>";
+                setTimeout(() => { let separator = originalSrc.includes('?') ? '&' : '?'; img.src = originalSrc + separator + 'retry=' + Date.now(); }, 1500); return;
+            }
+            if (!img.dataset.proxied) {
+                img.dataset.proxied = 'true'; let match = img.dataset.originalSrc.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
+                if (match && match[1]) { img.src = `https://wsrv.nl/?url=drive.google.com/uc?id=${match[1]}`; return; }
+            }
+            img.dataset.failed = 'true'; img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%23f4f4f5'/><text x='50%' y='50%' font-size='10' text-anchor='middle' alignment-baseline='middle' font-family='sans-serif' fill='%23dc2626' font-weight='bold'>無法載入</text></svg>";
+        }
+        
+        function hideMobileTooltip() { const tip = document.getElementById('mobile-tooltip'); if(tip) { tip.style.opacity = '0'; setTimeout(() => { if(tip.style.opacity === '0') tip.style.display = 'none'; }, 200); } }
+        function initMobileTooltips() {
+            if (window._tooltipsInitialized) return; window._tooltipsInitialized = true; let holdTimer = null; const tip = document.getElementById('mobile-tooltip');
+            document.querySelectorAll('.manual-save-btn[data-tip]').forEach(btn => {
+                const showTip = () => { let rect = btn.getBoundingClientRect(); tip.innerText = btn.getAttribute('data-tip'); tip.style.display = 'block'; tip.style.left = (rect.left + (rect.width / 2)) + 'px'; tip.style.top = (rect.bottom + 8) + 'px'; tip.style.transform = 'translateX(-50%) scale(1)'; setTimeout(() => tip.style.opacity = '1', 10); };
+                btn.addEventListener('touchstart', (e) => { clearTimeout(holdTimer); holdTimer = setTimeout(showTip, 400); }, {passive: true});
+                btn.addEventListener('touchend', () => { clearTimeout(holdTimer); hideMobileTooltip(); }); btn.addEventListener('touchmove', () => { clearTimeout(holdTimer); hideMobileTooltip(); });
+                btn.addEventListener('mouseenter', showTip); btn.addEventListener('mouseleave', hideMobileTooltip);
+            });
+            window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideMobileTooltip(); }, {passive: true});
+        }
+
+        try {
+            let savedTheme = localStorage.getItem('travelAppDarkMode');
+            if (savedTheme === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && savedTheme !== 'false')) { document.body.classList.add('dark-mode'); }
+        } catch(e) { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('dark-mode'); }
+        
+        function applyShareMode() { 
+            let search = window.location.search; 
+            if (search.includes('readonly=')) { document.body.classList.add('readonly-mode-active'); isAppReady = false; } 
+            else if (search.includes('share=')) { document.body.classList.add('share-mode-active'); } 
+            
+            if (!search.includes('readonly=') && !isEditMode) {
+                document.body.classList.add('view-mode-active');
+                updateEditToggleButton();
+            }
+        }
+    </script>
+
+    <div style="position: relative;">
+        <div class="hero" id="hero-container">
+            <h1 class="editable" contenteditable="true">2026 古京阪六天五夜</h1>
+            <p class="editable" contenteditable="true" style="max-width: 75%;">09/25 - 09/30 | 2人同行 | 京都 & 大阪</p>
+        </div>
+        <div id="exchange-rate-display" onclick="changeTravelCurrency()" style="position: absolute; right: 16px; bottom: 12px; z-index: 10; font-size: 10px; font-weight: 800; color: white; text-align: right; background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(12px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: 0.3s var(--spring); border: 1px solid rgba(255,255,255,0.2);">
+            <span id="curr-label">JPY</span> <span style="color:#fcd34d; margin-left:4px;" id="rate-num">載入中</span>
+        </div>
+    </div>
+
+    <!-- 控制列 -->
+    <div class="global-controls" style="flex-direction: column; align-items: stretch; padding: 8px 12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
+            <div class="hide-scrollbar" style="display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;">
+                <button id="edit-toggle-btn" class="manual-save-btn always-show" onclick="toggleEditMode()" style="background:#52525b;" data-tip="目前唯讀，點擊解鎖"><span class="material-icons-round" id="edit-toggle-icon" style="font-size:14px;">lock</span></button>
+                
+                <button class="manual-save-btn edit-only-btn" onclick="forceManualSave()" style="background:#4a6fa5;" data-tip="儲存至雲端"><span class="material-icons-round" style="font-size:14px;">save</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="undoAction()" style="background:#71717a;" data-tip="復原上一步"><span class="material-icons-round" style="font-size:14px;">undo</span></button>
+                <button class="manual-save-btn edit-only-btn" onclick="redoAction()" style="background:#a1a1aa;" data-tip="重做下一步"><span class="material-icons-round" style="font-size:14px;">redo</span></button>
+                
+                <button class="manual-save-btn always-show" onclick="location.reload()" style="background:#52525b;" data-tip="重新載入頁面"><span class="material-icons-round" style="font-size:14px;">refresh</span></button>
+                <button class="manual-save-btn toggle-more-btn always-show" onclick="toggleMoreOptions()" style="background:#3f3f46;" data-tip="更多選項"><span class="material-icons-round" id="more-options-icon" style="font-size:14px;">more_vert</span></button>
+            </div>
+            <div id="sync-status" style="font-size: 10px; font-weight:800; color: var(--text-muted); display:flex; align-items:center; gap:2px; white-space:nowrap; padding-left:8px;"><span class="material-icons-round" style="font-size:14px; color: #10b981;">cloud_done</span> <span>已就緒</span></div>
+        </div>
+        <div id="more-options-bar" class="hide-scrollbar" style="display:none; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-top:8px; padding-top:8px; border-top:1px dashed var(--glass-border);">
+            <button class="manual-save-btn" onclick="generateShareLink()" style="background:#0284c7;" data-tip="產生分享網址"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">share</span> 分享</button>
+            <button class="manual-save-btn" onclick="toggleDarkMode()" style="background:#3f3f46;" data-tip="深色/淺色模式"><span class="material-icons-round" id="dark-mode-icon" style="font-size:14px; margin-right:4px;">dark_mode</span> 夜間</button>
+            <button class="manual-save-btn" onclick="exportToPDF()" style="background:#0d9488;" data-tip="匯出 PDF"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">picture_as_pdf</span> 列印</button>
+            <button class="manual-save-btn" onclick="exportBackup()" style="background:#d97706;" data-tip="下載實體備份"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">download</span> 下載</button>
+            <button class="manual-save-btn edit-only-btn" onclick="triggerImportBackup()" style="background:#ea580c;" data-tip="從手機匯入還原"><span class="material-icons-round" style="font-size:14px; margin-right:4px;">upload</span> 還原</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMoreOptions() { let bar = document.getElementById('more-options-bar'); let icon = document.getElementById('more-options-icon'); if(bar.style.display === 'none') { bar.style.display = 'flex'; icon.innerText = 'expand_less'; } else { bar.style.display = 'none'; icon.innerText = 'more_vert'; } adjustStickyTabs(); }
+        function forceManualSave() { saveData(true); }
+        function recordHistory() { if (typeof LZString === 'undefined' || !isEditMode) return; let state = captureState(); let compressed = LZString.compressToUTF16(JSON.stringify(state)); if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== compressed) { undoStack.push(compressed); if (undoStack.length > 20) undoStack.shift(); redoStack = []; } }
+        function restoreState(compressedData) { try { let state = JSON.parse(LZString.decompressFromUTF16(compressedData)); if(state && state.html) { document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable(); } } catch(e) { console.error("復原失敗", e); } }
+        function undoAction() { if (undoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); redoStack.push(currentState); restoreState(undoStack.pop()); saveData(false, true); } else { alert("已經是最早的狀態，無法再上一步囉！"); } }
+        function redoAction() { if (redoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); undoStack.push(currentState); restoreState(redoStack.pop()); saveData(false, true); } else { alert("沒有可以重做的動作囉！"); } }
+        function initHistory() { if (undoStack.length === 0 && isEditMode) recordHistory(); }
+        function toggleDarkMode() { let isDark = document.body.classList.toggle('dark-mode'); try { localStorage.setItem('travelAppDarkMode', isDark); } catch(e){} let icon = document.getElementById('dark-mode-icon'); if(icon) icon.innerText = isDark ? 'light_mode' : 'dark_mode'; }
+        
+        function generateShareLink() {
+            let type = prompt("請問要產生哪種分享網址？\n\n輸入 1：【協作模式】(旅伴可共同編輯與新增)\n輸入 2：【唯讀模式】(對方只能觀看，無法修改)", "1");
+            if (type !== "1" && type !== "2") return; 
+            let input = prompt("請問想分享「第幾天」的行程？\n(例如只分享第1和第3天，請輸入 1,3)\n\n※ 若想分享「完整行程」，請直接留空並按確定。"); if (input === null) return; 
+            let baseUrl = window.location.origin + window.location.pathname;
+            let cleanInput = input.replace(/[^0-9,]/g, function(match){ return match==='，'||match==='、' ? ',' : ''; });
+            let paramName = (type === "1") ? "share" : "readonly";
+            let shareUrl = cleanInput ? baseUrl + "?" + paramName + "=" + cleanInput : baseUrl + "?" + paramName + "=all";
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shareUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shareUrl}` : `✅ 「唯讀」短網址已複製！\n\n網址：${shareUrl}`; alert(msg); }).catch(() => { prompt("請手動複製以下網址分享：", shareUrl); }); } else { prompt("請手動複製以下網址分享：", shareUrl); }
+        }
+        function exportToPDF() { window.print(); }
+        function exportBackup() { let data = null; try{ data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); }catch(e){} if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+        function triggerImportBackup() { document.getElementById('backup-file-input').click(); }
+        function handleBackupUpload(event) { let file = event.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(e) { try { let content = e.target.result; JSON.parse(content); try { localStorage.setItem('travelAppSave_Keihan_vCloudFinal', content); }catch(e){} alert("✅ 備份檔還原成功！即將重新載入頁面。"); location.reload(); } catch(err) { alert("❌ 備份檔格式不正確，請確認檔案是否有毀損！"); } }; reader.readAsText(file); }
+    </script>
+
+    <div class="container" id="main-container"></div>
+
+    <template id="default-template">
+        <div id="tab-itinerary" class="tab-content active">
+            <div id="day-tabs-container" class="day-tabs-wrapper"></div>
+            <div id="itinerary-days-container"></div>
+            <button class="add-btn" onclick="addNewDayCard()" style="background: var(--primary-color); color: white;">+ 新增天數區塊</button>
+        </div>
+        <div id="tab-transport" class="tab-content">
+            <div class="glass-card">
+                <h2 class="section-title"><span class="material-icons-round" style="font-size:18px;">directions_transit</span> 交通票券與指南</h2>
+                <div id="transport-text-list" style="margin-top: 10px;"></div>
+                <button class="add-btn" onclick="addTransportText(this)" style="margin-top: 4px;">+ 新增交通指南</button>
+            </div>
+        </div>
+        <div id="tab-hotel" class="tab-content">
+            <div id="hotel-cards-container"></div>
+            <button class="add-btn" onclick="addHotelCard()" style="background: var(--primary-color); color: white;">+ 新增住宿區塊</button>
+        </div>
+        <div id="tab-shopping" class="tab-content">
+            <div class="glass-card">
+                <h2 class="section-title"><span class="material-icons-round" style="font-size:18px;">shopping_bag</span> 採買清單</h2>
+                <div id="shopping-list"></div>
+                <button class="add-btn" onclick="addGeneralItemWithNote(this)">+ 新增清單項目</button>
+            </div>
+        </div>
+        <div id="tab-budget" class="tab-content">
+            <div class="glass-card" style="padding: 10px;">
+                <h2 class="section-title" style="margin-bottom: 4px;"><span class="material-icons-round" style="font-size:18px;">receipt_long</span> 記帳與分帳系統</h2>
+                <div style="margin-bottom: 6px; padding: 0px;">
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 800;">建立與管理付款人清單：</div>
+                    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                        <div id="payer-tags-container" style="display:inline-flex; flex-wrap:wrap; gap:4px;"></div>
+                        <button onclick="addPayer()" class="btn-nav" style="background: rgba(0,0,0,0.05); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 50px; box-shadow: none;">+ 新增付款人</button>
+                    </div>
+                </div>
+                <table id="budget-table">
+                    <thead><tr><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr></thead>
+                    <tbody id="budget-tbody"></tbody>
+                </table>
+                <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 6px;">+ 新增記帳項目</button>
+                <div id="budget-result" style="margin-top:10px; padding-top:10px; border-top:2px dashed rgba(0,0,0,0.05); line-height: 1.5;"></div>
+            </div>
+        </div>
+        <div id="tab-todo" class="tab-content">
+            <div class="glass-card">
+                <h2 class="section-title"><span class="material-icons-round" style="font-size:18px;">book_online</span> 預訂類</h2>
+                <div id="booking-list"></div>
+                <button class="add-btn" onclick="addTodoItemToContainer('booking-list')">+ 新增預訂項目</button>
+            </div>
+            <div class="glass-card">
+                <div class="flex-between" style="margin-bottom: 10px;">
+                    <h2 class="section-title" style="margin-bottom: 0;"><span class="material-icons-round" style="font-size:18px;">luggage</span> 事前準備類</h2>
+                    <div class="person-select-wrapper" style="display:flex; align-items:center; gap:4px;">
+                        <select id="todo-person-select" onchange="switchTodoPerson(this.value)" style="border:1px solid var(--primary-color); color:var(--primary-color); font-weight:800; border-radius:50px; padding:2px 8px; font-size:11px;"><option value="預設範本" selected>預設範本</option></select>
+                        <span class="material-icons-round delete-btn" style="padding:0; font-size: 20px; color:var(--danger-color); cursor: pointer;" onclick="deleteTodoPerson()">delete</span>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addNewTodoPerson()" style="background:var(--primary-color); color:white;">+ 拷貝建立新人員清單</button>
+                <div id="person-todo-container">
+                    <div class="person-todo-list" data-person="預設範本" style="display: block;">
+                        <div class="todo-category-header flex-between">
+                            <span class="editable" contenteditable="true"> 確認行李重量</span>
+                            <div style="display:flex; gap:6px;"><span class="cat-action-icon" style="color:var(--primary-color); cursor:pointer;" onclick="addTodoItemHere(this)"><span class="material-icons-round" style="font-size:16px;">add_circle</span></span></div>
+                        </div>
+                        <div class="flex-between" style="gap:8px; margin-top:12px;"><button class="add-btn" onclick="addTodoCategory(this)">+ 新增分類標題</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleItemUpload(event)">
+    <input type="file" id="receipt-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleReceiptUpload(event)">
+    <input type="file" id="backup-file-input" accept=".json,.txt" style="display: none;" onchange="handleBackupUpload(event)">
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('tab-itinerary', this)"><span class="material-icons-round">format_list_bulleted</span>行程</div>
+        <div class="nav-item" onclick="switchTab('tab-transport', this)"><span class="material-icons-round">directions_transit</span>交通</div>
+        <div class="nav-item" onclick="switchTab('tab-hotel', this)"><span class="material-icons-round">bed</span>住宿</div>
+        <div class="nav-item" onclick="switchTab('tab-shopping', this)"><span class="material-icons-round">shopping_cart</span>購物</div>
+        <div class="nav-item" onclick="switchTab('tab-budget', this)"><span class="material-icons-round">savings</span>預算</div>
+        <div class="nav-item" onclick="switchTab('tab-todo', this)"><span class="material-icons-round">checklist</span>待辦</div>
+    </nav>
+
+    <script>
+        function captureState() {
+            let moreBar = document.getElementById('more-options-bar');
+            if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
+            let tempMain = document.createElement('div'); tempMain.innerHTML = document.getElementById('main-container').innerHTML;
+            let tempHero = document.createElement('div'); tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
+
+            [tempMain, tempHero].forEach(container => {
+                container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
+                container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
+                container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
+                container.querySelectorAll('.resizer').forEach(el => el.remove());
+                container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span>`; } });
+                container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; } });
+                container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
+                container.querySelectorAll('*').forEach(el => {
+                    el.removeAttribute('draggable');
+                    if (el.classList.contains('timeline-item')) el.removeAttribute('style'); 
+                    if (el.getAttribute('style') === '') el.removeAttribute('style'); 
+                    if (el.getAttribute('class') === '') el.removeAttribute('class'); 
+                    if (el.classList.contains('editable') && el.getAttribute('contenteditable') === 'false') { el.setAttribute('contenteditable', 'true'); }
+                });
+            });
+
+            tempMain.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            let itTab = tempMain.querySelector('#tab-itinerary'); if(itTab) itTab.classList.add('active');
+
+            return { html: tempMain.innerHTML, heroHtml: tempHero.innerHTML, payersData: JSON.parse(JSON.stringify(payers)), lastModified: Date.now() };
+        }
+
+        function saveData(isManual = false, skipHistory = false) {
+            if (new URLSearchParams(window.location.search).get('readonly')) return;
+            if (!isAppReady) return;
+            if (typeof LZString === 'undefined') return;
+            if (!isEditMode && !isManual) return;
+            if (isInitializing && !isManual) return;
+            
+            if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
+            
+            let newCompressedData; 
+            let payload; 
+
+            try {
+                const state = captureState(); 
+                newCompressedData = LZString.compressToUTF16(JSON.stringify(state));
+                
+                if (!isManual && newCompressedData === lastCloudDataHash) return; 
+                
+                payload = JSON.stringify({ 
+                    isCompressed: true, 
+                    data: newCompressedData 
+                });
+            } catch(e) { return; }
+
+            try {
+                localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
+                localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+            } catch(e) {}
+            
+            setStatus('sync', '背景同步中...'); 
+            clearTimeout(syncTimeout);
+            
+            syncTimeout = setTimeout(() => {
+                lockRef.once('value').then(snapshot => {
+                    const currentLock = snapshot.val();
+                    if (currentLock && currentLock.deviceId === myDeviceId) {
+                        tripRef.set({
+                            compressedData: newCompressedData,
+                            lastModified: Date.now()
+                        }).then(() => {
+                            lastCloudDataHash = newCompressedData; 
+                            setStatus('cloud_done', '雲端已同步'); 
+                            if(isManual) showToast("✅ 同步成功！"); 
+                        }).catch(err => {
+                            setStatus('cloud_off', '連線失敗', true); 
+                            if(isManual) alert("❌ 存檔失敗，請檢查網路！");
+                        });
+                    }
+                });
+            }, isManual ? 0 : 1500); 
+        }
+
+        function loadData() {
+            updateProgress(30, '連線至 Firebase 即時資料庫...');
+            
+            tripRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data && data.compressedData) {
+                    if (data.compressedData !== lastCloudDataHash) {
+                        lastCloudDataHash = data.compressedData;
+                        
+                        if (isInitializing) {
+                            updateProgress(80, '解析雲端資料...');
+                            try {
+                                let state = JSON.parse(LZString.decompressFromUTF16(data.compressedData));
+                                if(state && state.html) {
+                                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
+                                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                                    if(state.payersData) payers = state.payersData;
+                                    renderPayerTags(); rebindEvents();
+                                    setStatus('cloud_done', '雲端已同步');
+                                }
+                            } catch(e) {}
+                            finalizeLoad();
+                            isInitializing = false;
+                        } else {
+                            try {
+                                let state = JSON.parse(LZString.decompressFromUTF16(data.compressedData));
+                                if(state && state.html) {
+                                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
+                                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                                    if(state.payersData) payers = state.payersData;
+                                    renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable();
+                                    showToast("🔄 資料已自動同步為最新進度");
+                                }
+                            } catch(e) {}
+                        }
+                    }
+                } else if (!data && isInitializing) {
+                    updateProgress(60, '執行舊資料無痛搬家...');
+                    const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
+                    if (saved) {
+                        try {
+                            let parsed = JSON.parse(saved);
+                            if (parsed.data) {
+                                tripRef.set({ compressedData: parsed.data, lastModified: Date.now() });
+                                lastCloudDataHash = parsed.data;
+                                let state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
+                                if(state && state.html) {
+                                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
+                                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                                    if(state.payersData) payers = state.payersData;
+                                    renderPayerTags(); rebindEvents();
+                                }
+                            }
+                        } catch(e) {}
+                    } else {
+                        addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580');
+                    }
+                    finalizeLoad();
+                    isInitializing = false;
+                }
+            });
+            
+            setTimeout(() => {
+                if(isInitializing) {
+                    const splash = document.getElementById('splash-screen'); 
+                    if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
+                    isInitializing = false;
+                    isAppReady = true;
+                }
+            }, 5000);
+        }
+
+        function uploadImageToCloud(base64Str, filename, callback, errorCallback) {
+            setStatus('sync', '圖片上傳中...');
+            const storageRef = firebase.storage().ref('images/' + Date.now() + '_' + filename);
+            storageRef.putString(base64Str, 'data_url').then(snapshot => {
+                return snapshot.ref.getDownloadURL();
+            }).then(downloadURL => {
+                setStatus('cloud_done', '上傳成功'); 
+                callback(downloadURL); 
+            }).catch(e => {
+                setStatus('cloud_off', '上傳失敗', true); 
+                alert('圖片上傳失敗！\n(請確認 Firebase Storage 規則是否設定正確)'); 
+                if(errorCallback) errorCallback();
+            });
+        }
+
+        function deleteImageFromCloud(imgUrl) {
+            if (!imgUrl) return; 
+            if (imgUrl.includes('firebasestorage.app') || imgUrl.includes('firebase')) {
+                try { firebase.storage().refFromURL(imgUrl).delete(); } catch(e){}
+            }
+        }
+
+        async function handleItemUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0 || !currentItemThumbBox) return;
+
+            isImageProcessing = true; 
+            let originalHTML = currentItemThumbBox.innerHTML; 
+            let isNew = !currentItemThumbBox.classList.contains('has-photo');
+
+            if (isNew) { 
+                currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; 
+            } else { 
+                let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); 
+                if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; 
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+                try {
+                    let driveUrl = await new Promise((resolve, reject) => {
+                        compressImage(file, 800, 0.6, function(base64DataUrl) {
+                            uploadImageToCloud(base64DataUrl, file.name, resolve, reject);
+                        }, reject);
+                    });
+
+                    if (!currentItemThumbBox.classList.contains('has-photo')) {
+                        currentItemThumbBox.className = 'action-box has-photo photo-box';
+                        currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:8px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-4px; left:-4px; background:var(--primary-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
+                    } else {
+                        let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); 
+                        if(addBadge) addBadge.innerHTML = '+';
+                        let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
+                        if (albumContainer) {
+                            let newImg = document.createElement('img'); 
+                            newImg.src = driveUrl; newImg.style.display = 'none'; 
+                            newImg.setAttribute('onerror', 'handleImageError(this)'); 
+                            albumContainer.appendChild(newImg);
+                            
+                            let countBadge = albumContainer.querySelector('.album-count-badge'); 
+                            let imgCount = albumContainer.querySelectorAll('img').length;
+                            if (!countBadge) { 
+                                countBadge = document.createElement('div'); 
+                                countBadge.className = 'album-count-badge'; 
+                                countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; line-height:1.2;'; 
+                                albumContainer.appendChild(countBadge); 
+                            }
+                            countBadge.innerText = '+' + (imgCount - 1);
+                        }
+                    }
+                } catch (e) { console.log('單張圖片上傳失敗', e); }
+            }
+
+            if (!currentItemThumbBox.classList.contains('has-photo')) {
+                currentItemThumbBox.innerHTML = originalHTML;
+            } else {
+                let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); 
+                if(addBadge) addBadge.innerHTML = '+';
+            }
+
+            saveData(); 
+            isImageProcessing = false;
+            event.target.value = ''; 
+        }
+
+        function handleReceiptUpload(event) {
+            const file = event.target.files[0];
+            if (file && currentReceiptBox) {
+                isImageProcessing = true; currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
+                compressImage(file, 800, 0.6, function(base64DataUrl) {
+                    uploadImageToCloud(base64DataUrl, file.name, function(driveUrl) {
+                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"></div>`; 
+                        saveData(); isImageProcessing = false;
+                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
+                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
+            }
+        }
+
+        function compressImage(file, maxWidth, quality, callback, errorCallback) {
+            if (!file) { if(errorCallback) errorCallback(); return; }
+            if (file.type && !file.type.startsWith('image/') && !file.name.match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/i)) { alert("⚠️ 請選擇正確的圖片檔案！"); if(errorCallback) errorCallback(); return; }
+
+            let isProcessed = false; const img = new Image(); const objectUrl = URL.createObjectURL(file);
+            img.onload = function() {
+                if (isProcessed) return; isProcessed = true; URL.revokeObjectURL(objectUrl);
+                try {
+                    const canvas = document.createElement('canvas'); let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
+                    canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
+                    const ctx = canvas.getContext('2d'); if (!ctx) throw new Error("無法建立 Canvas");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height); const result = canvas.toDataURL('image/jpeg', quality);
+                    if (result === 'data:,') throw new Error("Canvas 內容為空"); callback(result);
+                } catch (err) { alert("圖片處理失敗，可能是檔案過大導致記憶體不足！"); if(errorCallback) errorCallback(); }
+            };
+            img.onerror = function() { if (isProcessed) return; isProcessed = true; URL.revokeObjectURL(objectUrl); alert("圖片載入失敗！若是 iCloud 雲端照片，請確認已下載至手機後再試。"); if(errorCallback) errorCallback(); };
+            setTimeout(() => { img.src = objectUrl; }, 100);
+        }
+
+        function addBudgetRow(item = '新項目', payerName = payers[0], split = '平分', currency = currentTravelCurrency, amount = '0') {
+            const tbody = document.getElementById('budget-tbody'); const tr = document.createElement('tr'); tr.className = 'budget-row';
+            let currentRate = allRatesToTWD[currency] || 1; tr.setAttribute('data-rate', currentRate);
+            let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
+            let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR']; if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
+            let currencyOpts = opts.map(c => `<option value="${c}" ${c===currency?'selected':''}>${c}</option>`).join('');
+            let formattedAmt = Number(String(amount).replace(/,/g, '') || 0).toLocaleString('en-US');
+            
+            tr.innerHTML = `<td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td><td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td><td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${split==='平分'?'selected':''}>平分</option><option value="個人" ${split==='個人'?'selected':''}>個人</option></select></td><td style="white-space:nowrap;"><select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();">${currencyOpts}</select><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();"></td><td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #cbd5e1; border-radius:12px; background:rgba(0,0,0,0.02); white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>`;
+            tbody.appendChild(tr); calcBudget(); saveData();
+        }
+
+        function deleteBudgetRow(btn) { if(confirm('確定刪除此記帳項目嗎？')) { let tr = btn.closest('tr'); let img = tr.querySelector('.receipt-thumb-wrap img'); if (img) deleteImageFromCloud(img.src); tr.remove(); calcBudget(); saveData(); } }
+
+        function calcBudget() {
+            const rows = document.querySelectorAll('#budget-tbody .budget-row');
+            let totalsPaid = {}; let totalsOwed = {}; let grandTotal = 0; payers.forEach(p => { totalsPaid[p] = 0; totalsOwed[p] = 0; });
+            
+            rows.forEach(r => {
+                let payer = r.querySelector('.payer-select')?.value; let splitType = r.querySelector('.split-select')?.value || '個人';
+                let rowCurr = r.querySelector('.curr-select')?.value; let amountInputEl = r.querySelector('.amount-input'); if(!amountInputEl) return;
+                let valStr = amountInputEl.value.replace(/,/g, ''); let amount = parseFloat(valStr) || 0;
+                if (document.activeElement !== amountInputEl) { let formatted = amount.toLocaleString('en-US'); amountInputEl.value = formatted; amountInputEl.setAttribute('value', formatted); }
+                let rowRate = parseFloat(r.getAttribute('data-rate')); if (isNaN(rowRate) || !rowRate) { rowRate = allRatesToTWD[rowCurr] || 1; r.setAttribute('data-rate', rowRate); } if (rowCurr === 'TWD') rowRate = 1; 
+                
+                let amtInTWD = amount * rowRate;
+                if(payer) { if(totalsPaid[payer] === undefined) { totalsPaid[payer] = 0; totalsOwed[payer] = 0; } totalsPaid[payer] += amtInTWD; } grandTotal += amtInTWD;
+                if (splitType === '平分') { let splitAmount = amtInTWD / payers.length; payers.forEach(p => { totalsOwed[p] += splitAmount; }); } else { if(payer) { totalsOwed[payer] += amtInTWD; } }
+            });
+            
+            let balances = {}; let debtors = []; let creditors = [];
+            payers.forEach(p => { balances[p] = totalsPaid[p] - totalsOwed[p]; if (balances[p] < -0.5) debtors.push({ name: p, amount: Math.abs(balances[p]) }); else if (balances[p] > 0.5) creditors.push({ name: p, amount: balances[p] }); });
+            
+            let transfers = []; let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                let debtor = debtors[i]; let creditor = creditors[j]; let amount = Math.min(debtor.amount, creditor.amount);
+                transfers.push(`${debtor.name} <span class="material-icons-round" style="font-size:12px; vertical-align:middle; color:var(--text-muted);">arrow_forward</span> ${creditor.name}：<span style="color:var(--primary-color);">NT$${Math.round(amount).toLocaleString('en-US')}</span>`);
+                debtor.amount -= amount; creditor.amount -= amount; if (debtor.amount < 0.5) i++; if (creditor.amount < 0.5) j++;
+            }
+            
+            let resHTML = `<div class="flex-between" style="font-weight:800; color:var(--primary-color); font-size:15px; border-bottom:2px dashed rgba(0,0,0,0.05); padding-bottom:8px; margin-bottom:8px;"><span> 旅程總花費：</span><span>NT$${Math.round(grandTotal).toLocaleString('en-US')}</span></div><div style="font-size:11px; font-weight:800; margin-bottom:6px; color:var(--text-muted);"> 各自應付總額 (含個人與共同)：</div>`;
+            for(let p in totalsOwed) { resHTML += `<div class="flex-between" style="font-size:12px; margin-bottom:4px; color:var(--text-main); font-weight:600;"><span> ${p}</span><span>NT$${Math.round(totalsOwed[p]).toLocaleString('en-US')}</span></div>`; }
+            resHTML += `<div style="font-size:12px; font-weight:800; margin-top:12px; margin-bottom:6px; color:var(--danger-color); background:rgba(220,38,38,0.1); padding:4px 10px; border-radius:50px; display:inline-block;"> 💰 結算：誰該給誰錢？</div>`;
+            if (transfers.length > 0) { transfers.forEach(t => { resHTML += `<div style="font-size:13px; font-weight:800; margin-bottom:6px; padding-left:4px; color:var(--text-main);">${t}</div>`; }); } else { resHTML += `<div style="font-size:12px; font-weight:600; color:var(--text-muted); padding-left:4px;">目前帳目平衡，無需給錢。</div>`; }
+            let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
+        }
+
+        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:4px; font-size:16px; color:var(--danger-color); line-height:1;" onclick="deletePayer(${idx})">×</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
+        function updatePayerDropdowns() { let options = payers.map(p => `<option value="${p}">${p}</option>`).join(''); document.querySelectorAll('.payer-select').forEach(sel => { let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options; if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; } }); }
+        function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
+        function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
+
+        function switchTodoPerson(personName) { document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none'); let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block'; let select = document.getElementById('todo-person-select'); Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); saveData(); }
+        function addNewTodoPerson() { let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return; if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; } let currentTemplateName = document.getElementById('todo-person-select').value; let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`); let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none'; newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed')); document.getElementById('person-todo-container').appendChild(newList); let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); }
+        function deleteTodoPerson() { let select = document.getElementById('todo-person-select'); let personName = select.value; if (personName === '預設範本') { alert('「預設範本」無法被刪除喔！'); return; } if (confirm(`確定要刪除人員「${personName}」的所有清單嗎？`)) { Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); }); let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove(); select.value = '預設範本'; switchTodoPerson('預設範本'); } }
+        
+        function toggleTransportMode(iconEl, event) { 
+            event.stopPropagation(); 
+            let modes = ['directions_transit', 'flight', 'two_wheeler', 'directions_walk', 'directions_car']; 
+            let current = iconEl.innerText.trim(); 
+            let nextIndex = (modes.indexOf(current) + 1) % modes.length;
+            iconEl.innerText = modes[nextIndex >= 0 ? nextIndex : 0]; 
+            let card = iconEl.closest('.day-card'); 
+            if(card) recalculateDayTime(card); 
+            saveData(); 
+        }
+        
+        function recalculateDayTime(dayCardElement) {
+            let items = dayCardElement.querySelectorAll('.timeline-item'); if (items.length === 0) return;
+            let prevEndTimeMins = null; let prevTravelMins = null; let prevTimeCol = null;
+            items.forEach((item, index) => {
+                let timeCol = item.querySelector('.time-column'); if (!timeCol) return; 
+                let startEl = item.querySelector('.start-time'); let durationEl = item.querySelector('.duration');
+                let endEl = item.querySelector('.end-time'); let travelEl = item.querySelector('.travel-time');
+                let oldAuto = timeCol.querySelector('.auto-start'); let oldGap = timeCol.querySelector('.gap-text');
+                if (oldAuto) oldAuto.remove(); if (oldGap) oldGap.remove();
+                if (!startEl || !durationEl || !endEl) return;
+                
+                let startMins = 0; let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
+                if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
+                
+                let duration = parseMins(durationEl.innerText);
+                if (document.activeElement !== durationEl) durationEl.innerText = formatMins(duration);
+                
+                let endMins = startMins + duration;
+                endEl.innerText = `${String(Math.floor(endMins / 60) % 24).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
+                
+                if (index > 0 && prevTimeCol) {
+                    let expMins = prevEndTimeMins + (prevTravelMins || 0); let gap = startMins - expMins; if (gap < -300) gap += 24 * 60; 
+                    let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start'; autoStartEl.innerText = `預計 ${String(Math.floor(expMins / 60) % 24).padStart(2, '0')}:${String(expMins % 60).padStart(2, '0')}`;
+                    let gapEl = document.createElement('div'); gapEl.className = 'gap-text'; 
+                    if (gap < 0) { gapEl.style.color = 'var(--danger-color)'; gapEl.innerText = `重疊 ${formatMins(Math.abs(gap))}`; } else { gapEl.innerText = `隔 ${formatMins(gap)}`; }
+                    prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
+                }
+                prevEndTimeMins = endMins; 
+                if(travelEl) {
+                    prevTravelMins = parseMins(travelEl.innerText);
+                    if(document.activeElement !== travelEl) travelEl.innerText = formatMins(prevTravelMins);
+                } else { prevTravelMins = 0; }
+                prevTimeCol = timeCol;
+            });
+        }
+
+        function adjustStickyTabs() { let gc = document.querySelector('.global-controls'); let tabs = document.getElementById('day-tabs-container'); if (tabs) tabs.style.top = (gc && gc.style.display !== 'none') ? gc.offsetHeight + 'px' : '0px'; }
+        window.addEventListener('resize', adjustStickyTabs);
+
+        function initSortable() {
+            if (typeof Sortable === 'undefined') return;
+            window.sortableInstances.forEach(s => s.destroy()); window.sortableInstances = [];
+            const sortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } };
+            document.querySelectorAll('.day-card').forEach(card => { window.sortableInstances.push(Sortable.create(card, sortableOptions)); });
+            const lists = ['transport-text-list', 'shopping-list', 'booking-list']; lists.forEach(id => { let el = document.getElementById(id); if(el) window.sortableInstances.push(Sortable.create(el, sortableOptions)); });
+            document.querySelectorAll('.person-todo-list').forEach(list => { window.sortableInstances.push(Sortable.create(list, sortableOptions)); });
+            const subSortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.sub-item', filter: '.editable, img, .action-box, .material-icons-round', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function () { saveData(); } };
+            document.querySelectorAll('.sub-items-container').forEach(cont => { window.sortableInstances.push(Sortable.create(cont, subSortableOptions)); });
+        }
+
+        // 🌟 背景偷偷打勾存檔魔法
+        function toggleComplete(element, event) { 
+            if (!event.target.closest('.custom-checkbox')) return; 
+            element.classList.toggle('completed'); 
+            
+            if (isEditMode) {
+                saveData(); 
+            } else {
+                clearTimeout(window.bgSyncTimer);
+                window.bgSyncTimer = setTimeout(() => {
+                    lockRef.once('value').then(snap => {
+                        let currentLock = snap.val();
+                        if (!currentLock || (Date.now() - currentLock.timestamp > 180000)) {
+                            lockRef.set({ deviceId: myDeviceId, timestamp: Date.now() }).then(() => {
+                                let state = captureState();
+                                let bgCompressed = LZString.compressToUTF16(JSON.stringify(state));
+                                tripRef.set({ compressedData: bgCompressed, lastModified: Date.now() }).then(() => {
+                                    lockRef.remove();
+                                });
+                            });
+                        }
+                    });
+                }, 5000);
+            }
+        }
+
+        function autoNavigate(btn, event) {
+            event.preventDefault(); let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card'); if (!currentItem) return;
+            let titleEl = currentItem.querySelector('.item-name-target'); let title = titleEl ? titleEl.innerText.trim() : ''; if (!title) { alert('請先輸入地點名稱！'); return; }
+            let origin = ''; let dest = title; let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+            if (match) { origin = match[1].trim(); dest = match[2].trim(); } 
+            else { let prevItem = currentItem.previousElementSibling; while(prevItem && !prevItem.classList.contains('timeline-item')) { prevItem = prevItem.previousElementSibling; } if (prevItem && prevItem.querySelector('.item-name-target')) { let prevTitle = prevItem.querySelector('.item-name-target').innerText.trim(); let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i); origin = prevMatch ? prevMatch[2].trim() : prevTitle; } }
+            
+            let mode = 'transit'; 
+            let iconEl = currentItem.querySelector('.transport-icon'); 
+            if (iconEl) { 
+                let t = iconEl.innerText.trim(); 
+                if (t === 'directions_walk') mode = 'walking'; 
+                if (t === 'directions_car') mode = 'driving'; 
+                if (t === 'two_wheeler') mode = 'driving'; 
+                if (t === 'flight') mode = 'transit'; 
+            }
+            
+            let mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`; if (origin && origin !== '輸入行程名稱') mapUrl += `&origin=${encodeURIComponent(origin)}`;
+            
+            let a = document.createElement('a'); a.href = mapUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function updateDayTabs() {
+            let container = document.getElementById('day-tabs-container'); if (!container) return; 
+            let shareMatch = window.location.href.match(/[?&](share|readonly)=([0-9,，、]+)/); let allowedIndexes = shareMatch ? shareMatch[2].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d)) : null;
+            let cards = document.querySelectorAll('#itinerary-days-container .day-card'); let html = ''; let activeIndex = -1;
+            cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; }); if (allowedIndexes && !allowedIndexes.includes(activeIndex)) activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
+            cards.forEach((card, index) => { if (allowedIndexes && !allowedIndexes.includes(index)) return; let title = card.querySelector('.section-title') ? card.querySelector('.section-title').innerText : ''; let dateStr = title.match(/\d{1,2}\/\d{1,2}/) ? title.match(/\d{1,2}\/\d{1,2}/)[0] : '日期'; html += `<div class="day-tab ${index === activeIndex ? 'active' : ''}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`; });
+            container.innerHTML = html;
+            if (cards.length > 0) { if (activeIndex === -1 || activeIndex >= cards.length) activeIndex = allowedIndexes ? allowedIndexes[0] : 0; switchDayCard(activeIndex); }
+            setTimeout(adjustStickyTabs, 50);
+        }
+
+        function switchDayCard(targetIndex) { document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => { let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`); if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); } }); saveData(); }
+        function addNewDayCard() { let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1; let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`; container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); }
+        function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
+
+        function rebindEvents() {
+            document.querySelectorAll('.photo-box img').forEach(img => { 
+                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
+                if (!img.closest('.photo-album-container')) { img.onclick = function(e) { openImageModal(this, e); }; }
+            });
+            document.querySelectorAll('.receipt-thumb-wrap img').forEach(img => { 
+                if(!img.hasAttribute('onerror')) img.setAttribute('onerror', 'handleImageError(this)'); 
+                img.onclick = function(e) { openImageModal(this, e); };
+            });
+            document.querySelectorAll('.photo-album-container img').forEach(img => { img.onclick = null; });
+        }
+        
+        window.onload = loadData;
+    </script>
+</body>
+</html>
