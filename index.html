@@ -12,10 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
+    <!-- 引入外部套件 -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
+
+    <!-- 🚀 引入 Firebase 官方極速套件 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
     <style>
         /* 🌟 質感灰階色調與動畫設定 */
@@ -220,32 +226,43 @@
     </div>
     
     <script>
-        // 🌟 1. 新增 Device ID 與心跳計時器
+        // 🌟 初始化 Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkpZb1t6YgANh4SlwRsaOY--lDD6R-2b0",
+            authDomain: "keihan-2026.firebaseapp.com",
+            databaseURL: "https://keihan-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "keihan-2026",
+            storageBucket: "keihan-2026.firebasestorage.app",
+            messagingSenderId: "138020414325",
+            appId: "1:138020414325:web:5cc6f8be56570ef2d3293c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const storage = firebase.storage();
+        
+        // 🌟 資料庫參照點
+        const tripRef = db.ref('tripData');
+        const lockRef = db.ref('lock');
+
+        // 🌟 產生 Device ID
         let myDeviceId = localStorage.getItem('travelAppDeviceId');
         if (!myDeviceId) {
             myDeviceId = 'device_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('travelAppDeviceId', myDeviceId);
         }
-        let lockHeartbeatTimer = null;
 
         let isAppReady = false, lastActiveTime = Date.now(), lastCloudDataHash = null, isSavingToCloud = false, pendingSaveAction = false, syncTimeout = null, isImageProcessing = false;
         let isInitializing = true; 
         let isEditMode = false; 
-        let lastCloudModifiedTime = 0;
         let hasShownStartupToast = false;
-        let needsSaveAfterFetch = false;
-        let allRatesToTWD = {}; /* 🌟 修正：補上全域匯率變數宣告，避免 ReferenceError */
+        let allRatesToTWD = {}; 
         window.sortableInstances = [];
         
         let payers = ['本人', '家人']; let currentReceiptBox = null, currentItemThumbBox = null;
-        
         let currentTravelCurrency = 'JPY';
         try { currentTravelCurrency = localStorage.getItem('travelAppCurrency') || 'JPY'; } catch(e) {}
         
         let undoStack = [], redoStack = [];
-        
-        const API_URL = "https://script.google.com/macros/s/AKfycbw-hI5Inz_KBE91uUYwOGwZojXLoTi0ceDHp2M1l7wc6gUcRvFYvzQw0O-0wKr3PsDMTw/exec"; 
-        const APP_TOKEN = "YOUR_SECRET_TOKEN_2026"; 
         const TAB_PASSWORD = "0719"; 
 
         /* 🌟 更新進度條 UI 的輔助函數 */
@@ -351,67 +368,65 @@
             setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) scale(0.9)'; }, 3500);
         }
 
-// 🌟 1. 終極優化版：樂觀解鎖 (Optimistic UI)
+        // 🌟 監聽 Firebase Lock 變化 (防搶奪機制)
+        lockRef.on('value', (snapshot) => {
+            const currentLock = snapshot.val();
+            // 如果我正在編輯，但雲端發現鎖不是我的，代表我被接管了
+            if (currentLock && currentLock.deviceId !== myDeviceId && isEditMode) {
+                handleLockStolen();
+            }
+        });
+
+        // 🌟 終極 Firebase 解鎖邏輯 (原子操作防衝突)
         function toggleEditMode() {
             if (new URLSearchParams(window.location.search).get('readonly')) { alert("此為專屬唯讀分享連結，無法解鎖編輯。"); return; }
             
             if (!isEditMode) {
-                // 【魔法在這裡】不等待後端，瞬間解鎖 UI 讓使用者立刻操作！
-                enableEditUI(); 
-                setStatus('sync', '背景確認權限中...');
+                setStatus('sync', '申請編輯權限...');
                 
-                let payload = JSON.stringify({ action: "requestLock", deviceId: myDeviceId, token: APP_TOKEN });
-                fetch(API_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: payload 
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === "success") {
-                            setStatus('cloud_done', '編輯中'); // 權限確認成功，悄悄改文字就好
-                        } else if (data.status === "locked") {
-                            // 如果真的被別人鎖了，才退回唯讀模式
-                            disableEditUI();
-                            setStatus('cloud_off', '有人正在編輯', true);
-                            if (confirm("🚨 目前有其他裝置正在編輯中！\n\n是否要【強制接管】編輯權？\n(這將迫使對方的裝置自動跳回唯讀模式)")) {
-                                forceTakeoverLock();
-                            }
+                lockRef.transaction((currentLock) => {
+                    const now = Date.now();
+                    // 如果沒人鎖，或是鎖本來就我的，或是鎖超過3分鐘沒更新(當作斷線死鎖)，就讓我鎖
+                    if (!currentLock || currentLock.deviceId === myDeviceId || (now - currentLock.timestamp > 180000)) {
+                        return { deviceId: myDeviceId, timestamp: now };
+                    }
+                    return; // 終止交易 (鎖在別人手上)
+                }, (error, committed, snapshot) => {
+                    if (error) {
+                        setStatus('cloud_off', '連線失敗', true);
+                        alert("網路錯誤，無法連線至 Firebase。");
+                    } else if (!committed) {
+                        setStatus('cloud_off', '有人正在編輯', true);
+                        if (confirm("🚨 目前有其他裝置正在編輯中！\n\n是否要【強制接管】編輯權？\n(這將迫使對方的裝置自動跳回唯讀模式)")) {
+                            forceTakeoverLock();
                         }
-                    }).catch(e => { 
-                        disableEditUI(); // 網路斷線，為了安全退回唯讀
-                        setStatus('cloud_off', '權限確認失敗', true); 
-                        alert("網路錯誤，無法連線確認權限。"); 
-                    });
+                    } else {
+                        // 🎉 成功拿到鎖
+                        lockRef.onDisconnect().remove(); // 魔法：如果使用者直接關掉網頁，Firebase 自動解除鎖定！
+                        enableEditUI();
+                    }
+                });
             } else {
                 saveData(true);
                 disableEditUI();
-                let payload = JSON.stringify({ action: "releaseLock", deviceId: myDeviceId, token: APP_TOKEN });
-                fetch(API_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: payload 
-                }); // 背景釋放
+                lockRef.remove(); // 釋放鎖
+                lockRef.onDisconnect().cancel();
             }
             adjustStickyTabs();
         }
+
         function forceTakeoverLock() {
             setStatus('sync', '強制接管中...');
-            let payload = JSON.stringify({ action: "forceTakeover", deviceId: myDeviceId, token: APP_TOKEN });
-            fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 💡 補上這行
-                body: payload 
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        showToast("⚔️ 已強制接管編輯權限！");
-                        enableEditUI();
-                    }
-                }).catch(e => alert("強制接管失敗，請檢查網路。"));
+            lockRef.set({ deviceId: myDeviceId, timestamp: Date.now() })
+                .then(() => {
+                    lockRef.onDisconnect().remove();
+                    showToast("⚔️ 已強制接管編輯權限！");
+                    enableEditUI();
+                })
+                .catch(e => alert("強制接管失敗，請檢查網路。"));
         }
 
+        let lockHeartbeatTimer = null;
         function enableEditUI() {
             isEditMode = true; 
             document.body.classList.remove('view-mode-active'); 
@@ -421,7 +436,9 @@
             setStatus('cloud_done', '編輯中');
             
             clearInterval(lockHeartbeatTimer);
-            lockHeartbeatTimer = setInterval(sendHeartbeat, 60000); // 每 60 秒送一次心跳
+            lockHeartbeatTimer = setInterval(() => {
+                if (isEditMode) lockRef.update({ timestamp: Date.now() }).catch(e=>console.log(e));
+            }, 60000); 
         }
 
         function disableEditUI() {
@@ -433,28 +450,13 @@
             clearInterval(lockHeartbeatTimer);
         }
 
-        function sendHeartbeat() {
-            if (!isEditMode) return;
-            let payload = JSON.stringify({ action: "heartbeat", deviceId: myDeviceId, token: APP_TOKEN });
-            fetch(API_URL, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 💡 補上這行
-                body: payload 
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "locked") handleLockStolen();
-                }).catch(e => console.log("心跳發送失敗"));
-        }
-
         function handleLockStolen() {
-            clearInterval(lockHeartbeatTimer);
             disableEditUI();
             setStatus('cloud_off', '權限已被接管', true);
             alert("⚠️ 【編輯權限已被接管】\n\n您的編輯權限已被其他裝置強制接管！\n為了防止您的心血白費，系統即將為您自動下載實體備份檔，並將畫面恢復為唯讀模式。");
             if (typeof exportBackup === 'function') exportBackup(); 
-            if (typeof checkCloudFreshness === 'function') checkCloudFreshness(); 
         }
+
         function updateEditToggleButton() {
             let btn = document.getElementById('edit-toggle-btn'); let icon = document.getElementById('edit-toggle-icon'); if (!btn || !icon) return;
             if (isEditMode) { btn.style.background = "#d97706"; btn.setAttribute('data-tip', '編輯中，點擊鎖定並儲存'); icon.innerText = "lock_open"; } 
@@ -551,37 +553,6 @@
             window.addEventListener('touchstart', (e) => { if (!e.target.closest('.manual-save-btn')) hideMobileTooltip(); }, {passive: true});
         }
 
-        function checkCloudFreshness() {
-            if (new URLSearchParams(window.location.search).get('readonly')) return;
-            if (!isAppReady || isSavingToCloud || pendingSaveAction || !lastCloudDataHash || typeof LZString === 'undefined') return;
-            setStatus('sync', '檢查進度...');
-            fetch(API_URL + "?t=" + Date.now()).then(res => res.json()).then(rawData => {
-                if (isSavingToCloud || pendingSaveAction) { setStatus('cloud_done', '已就緒'); return; }
-                if (rawData && rawData.isCompressed && rawData.data) {
-                    if (rawData.data !== lastCloudDataHash) {
-                        isAppReady = false; const splash = document.getElementById('splash-screen');
-                        if (splash) { updateProgress(50, '載入最新資料...'); splash.style.display = 'flex'; splash.style.opacity = '1'; }
-                        lastCloudDataHash = rawData.data; let state = null;
-                        try { state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {}
-                        if(state && state.html) {
-                            if (state.lastModified) lastCloudModifiedTime = state.lastModified;
-                            document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
-                            if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
-                            if(state.payersData) payers = state.payersData;
-                            renderPayerTags(); rebindEvents();
-                            showToast("🔄 資料已自動同步為最新進度");
-                        }
-                        finalizeLoad();
-                    } else { setStatus('cloud_done', '已就緒'); }
-                }
-            }).catch(e => setStatus('cloud_done', '已就緒'));
-        }
-
-        document.addEventListener("visibilitychange", () => { if (document.visibilityState === 'visible') { checkCloudFreshness(); fetchExchangeRate(); } lastActiveTime = Date.now(); });
-        window.addEventListener("focus", () => { checkCloudFreshness(); });
-        ['touchstart', 'mousemove', 'keydown', 'scroll', 'click'].forEach(evt => { document.addEventListener(evt, () => { if (Date.now() - lastActiveTime > 180000) checkCloudFreshness(); lastActiveTime = Date.now(); }, {passive: true}); });
-        if (window.location.search.includes('share=') || window.location.search.includes('readonly=')) { var splashImg = document.getElementById('splash-bg-img'); if (splashImg) splashImg.style.display = 'none'; }
-        
         try {
             let savedTheme = localStorage.getItem('travelAppDarkMode');
             if (savedTheme === 'true' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && savedTheme !== 'false')) { document.body.classList.add('dark-mode'); }
@@ -776,7 +747,7 @@
             return { html: tempMain.innerHTML, heroHtml: tempHero.innerHTML, payersData: JSON.parse(JSON.stringify(payers)), lastModified: Date.now() };
         }
 
-/* 🌟 版本衝突修復的核心區塊 (已加入智慧攔截與延長緩衝) */
+        // 🌟 最終版 saveData (寫入 Firebase 即時資料庫)
         function saveData(isManual = false, skipHistory = false) {
             if (new URLSearchParams(window.location.search).get('readonly')) return;
             if (!isAppReady) return;
@@ -784,36 +755,23 @@
             if (!isEditMode && !isManual) return;
             if (isInitializing && !isManual) return;
             
-            if (isSavingToCloud) {
-                needsSaveAfterFetch = true;
-                if (isManual) showToast("⏳ 資料同步中，已加入排程...");
-                return; 
-            }
-
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
             
-            let payload;
             let newCompressedData; 
+            let payload; // 給本機備份用的
 
             try {
                 const state = captureState(); 
                 newCompressedData = LZString.compressToUTF16(JSON.stringify(state));
                 
-                // 【魔法在這裡】智慧攔截：如果目前的資料跟雲端完全一樣，提早結束，不浪費時間呼叫 API！
-                if (!isManual && newCompressedData === lastCloudDataHash) {
-                    return; 
-                }
-
+                // 智慧攔截：如果目前的資料跟雲端完全一樣，提早結束！
+                if (!isManual && newCompressedData === lastCloudDataHash) return; 
+                
                 payload = JSON.stringify({ 
                     isCompressed: true, 
-                    data: newCompressedData, 
-                    token: APP_TOKEN,
-                    baseHash: lastCloudDataHash,
-                    deviceId: myDeviceId 
+                    data: newCompressedData 
                 });
-            } catch(e) { console.error("存檔壓縮失敗", e); pendingSaveAction = false; return; }
-
-            pendingSaveAction = true; // 移到這裡，確定資料有變才開始計算動作
+            } catch(e) { return; }
 
             try {
                 // 本地備份照常執行
@@ -821,90 +779,177 @@
                 localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
             } catch(e) {}
             
-            if(!API_URL.startsWith("https://script.google.com")) { setStatus('cloud_off', '本機模式', true); pendingSaveAction = false; return; }
-            
-            setStatus('sync', '背景同步中...'); // 文字改得溫和一點，避免使用者焦慮
+            setStatus('sync', '背景同步中...'); 
             clearTimeout(syncTimeout);
             
-            // 【魔法在這裡】將緩衝時間從 1500 延長到 3000 (3秒)，打字更順暢不會頻繁卡頓
+            // 延遲 1.5 秒送出，避免打字卡頓
             syncTimeout = setTimeout(() => {
-                pendingSaveAction = false; 
-                isSavingToCloud = true;
-                
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-                .then(res => res.json())
-                .then(data => {
-                    isSavingToCloud = false; 
-                    if(data.status === "success") { 
-                        lastCloudDataHash = newCompressedData; // 更新本地 Hash
-                        setStatus('cloud_done', '雲端已同步'); 
-                        if(isManual) showToast("✅ 同步成功！"); 
-                    } else if (data.status === "conflict") {
-                        if (data.message === "lock_stolen") {
-                            handleLockStolen(); 
-                        } else {
-                            setStatus('cloud_off', '版本衝突，拒絕存檔', true);
-                            alert("🚨 【版本衝突警告】\n\n在你編輯的期間，有人已經存檔了新版本！\n為了避免覆蓋別人的心血，系統已「拒絕」本次存檔。\n\n請點擊上方工具列的「下載」按鈕保留你的修改，然後重新整理頁面。");
-                        }
+                // 先檢查鎖是不是還在我們手上
+                lockRef.once('value').then(snapshot => {
+                    const currentLock = snapshot.val();
+                    if (currentLock && currentLock.deviceId === myDeviceId) {
+                        // 鎖在手上，大膽存入 Firebase！
+                        tripRef.set({
+                            compressedData: newCompressedData,
+                            lastModified: Date.now()
+                        }).then(() => {
+                            lastCloudDataHash = newCompressedData; 
+                            setStatus('cloud_done', '雲端已同步'); 
+                            if(isManual) showToast("✅ 同步成功！"); 
+                        }).catch(err => {
+                            setStatus('cloud_off', '連線失敗', true); 
+                            if(isManual) alert("❌ 存檔失敗，請檢查網路！");
+                        });
                     } else {
-                        setStatus('cloud_off', '上傳失敗', true); 
-                        if(isManual) alert('❌ 失敗：' + (data.message || '伺服器未回應'));
+                        // 鎖被搶走了！
+                        handleLockStolen();
                     }
-                    
-                    if (needsSaveAfterFetch && data.status === "success") {
-                        needsSaveAfterFetch = false;
-                        saveData();
-                    } else {
-                        needsSaveAfterFetch = false;
-                    }
-                }).catch(e => { 
-                    isSavingToCloud = false; 
-                    setStatus('cloud_off', '連線失敗(存本機)', true); 
-                    needsSaveAfterFetch = false;
-                    if(isManual) alert("❌ 同步失敗！請檢查網路連線或稍後再試。"); 
                 });
-            }, isManual ? 0 : 3000); 
+            }, isManual ? 0 : 1500); 
         }
-        /* 🌟 修正載入函數並綁定進度條 */
+
+        // 🌟 最終版 loadData (載入 Firebase 資料與自動搬家)
         function loadData() {
-            updateProgress(20, '初始化系統環境...');
-            let isLoaded = false;
-            const fallbackTimeout = setTimeout(() => { if(!isLoaded) { isLoaded = true; loadFromLocal(); setStatus('cloud_off', '讀取本機', true); } }, 20000);
-            const forceUnlockTimer = setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { isAppReady = true; splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); isInitializing = false;} }, 22000);
-
-            if (typeof LZString === 'undefined') return;
+            updateProgress(30, '連線至 Firebase 即時資料庫...');
             
-            updateProgress(40, '載入本機快取...');
-            const template = document.getElementById('default-template'); if(template) { document.getElementById('main-container').innerHTML = template.innerHTML; template.remove(); }
-            const savedPayers = localStorage.getItem('travelAppPayers_vCloudFinal'); if (savedPayers) payers = JSON.parse(savedPayers); renderPayerTags();
-            if(!API_URL.startsWith("https://script.google.com")) { if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '本機模式', true); } return; }
+            // 監聽 Firebase 資料庫變化
+            tripRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data && data.compressedData) {
+                    // 如果雲端資料跟本地不同，才更新畫面
+                    if (data.compressedData !== lastCloudDataHash) {
+                        lastCloudDataHash = data.compressedData;
+                        
+                        if (isInitializing) {
+                            updateProgress(80, '解析雲端資料...');
+                            try {
+                                let state = JSON.parse(LZString.decompressFromUTF16(data.compressedData));
+                                if(state && state.html) {
+                                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
+                                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                                    if(state.payersData) payers = state.payersData;
+                                    renderPayerTags(); rebindEvents();
+                                    setStatus('cloud_done', '雲端已同步');
+                                }
+                            } catch(e) {}
+                            finalizeLoad();
+                            isInitializing = false;
+                        } else {
+                            // 執行中被別人更新了！
+                            try {
+                                let state = JSON.parse(LZString.decompressFromUTF16(data.compressedData));
+                                if(state && state.html) {
+                                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
+                                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                                    if(state.payersData) payers = state.payersData;
+                                    renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable();
+                                    showToast("🔄 資料已自動同步為最新進度");
+                                }
+                            } catch(e) {}
+                        }
+                    }
+                } else if (!data && isInitializing) {
+                    // 🚀 Firebase 裡面沒東西！觸發【自動搬家精靈】
+                    updateProgress(60, '執行舊資料無痛搬家...');
+                    const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
+                    if (saved) {
+                        try {
+                            let parsed = JSON.parse(saved);
+                            if (parsed.data) {
+                                // 把本機的舊資料直接推上 Firebase
+                                tripRef.set({ compressedData: parsed.data, lastModified: Date.now() });
+                                lastCloudDataHash = parsed.data;
+                                let state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
+                                if(state && state.html) {
+                                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
+                                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                                    if(state.payersData) payers = state.payersData;
+                                    renderPayerTags(); rebindEvents();
+                                }
+                            }
+                        } catch(e) {}
+                    } else {
+                        addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580');
+                    }
+                    finalizeLoad();
+                    isInitializing = false;
+                }
+            });
             
-            updateProgress(60, '正在與雲端同步資料...');
-            fetch(API_URL).then(res => res.json()).then(rawData => {
-                if(isLoaded) return; isLoaded = true; clearTimeout(fallbackTimeout);
-                updateProgress(80, '解析雲端資料...');
-                let state = rawData;
-                if (rawData && rawData.isCompressed && typeof LZString !== 'undefined') { try { lastCloudDataHash = rawData.data; state = JSON.parse(LZString.decompressFromUTF16(rawData.data)); } catch(e) {} }
-                if (state && state.html) {
-                    if (state.lastModified) lastCloudModifiedTime = state.lastModified;
-                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
-                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
-                    if(state.payersData) payers = state.payersData;
-                    renderPayerTags(); rebindEvents(); setStatus('cloud_done', '雲端已同步');
-                } else { addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); setStatus('cloud_done', '建立新存檔'); }
-                finalizeLoad();
-            }).catch(e => { if(!isLoaded) { isLoaded = true; clearTimeout(fallbackTimeout); loadFromLocal(); setStatus('cloud_off', '離線模式(存本機)', true); } else { finalizeLoad(); } });
+            // 安全機制：萬一網路卡住，5秒後強行關閉 Splash 畫面
+            setTimeout(() => {
+                if(isInitializing) {
+                    const splash = document.getElementById('splash-screen'); 
+                    if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 300); }
+                    isInitializing = false;
+                    isAppReady = true;
+                }
+            }, 5000);
         }
 
-        function loadFromLocal() {
-            updateProgress(80, '套用本機備份...');
-            const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
-            if (saved) {
-                let state = null;
-                try { let parsed = JSON.parse(saved); if (parsed.isCompressed && typeof LZString !== 'undefined') { lastCloudDataHash = parsed.data; state = JSON.parse(LZString.decompressFromUTF16(parsed.data)); } else { state = parsed; } } catch(e) {}
-                if(state && state.html) { if (state.lastModified) lastCloudModifiedTime = state.lastModified; document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); }
-            } else { addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580'); }
-            finalizeLoad();
+        // 🌟 最終版圖片上傳 (直接上傳 Firebase Storage)
+        function uploadImageToCloud(base64Str, filename, callback, errorCallback) {
+            setStatus('sync', '圖片上傳中...');
+            const storageRef = firebase.storage().ref('images/' + Date.now() + '_' + filename);
+            storageRef.putString(base64Str, 'data_url').then(snapshot => {
+                return snapshot.ref.getDownloadURL();
+            }).then(downloadURL => {
+                setStatus('cloud_done', '上傳成功'); 
+                callback(downloadURL); 
+            }).catch(e => {
+                setStatus('cloud_off', '上傳失敗', true); 
+                alert('圖片上傳失敗！\n(請確認 Firebase Storage 規則是否設定正確)'); 
+                if(errorCallback) errorCallback();
+            });
+        }
+
+        function deleteImageFromCloud(imgUrl) {
+            if (!imgUrl) return; 
+            if (imgUrl.includes('firebasestorage.app') || imgUrl.includes('firebase')) {
+                try { firebase.storage().refFromURL(imgUrl).delete(); } catch(e){}
+            }
+        }
+
+        // 替換原本的 handleItemUpload 內容
+        function handleItemUpload(event) {
+            const file = event.target.files[0];
+            if (file && currentItemThumbBox) {
+                isImageProcessing = true; let originalHTML = currentItemThumbBox.innerHTML; let isNew = !currentItemThumbBox.classList.contains('has-photo');
+                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; }
+
+                compressImage(file, 800, 0.6, function(base64DataUrl) {
+                    uploadImageToCloud(base64DataUrl, file.name, function(driveUrl) {
+                        if (isNew) {
+                            currentItemThumbBox.className = 'action-box has-photo photo-box';
+                            currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:8px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-4px; left:-4px; background:var(--primary-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
+                        } else {
+                            let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = '+';
+                            let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
+                            if (albumContainer) {
+                                let newImg = document.createElement('img'); newImg.src = driveUrl; newImg.style.display = 'none'; newImg.setAttribute('onerror', 'handleImageError(this)'); albumContainer.appendChild(newImg);
+                                let countBadge = albumContainer.querySelector('.album-count-badge'); let imgCount = albumContainer.querySelectorAll('img').length;
+                                if (!countBadge) { countBadge = document.createElement('div'); countBadge.className = 'album-count-badge'; countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; line-height:1.2;'; albumContainer.appendChild(countBadge); }
+                                countBadge.innerText = '+' + (imgCount - 1);
+                            }
+                        } saveData(); isImageProcessing = false;
+                    }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
+                }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
+            }
+        }
+
+        // 替換原本的 handleReceiptUpload 內容
+        function handleReceiptUpload(event) {
+            const file = event.target.files[0];
+            if (file && currentReceiptBox) {
+                isImageProcessing = true; currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
+                compressImage(file, 800, 0.6, function(base64DataUrl) {
+                    uploadImageToCloud(base64DataUrl, file.name, function(driveUrl) {
+                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"></div>`; 
+                        saveData(); isImageProcessing = false;
+                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
+                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
+            }
         }
 
         function setStatus(icon, text, isError = false) { const statusEl = document.getElementById('sync-status'); if(statusEl) { statusEl.innerHTML = `<span class="material-icons-round" style="font-size:14px; color: ${isError ? 'var(--danger-color)' : '#10b981'};">${icon}</span> <span>${text}</span>`; } }
@@ -1018,7 +1063,7 @@
                     }
                 });
 
-                document.querySelectorAll('img').forEach(img => { if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') { img.setAttribute('onerror', 'handleImageError(this)'); } let currentSrc = img.getAttribute('src'); if(currentSrc) { let newSrc = getReliableDriveUrl(currentSrc); if (currentSrc !== newSrc) { img.src = newSrc; img.setAttribute('src', newSrc); } } });
+                document.querySelectorAll('img').forEach(img => { if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') { img.setAttribute('onerror', 'handleImageError(this)'); } });
                 document.querySelectorAll('.upload-area, button[onclick*="addLinkItem"]').forEach(el => el.style.display = 'none');
                 
                 document.querySelectorAll('.action-box.has-photo.photo-box').forEach(box => {
@@ -1067,12 +1112,6 @@
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
                 setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); } 
                 isInitializing = false; 
-                
-                if (!hasShownStartupToast && lastCloudModifiedTime > 0) {
-                    let diffMins = Math.floor((Date.now() - lastCloudModifiedTime) / 60000);
-                    if (diffMins < 5 && diffMins >= 0) { setTimeout(() => showToast(`💡 提示：這份行程在 ${diffMins===0 ? '剛才' : diffMins + ' 分鐘前'} 剛被編輯過！`), 800); }
-                    hasShownStartupToast = true;
-                }
                 }, 500); 
             }
         }
@@ -1209,202 +1248,11 @@
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
-        function deleteImageFromCloud(imgUrl) {
-            if (!imgUrl) return; let match = imgUrl.match(/(?:id=|\/d\/|id%3D)([^&/?]+)/);
-            if (match && match[1]) { fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteImage', fileId: match[1], token: APP_TOKEN }) }).catch(e => console.log('雲端刪除失敗', e)); }
-        }
-
         function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
         function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定刪除項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let imgs = item.querySelectorAll('img'); imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(); } }
         
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
-
-        function compressImage(file, maxWidth, quality, callback, errorCallback) {
-            if (!file) { if(errorCallback) errorCallback(); return; }
-            if (file.type && !file.type.startsWith('image/') && !file.name.match(/\.(jpg|jpeg|png|gif|webp|heic|heif)$/i)) { alert("⚠️ 請選擇正確的圖片檔案！"); if(errorCallback) errorCallback(); return; }
-
-            let isProcessed = false; const img = new Image(); const objectUrl = URL.createObjectURL(file);
-            img.onload = function() {
-                if (isProcessed) return; isProcessed = true; URL.revokeObjectURL(objectUrl);
-                try {
-                    const canvas = document.createElement('canvas'); let scaleSize = (img.width > maxWidth) ? (maxWidth / img.width) : 1;
-                    canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
-                    const ctx = canvas.getContext('2d'); if (!ctx) throw new Error("無法建立 Canvas");
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height); const result = canvas.toDataURL('image/jpeg', quality);
-                    if (result === 'data:,') throw new Error("Canvas 內容為空"); callback(result);
-                } catch (err) { alert("圖片處理失敗，可能是檔案過大導致記憶體不足！"); if(errorCallback) errorCallback(); }
-            };
-            img.onerror = function() { if (isProcessed) return; isProcessed = true; URL.revokeObjectURL(objectUrl); alert("圖片載入失敗！若是 iCloud 雲端照片，請確認已下載至手機後再試。"); if(errorCallback) errorCallback(); };
-            setTimeout(() => { img.src = objectUrl; }, 100);
-        }
-
-        function uploadImageToDrive(base64Str, filename, callback, errorCallback) {
-            setStatus('sync', '上傳中...');
-            const payload = JSON.stringify({ action: 'uploadImage', base64: base64Str, fileName: filename, token: APP_TOKEN });
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload })
-            .then(res => { if(!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-            .then(data => { if(data.status === "success") { setStatus('cloud_done', '上傳成功'); callback(getReliableDriveUrl(data.url)); } else { setStatus('cloud_off', '上傳失敗', true); alert('失敗：' + (data.message || '未知')); if(errorCallback) errorCallback(); } })
-            .catch(e => { setStatus('cloud_off', '上傳失敗', true); alert('網路錯誤！\n(請確認電腦網路暢通)'); if(errorCallback) errorCallback(); });
-        }
-
-        function handleItemUpload(event) {
-            const file = event.target.files[0];
-            if (file && currentItemThumbBox) {
-                isImageProcessing = true; let originalHTML = currentItemThumbBox.innerHTML; let isNew = !currentItemThumbBox.classList.contains('has-photo');
-                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; }
-
-                compressImage(file, 800, 0.6, function(base64DataUrl) {
-                    uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        if (isNew) {
-                            currentItemThumbBox.className = 'action-box has-photo photo-box';
-                            currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:8px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-4px; left:-4px; background:var(--primary-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
-                        } else {
-                            let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = '+';
-                            let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
-                            if (albumContainer) {
-                                let newImg = document.createElement('img'); newImg.src = driveUrl; newImg.style.display = 'none'; newImg.setAttribute('onerror', 'handleImageError(this)'); albumContainer.appendChild(newImg);
-                                let countBadge = albumContainer.querySelector('.album-count-badge'); let imgCount = albumContainer.querySelectorAll('img').length;
-                                if (!countBadge) { countBadge = document.createElement('div'); countBadge.className = 'album-count-badge'; countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; line-height:1.2;'; albumContainer.appendChild(countBadge); }
-                                countBadge.innerText = '+' + (imgCount - 1);
-                            }
-                        } saveData(); isImageProcessing = false;
-                    }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
-                }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
-            }
-        }
-
-        function handleReceiptUpload(event) {
-            const file = event.target.files[0];
-            if (file && currentReceiptBox) {
-                isImageProcessing = true; currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
-                compressImage(file, 800, 0.6, function(base64DataUrl) {
-                    uploadImageToDrive(base64DataUrl, file.name, function(driveUrl) {
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"></div>`; 
-                        saveData(); isImageProcessing = false;
-                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
-                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
-            }
-        }
-
-        function addBudgetRow(item = '新項目', payerName = payers[0], split = '平分', currency = currentTravelCurrency, amount = '0') {
-            const tbody = document.getElementById('budget-tbody'); const tr = document.createElement('tr'); tr.className = 'budget-row';
-            let currentRate = allRatesToTWD[currency] || 1; tr.setAttribute('data-rate', currentRate);
-            let payerOpts = payers.map(p => `<option value="${p}" ${p===payerName?'selected':''}>${p}</option>`).join('');
-            let opts = ['TWD', 'JPY', 'KRW', 'THB', 'USD', 'EUR']; if(!opts.includes(currentTravelCurrency)) opts.push(currentTravelCurrency);
-            let currencyOpts = opts.map(c => `<option value="${c}" ${c===currency?'selected':''}>${c}</option>`).join('');
-            let formattedAmt = Number(String(amount).replace(/,/g, '') || 0).toLocaleString('en-US');
-            
-            tr.innerHTML = `<td contenteditable="true" class="editable" style="font-weight:bold; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item}</td><td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOpts}</select></td><td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${split==='平分'?'selected':''}>平分</option><option value="個人" ${split==='個人'?'selected':''}>個人</option></select></td><td style="white-space:nowrap;"><select class="curr-select" onchange="this.closest('tr').setAttribute('data-rate', allRatesToTWD[this.value] || 1); saveData(); calcBudget();">${currencyOpts}</select><input type="text" class="amount-input" value="${formattedAmt}" onfocus="this.value = this.value.replace(/,/g, '')" onblur="this.value = Number(this.value.replace(/,/g, '') || 0).toLocaleString('en-US'); this.setAttribute('value', this.value); calcBudget(); saveData();"></td><td style="text-align:center;"><div style="display:inline-flex; flex-direction:row; align-items:center; gap:4px; padding:4px; border:1px dashed #cbd5e1; border-radius:12px; background:rgba(0,0,0,0.02); white-space: nowrap;"><div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">add_a_photo</span></div><span class="material-icons-round" style="color:var(--danger-color); font-size:14px; cursor:pointer;" onclick="deleteBudgetRow(this)">delete</span></div></td>`;
-            tbody.appendChild(tr); calcBudget(); saveData();
-        }
-
-        function deleteBudgetRow(btn) { if(confirm('確定刪除此記帳項目嗎？')) { let tr = btn.closest('tr'); let img = tr.querySelector('.receipt-thumb-wrap img'); if (img) deleteImageFromCloud(img.src); tr.remove(); calcBudget(); saveData(); } }
-
-        function calcBudget() {
-            const rows = document.querySelectorAll('#budget-tbody .budget-row');
-            let totalsPaid = {}; let totalsOwed = {}; let grandTotal = 0; payers.forEach(p => { totalsPaid[p] = 0; totalsOwed[p] = 0; });
-            
-            rows.forEach(r => {
-                let payer = r.querySelector('.payer-select')?.value; let splitType = r.querySelector('.split-select')?.value || '個人';
-                let rowCurr = r.querySelector('.curr-select')?.value; let amountInputEl = r.querySelector('.amount-input'); if(!amountInputEl) return;
-                let valStr = amountInputEl.value.replace(/,/g, ''); let amount = parseFloat(valStr) || 0;
-                if (document.activeElement !== amountInputEl) { let formatted = amount.toLocaleString('en-US'); amountInputEl.value = formatted; amountInputEl.setAttribute('value', formatted); }
-                let rowRate = parseFloat(r.getAttribute('data-rate')); if (isNaN(rowRate) || !rowRate) { rowRate = allRatesToTWD[rowCurr] || 1; r.setAttribute('data-rate', rowRate); } if (rowCurr === 'TWD') rowRate = 1; 
-                
-                let amtInTWD = amount * rowRate;
-                if(payer) { if(totalsPaid[payer] === undefined) { totalsPaid[payer] = 0; totalsOwed[payer] = 0; } totalsPaid[payer] += amtInTWD; } grandTotal += amtInTWD;
-                if (splitType === '平分') { let splitAmount = amtInTWD / payers.length; payers.forEach(p => { totalsOwed[p] += splitAmount; }); } else { if(payer) { totalsOwed[payer] += amtInTWD; } }
-            });
-            
-            let balances = {}; let debtors = []; let creditors = [];
-            payers.forEach(p => { balances[p] = totalsPaid[p] - totalsOwed[p]; if (balances[p] < -0.5) debtors.push({ name: p, amount: Math.abs(balances[p]) }); else if (balances[p] > 0.5) creditors.push({ name: p, amount: balances[p] }); });
-            
-            let transfers = []; let i = 0, j = 0;
-            while (i < debtors.length && j < creditors.length) {
-                let debtor = debtors[i]; let creditor = creditors[j]; let amount = Math.min(debtor.amount, creditor.amount);
-                transfers.push(`${debtor.name} <span class="material-icons-round" style="font-size:12px; vertical-align:middle; color:var(--text-muted);">arrow_forward</span> ${creditor.name}：<span style="color:var(--primary-color);">NT$${Math.round(amount).toLocaleString('en-US')}</span>`);
-                debtor.amount -= amount; creditor.amount -= amount; if (debtor.amount < 0.5) i++; if (creditor.amount < 0.5) j++;
-            }
-            
-            let resHTML = `<div class="flex-between" style="font-weight:800; color:var(--primary-color); font-size:15px; border-bottom:2px dashed rgba(0,0,0,0.05); padding-bottom:8px; margin-bottom:8px;"><span> 旅程總花費：</span><span>NT$${Math.round(grandTotal).toLocaleString('en-US')}</span></div><div style="font-size:11px; font-weight:800; margin-bottom:6px; color:var(--text-muted);"> 各自應付總額 (含個人與共同)：</div>`;
-            for(let p in totalsOwed) { resHTML += `<div class="flex-between" style="font-size:12px; margin-bottom:4px; color:var(--text-main); font-weight:600;"><span> ${p}</span><span>NT$${Math.round(totalsOwed[p]).toLocaleString('en-US')}</span></div>`; }
-            resHTML += `<div style="font-size:12px; font-weight:800; margin-top:12px; margin-bottom:6px; color:var(--danger-color); background:rgba(220,38,38,0.1); padding:4px 10px; border-radius:50px; display:inline-block;"> 💰 結算：誰該給誰錢？</div>`;
-            if (transfers.length > 0) { transfers.forEach(t => { resHTML += `<div style="font-size:13px; font-weight:800; margin-bottom:6px; padding-left:4px; color:var(--text-main);">${t}</div>`; }); } else { resHTML += `<div style="font-size:12px; font-weight:600; color:var(--text-muted); padding-left:4px;">目前帳目平衡，無需給錢。</div>`; }
-            let resEl = document.getElementById('budget-result'); if(resEl) resEl.innerHTML = resHTML;
-        }
-
-        function renderPayerTags() { let html = ''; payers.forEach((p, idx) => { html += `<span class="payer-tag">${p} <span class="payer-del-btn" style="cursor:pointer; margin-left:4px; font-size:16px; color:var(--danger-color); line-height:1;" onclick="deletePayer(${idx})">×</span></span>`; }); document.getElementById('payer-tags-container').innerHTML = html; }
-        function updatePayerDropdowns() { let options = payers.map(p => `<option value="${p}">${p}</option>`).join(''); document.querySelectorAll('.payer-select').forEach(sel => { let currentVal = sel.value || sel.getAttribute('data-saved-val'); sel.innerHTML = options; if (payers.includes(currentVal)) { sel.value = currentVal; sel.setAttribute('selected', 'selected'); } else if (payers.length > 0) { sel.value = payers[0]; } }); }
-        function addPayer() { let name = prompt('請輸入新的付款人名稱：'); if(name && name.trim() !== '' && !payers.includes(name.trim())) { payers.push(name.trim()); renderPayerTags(); updatePayerDropdowns(); saveData(); } }
-        function deletePayer(idx) { if(payers.length <= 1) { alert('至少需保留一位付款人！'); return; } if(confirm(`確定刪除付款人「${payers[idx]}」嗎？`)) { payers.splice(idx, 1); renderPayerTags(); updatePayerDropdowns(); calcBudget(); saveData(); } }
-
-        function switchTodoPerson(personName) { document.querySelectorAll('.person-todo-list').forEach(el => el.style.display = 'none'); let target = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if(target) target.style.display = 'block'; let select = document.getElementById('todo-person-select'); Array.from(select.options).forEach(opt => { if(opt.value === personName) opt.setAttribute('selected', 'selected'); else opt.removeAttribute('selected'); }); saveData(); }
-        function addNewTodoPerson() { let name = prompt('請輸入要新增的人員名稱：'); if(!name || name.trim() === '') return; if(document.querySelector(`.person-todo-list[data-person="${name}"]`)) { alert('這個人員已經存在囉！'); return; } let currentTemplateName = document.getElementById('todo-person-select').value; let defaultList = document.querySelector(`.person-todo-list[data-person="${currentTemplateName}"]`); let newList = defaultList.cloneNode(true); newList.setAttribute('data-person', name); newList.style.display = 'none'; newList.querySelectorAll('.completed').forEach(el => el.classList.remove('completed')); document.getElementById('person-todo-container').appendChild(newList); let select = document.getElementById('todo-person-select'); let opt = document.createElement('option'); opt.value = name; opt.innerText = name; select.appendChild(opt); select.value = name; switchTodoPerson(name); initSortable(); }
-        function deleteTodoPerson() { let select = document.getElementById('todo-person-select'); let personName = select.value; if (personName === '預設範本') { alert('「預設範本」無法被刪除喔！'); return; } if (confirm(`確定要刪除人員「${personName}」的所有清單嗎？`)) { Array.from(select.options).forEach(opt => { if (opt.value === personName) opt.remove(); }); let targetList = document.querySelector(`.person-todo-list[data-person="${personName}"]`); if (targetList) targetList.remove(); select.value = '預設範本'; switchTodoPerson('預設範本'); } }
-        
-        function toggleTransportMode(iconEl, event) { 
-            event.stopPropagation(); 
-            let modes = ['directions_transit', 'flight', 'two_wheeler', 'directions_walk', 'directions_car']; 
-            let current = iconEl.innerText.trim(); 
-            let nextIndex = (modes.indexOf(current) + 1) % modes.length;
-            iconEl.innerText = modes[nextIndex >= 0 ? nextIndex : 0]; 
-            let card = iconEl.closest('.day-card'); 
-            if(card) recalculateDayTime(card); 
-            saveData(); 
-        }
-        
-        function recalculateDayTime(dayCardElement) {
-            let items = dayCardElement.querySelectorAll('.timeline-item'); if (items.length === 0) return;
-            let prevEndTimeMins = null; let prevTravelMins = null; let prevTimeCol = null;
-            items.forEach((item, index) => {
-                let timeCol = item.querySelector('.time-column'); if (!timeCol) return; 
-                let startEl = item.querySelector('.start-time'); let durationEl = item.querySelector('.duration');
-                let endEl = item.querySelector('.end-time'); let travelEl = item.querySelector('.travel-time');
-                let oldAuto = timeCol.querySelector('.auto-start'); let oldGap = timeCol.querySelector('.gap-text');
-                if (oldAuto) oldAuto.remove(); if (oldGap) oldGap.remove();
-                if (!startEl || !durationEl || !endEl) return;
-                
-                let startMins = 0; let timeMatch = startEl.innerText.trim().match(/^(\d{1,2})[:：](\d{2})$/);
-                if (timeMatch) startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
-                
-                let duration = parseMins(durationEl.innerText);
-                if (document.activeElement !== durationEl) durationEl.innerText = formatMins(duration);
-                
-                let endMins = startMins + duration;
-                endEl.innerText = `${String(Math.floor(endMins / 60) % 24).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
-                
-                if (index > 0 && prevTimeCol) {
-                    let expMins = prevEndTimeMins + (prevTravelMins || 0); let gap = startMins - expMins; if (gap < -300) gap += 24 * 60; 
-                    let autoStartEl = document.createElement('div'); autoStartEl.className = 'auto-start'; autoStartEl.innerText = `預計 ${String(Math.floor(expMins / 60) % 24).padStart(2, '0')}:${String(expMins % 60).padStart(2, '0')}`;
-                    let gapEl = document.createElement('div'); gapEl.className = 'gap-text'; 
-                    if (gap < 0) { gapEl.style.color = 'var(--danger-color)'; gapEl.innerText = `重疊 ${formatMins(Math.abs(gap))}`; } else { gapEl.innerText = `隔 ${formatMins(gap)}`; }
-                    prevTimeCol.appendChild(autoStartEl); prevTimeCol.appendChild(gapEl);
-                }
-                prevEndTimeMins = endMins; 
-                if(travelEl) {
-                    prevTravelMins = parseMins(travelEl.innerText);
-                    if(document.activeElement !== travelEl) travelEl.innerText = formatMins(prevTravelMins);
-                } else { prevTravelMins = 0; }
-                prevTimeCol = timeCol;
-            });
-        }
-
-        function adjustStickyTabs() { let gc = document.querySelector('.global-controls'); let tabs = document.getElementById('day-tabs-container'); if (tabs) tabs.style.top = (gc && gc.style.display !== 'none') ? gc.offsetHeight + 'px' : '0px'; }
-        window.addEventListener('resize', adjustStickyTabs);
-
-        function initSortable() {
-            if (typeof Sortable === 'undefined') return;
-            window.sortableInstances.forEach(s => s.destroy()); window.sortableInstances = [];
-            const sortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.timeline-item', filter: '.editable, button, select, input, .transport-icon, .note-link, img, .action-box', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function (evt) { let card = evt.item.closest('.day-card'); if (card) recalculateDayTime(card); saveData(); } };
-            document.querySelectorAll('.day-card').forEach(card => { window.sortableInstances.push(Sortable.create(card, sortableOptions)); });
-            const lists = ['transport-text-list', 'shopping-list', 'booking-list']; lists.forEach(id => { let el = document.getElementById(id); if(el) window.sortableInstances.push(Sortable.create(el, sortableOptions)); });
-            document.querySelectorAll('.person-todo-list').forEach(list => { window.sortableInstances.push(Sortable.create(list, sortableOptions)); });
-            const subSortableOptions = { animation: 150, delay: 250, delayOnTouchOnly: true, draggable: '.sub-item', filter: '.editable, img, .action-box, .material-icons-round', preventOnFilter: false, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', disabled: !isEditMode, onEnd: function () { saveData(); } };
-            document.querySelectorAll('.sub-items-container').forEach(cont => { window.sortableInstances.push(Sortable.create(cont, subSortableOptions)); });
-        }
-
-        function toggleComplete(element, event) { if (!event.target.closest('.custom-checkbox')) return; element.classList.toggle('completed'); saveData(); }
 
         function autoNavigate(btn, event) {
             event.preventDefault(); let currentItem = btn.closest('.timeline-item') || btn.closest('.glass-card'); if (!currentItem) return;
