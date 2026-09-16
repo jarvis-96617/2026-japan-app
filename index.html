@@ -36,8 +36,9 @@
             --glass-bg: rgba(24, 24, 27, 0.75); --glass-border: rgba(255, 255, 255, 0.05);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(75px + var(--safe-bottom)); overflow-x: hidden; transition: 0.3s ease; }
+       /* 🌟 禁用手機長按藍字反白，但保留輸入框與可編輯區的正常選取拷貝功能 */
+        body { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        .editable, input, select, textarea { -webkit-touch-callout: default !important; -webkit-user-select: auto !important; user-select: auto !important; }
 
         #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e4e4e7 0%, #d4d4d8 100%); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
         #splash-screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.6; filter: grayscale(50%); }
@@ -655,7 +656,15 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             setStatus('sync', '產生短網址中...');
             fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
         }
-        function exportToPDF() { window.print(); }
+        function exportToPDF() { 
+            // 偵測是否身處在 iOS 的「加入主畫面 (APP)」模式中
+            if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+                alert("💡 蘋果系統限制提醒：\n\n在「主畫面 APP」模式下，蘋果限制了直接列印的功能。\n\n👉 破解方法：請點擊左側的「分享」按鈕取得網址，把網址貼到 Safari 瀏覽器中打開，就可以正常列印囉！");
+            } else {
+                // 如果是在一般瀏覽器，就直接執行列印
+                window.print(); 
+            }
+        }
         function exportBackup() { let data = null; try{ data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); }catch(e){} if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
         function triggerImportBackup() { document.getElementById('backup-file-input').click(); }
         function handleBackupUpload(event) { let file = event.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(e) { try { let content = e.target.result; JSON.parse(content); try { localStorage.setItem('travelAppSave_Keihan_vCloudFinal', content); }catch(e){} alert("✅ 備份檔還原成功！即將重新載入頁面。"); location.reload(); } catch(err) { alert("❌ 備份檔格式不正確，請確認檔案是否有毀損！"); } }; reader.readAsText(file); }
