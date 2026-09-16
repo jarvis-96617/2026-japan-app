@@ -1119,7 +1119,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         dashBox.remove();
                     }
 
-                    let linkBox = rightGroup.querySelector('.link-box');
+                   let linkBox = rightGroup.querySelector('.link-box');
                     if (linkBox && linkBox.classList.contains('has-link')) {
                         let span = linkBox.querySelector('span');
                         if (span && span.getAttribute('onclick') && span.getAttribute('onclick').includes('window.open')) {
@@ -1129,6 +1129,28 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                                 span.removeAttribute('onclick'); span.style.pointerEvents = 'none';
                             }
                         }
+                    }
+
+                    // 👉 新增：連結多開支援 - 分離已存在的連結，並確保底部永遠有一顆乾淨的「新增連結」按鈕
+                    let allHasLinks = rightGroup.querySelectorAll('.action-box.has-link');
+                    allHasLinks.forEach(lb => {
+                        lb.classList.add('single-link-box');
+                        lb.classList.remove('link-box'); // 拔除原始標籤，讓它成為獨立的連結
+                        if (!lb.hasAttribute('title') && lb.getAttribute('data-href')) {
+                            lb.setAttribute('title', lb.getAttribute('data-href')); // 補上預覽網址
+                        }
+                    });
+
+                    // 如果找不到乾淨的「新增連結」按鈕，就自動生一顆補上去
+                    if (!rightGroup.querySelector('.action-box.link-box:not(.has-link)')) {
+                        let addLinkBtn = document.createElement('div');
+                        addLinkBtn.className = 'action-box link-box';
+                        addLinkBtn.setAttribute('onclick', 'handleItemLink(this, event)');
+                        addLinkBtn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span>`;
+                        
+                        let photoBox = rightGroup.querySelector('.photo-box');
+                        if (photoBox) rightGroup.insertBefore(addLinkBtn, photoBox);
+                        else rightGroup.appendChild(addLinkBtn);
                     }
                 });
 
@@ -1185,30 +1207,34 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             }
         }
 
-        function deleteItemLink(badgeEl, event) {
+      function deleteItemLink(badgeEl, event) {
             event.stopPropagation();
             if(confirm("確定移除此連結？")) {
+                // 直接移除該獨立連結方塊，保留底下的「新增連結」按鈕
                 let box = badgeEl.closest('.action-box');
-                box.className = 'action-box link-box';
-                box.removeAttribute('data-href');
-                box.setAttribute('onclick', 'handleItemLink(this, event)');
-                box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span>`;
+                if (box) box.remove();
                 saveData();
             }
         }
 
         function handleItemLink(btn, event) {
             event.stopPropagation();
-            if(btn.classList.contains('has-link')) return; 
             let url = prompt('請輸入要綁定的網址 (需包含 http/https)：', 'https://');
             if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-                btn.className = 'action-box has-link link-box';
-                btn.removeAttribute('onclick'); 
-                btn.setAttribute('data-href', url);
-                btn.setAttribute('onclick', 'openStoredLink(this, event)');
-                btn.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--primary-color); pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:var(--danger-color); pointer-events:auto;">×</div>`;
+                // 創造一個全新的連結方塊，而不是覆蓋掉原本的按鈕
+                let newLinkBox = document.createElement('div');
+                newLinkBox.className = 'action-box has-link single-link-box';
+                newLinkBox.setAttribute('data-href', url);
+                newLinkBox.setAttribute('title', url); // 增加 title 屬性，長按或懸浮可預覽網址
+                newLinkBox.setAttribute('onclick', 'openStoredLink(this, event)');
+                newLinkBox.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--primary-color); pointer-events:none; display:flex; align-items:center; justify-content:center;">link</span><div onclick="deleteItemLink(this, event)" class="img-delete-badge" style="background:var(--danger-color); pointer-events:auto;">×</div>`;
+                
+                // 把新連結插在「新增連結」按鈕的上方
+                btn.parentNode.insertBefore(newLinkBox, btn);
                 saveData();
-            } else if (url) { alert("請輸入有效的網址 (需包含 http 或 https)！"); }
+            } else if (url) { 
+                alert("請輸入有效的網址 (需包含 http 或 https)！"); 
+            }
         }
 
         function addSubItem(btn, event) {
