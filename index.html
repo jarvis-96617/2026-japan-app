@@ -1214,8 +1214,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 // 🌟 終極表格清洗與升級術
                 let budgetTable = document.getElementById('budget-table');
                 if (budgetTable) {
-                    // 1. 偵測並修復損壞的表頭：只要第一個格子不叫「日期」，代表這是錯位的幽靈存檔，直接重置乾淨！
-                    // ⚠️ 改用 textContent，避免切換分頁隱藏時 innerText 抓不到字的問題，確保不洗掉手拉寬度
+                    // 1. 偵測並修復損壞的表頭
                     let theadRow = budgetTable.querySelector('thead tr');
                     if (theadRow) {
                         let firstTh = theadRow.firstElementChild;
@@ -1224,7 +1223,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         }
                     }
 
-                    // 2. 解除下拉選單與輸入框封印：強制加上 pointer-events auto 與圖層優先級
+                    // 2. 解除下拉選單與輸入框封印
                     budgetTable.querySelectorAll('select, input').forEach(el => {
                         el.removeAttribute('disabled');
                         el.style.pointerEvents = 'auto';
@@ -1234,7 +1233,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
                     // 3. 升級資料列結構
                     budgetTable.querySelectorAll('tbody tr').forEach(tr => {
-                        // 處理極早期沒有分攤選項的資料
                         if (!tr.querySelector('.split-select')) {
                             let tds = tr.querySelectorAll('td');
                             if (tds.length === 5) {
@@ -1242,7 +1240,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             }
                         }
 
-                        // 處理缺「日期」的舊資料，幫它加上點擊清空屬性
                         let currentTds = tr.querySelectorAll('td');
                         if (currentTds.length === 5 && !tr.querySelector('.date-input')) {
                             let dateTd = document.createElement('td');
@@ -1257,11 +1254,44 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             }
                         }
                     });
+
+                    // 4. 舊資料無痛升級萬年曆與強制排序
+                    budgetTable.querySelectorAll('tbody tr').forEach(tr => {
+                        let dateTd = tr.querySelector('td:first-child');
+                        if (dateTd && !dateTd.querySelector('.real-date-input')) {
+                            let oldInput = dateTd.querySelector('input[type="text"]');
+                            let oldVal = oldInput ? oldInput.value : dateTd.innerText.trim();
+                            
+                            let mockDate = new Date();
+                            if(oldVal) {
+                                let parts = oldVal.split('/');
+                                if(parts.length === 2) {
+                                    mockDate.setMonth(parseInt(parts[0])-1);
+                                    mockDate.setDate(parseInt(parts[1]));
+                                } else if (!isNaN(parseInt(oldVal))) {
+                                    mockDate.setDate(parseInt(oldVal));
+                                }
+                            }
+                            let ts = mockDate.getTime();
+                            tr.setAttribute('data-ts', ts); 
+                            
+                            let tzOffset = mockDate.getTimezoneOffset() * 60000;
+                            let localISOTime = (new Date(mockDate - tzOffset)).toISOString().slice(0, 16);
+                            let displayDate = `${mockDate.getMonth()+1}/${mockDate.getDate()}`;
+                            
+                            dateTd.style.position = 'relative';
+                            dateTd.innerHTML = `
+                                <div class="date-display" style="width:100%; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px;">${displayDate}</div>
+                                <input type="datetime-local" class="real-date-input" value="${localISOTime}" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="updateBudgetRowDate(this)">
+                            `;
+                        }
+                    });
+                    sortBudgetTable(); // 執行大排序
                 }
+                
                 document.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 document.querySelectorAll('.amount-input').forEach(input => { let val = parseFloat(input.value.replace(/,/g, '')) || 0; input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value); });
                 calcBudget();
-
                 if(typeof updateCurrencyOptionsInTable === 'function') updateCurrencyOptionsInTable(); 
                 
                 updateDayTabs(); 
@@ -1608,19 +1638,51 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 if (payers.includes(currentVal)) select.value = currentVal;
             });
         }
+        // 🌟 處理日期選單改變時的邏輯
+        function updateBudgetRowDate(input) {
+            let tr = input.closest('tr');
+            let dt = new Date(input.value);
+            if(isNaN(dt.getTime())) return;
+            tr.setAttribute('data-ts', dt.getTime()); // 綁定精確的時間戳記供排序用
+            tr.querySelector('.date-display').innerText = `${dt.getMonth()+1}/${dt.getDate()}`; // 畫面上只顯示 月/日
+            sortBudgetTable(); // 重排表格
+            saveData();
+        }
 
+        // 🌟 預算表自動按時間排序 (從最舊到最新)
+        function sortBudgetTable() {
+            let tbody = document.getElementById('budget-tbody');
+            if(!tbody) return;
+            let rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                let tsA = parseInt(a.getAttribute('data-ts')) || 0;
+                let tsB = parseInt(b.getAttribute('data-ts')) || 0;
+                return tsA - tsB; // 由舊排到新
+            });
+            rows.forEach(tr => tbody.appendChild(tr)); // 重新按照順序插回表格
+        }
         // 5. 記帳項目新增與計算
        // 5. 記帳項目新增與計算
-        function addBudgetRow(itemName = '輸入項目', payer = payers[0] || '', splitType = '個人', currency = currentTravelCurrency, amount = '0', dateDay = '') {
-            if (!dateDay) dateDay = new Date().getDate().toString(); // 如果沒有給日期，自動抓取今天的天數
+        function addBudgetRow(itemName = '輸入項目', payer = payers[0] || '', splitType = '個人', currency = currentTravelCurrency, amount = '0', timestamp = null) {
+            if (!timestamp) timestamp = Date.now(); // 預設帶入當下時間
+            let dt = new Date(timestamp);
+            let displayDate = `${dt.getMonth()+1}/${dt.getDate()}`; // 畫面只顯示 9/17
+            // 轉換為萬年曆能吃懂的格式 (YYYY-MM-DDThh:mm)
+            let tzOffset = dt.getTimezoneOffset() * 60000;
+            let localISOTime = (new Date(dt - tzOffset)).toISOString().slice(0, 16);
 
             let tbody = document.getElementById('budget-tbody');
             if(!tbody) return;
             let tr = document.createElement('tr');
+            tr.setAttribute('data-ts', timestamp); // 寫入時間標籤
+            
             let payerOptions = payers.map(p => `<option value="${p}" ${p === payer ? 'selected' : ''}>${p}</option>`).join('');
             
             tr.innerHTML = `
-                <td><input type="text" class="date-input editable" value="${dateDay}" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px; padding:0;" onchange="saveData()" onfocus="this.select()"></td>
+                <td style="position:relative;">
+                    <div class="date-display" style="width:100%; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px;">${displayDate}</div>
+                    <input type="datetime-local" class="real-date-input" value="${localISOTime}" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="updateBudgetRowDate(this)">
+                </td>
                 <td><input type="text" class="editable" value="${itemName}" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--primary-color); padding:0;" onchange="saveData()" onfocus="if(this.value==='輸入項目')this.value=''" onblur="if(this.value==='')this.value='輸入項目'; saveData();"></td>
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOptions}</select></td>
                 <td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${splitType==='平分'?'selected':''}>平分</option><option value="個人" ${splitType==='個人'?'selected':''}>個人</option></select></td>
@@ -1636,7 +1698,10 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     <span class="material-icons-round delete-btn" onclick="deleteBudgetRow(this)" style="font-size:16px; color:var(--danger-color); cursor:pointer; vertical-align:middle; margin-left:2px;">delete</span>
                 </td>
             `;
-            tbody.appendChild(tr); saveData(); calcBudget();
+            tbody.appendChild(tr); 
+            sortBudgetTable(); // 新增完立刻呼叫排序
+            saveData(); 
+            calcBudget();
         }
 
         function deleteBudgetRow(btn) {
