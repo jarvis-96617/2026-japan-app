@@ -1838,5 +1838,23 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             }
         }
     </script>
+
+    <!-- 👇 補上這一段註冊服務生的程式碼 👇 -->
+    <script>
+        // 🌟 註冊 Service Worker 離線快取機制
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                .then(function(registration) {
+                    console.log('離線服務生註冊成功！範圍: ', registration.scope);
+                })
+                .catch(function(err) {
+                    console.log('離線服務生註冊失敗: ', err);
+                });
+            });
+        }
+    </script>
+    <!-- 👆 補上這一段註冊服務生的程式碼 👆 -->
+
 </body>
 </html>
