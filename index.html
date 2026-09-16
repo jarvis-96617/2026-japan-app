@@ -751,10 +751,26 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         function captureState() {
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
+
+            // 🌟 核心修正：在擷取存檔前，強制將所有輸入框與下拉選單的「當前畫面值」寫入底層 HTML 屬性
+            document.querySelectorAll('#main-container input').forEach(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    if (el.checked) el.setAttribute('checked', 'checked');
+                    else el.removeAttribute('checked');
+                } else {
+                    el.setAttribute('value', el.value);
+                }
+            });
+            document.querySelectorAll('#main-container select').forEach(el => {
+                Array.from(el.options).forEach(opt => opt.removeAttribute('selected'));
+                if (el.selectedIndex > -1) el.options[el.selectedIndex].setAttribute('selected', 'selected');
+            });
+
             let tempMain = document.createElement('div'); tempMain.innerHTML = document.getElementById('main-container').innerHTML;
             let tempHero = document.createElement('div'); tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
             [tempMain, tempHero].forEach(container => {
+                // ...後面保持原樣
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
