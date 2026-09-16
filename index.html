@@ -1398,6 +1398,284 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.querySelectorAll('.photo-album-container img').forEach(img => { img.onclick = null; });
         }
         
+// ==========================================
+        // 🌟 以下為遺失的記帳、待辦、時間計算核心功能
+        // ==========================================
+
+        // 1. 行程時間自動計算
+        function recalculateDayTime(card) {
+            if (!card) return;
+            let items = card.querySelectorAll('.timeline-item');
+            if (items.length === 0) return;
+
+            let currentMins = 0;
+            items.forEach((item, index) => {
+                let startEl = item.querySelector('.start-time');
+                let endEl = item.querySelector('.end-time');
+                let durEl = item.querySelector('.duration');
+                let travelEl = item.querySelector('.travel-time');
+
+                if (index === 0 && startEl) {
+                    let match = startEl.innerText.match(/(\d{1,2}):(\d{2})/);
+                    if (match) currentMins = parseInt(match[1]) * 60 + parseInt(match[2]);
+                    else currentMins = 8 * 60; // 預設 08:00
+                } else if (startEl) {
+                    let h = Math.floor(currentMins / 60) % 24;
+                    let m = currentMins % 60;
+                    startEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                }
+
+                let durMins = durEl ? parseMins(durEl.innerText) : 0;
+                let travelMins = travelEl ? parseMins(travelEl.innerText) : 0;
+
+                let endMins = currentMins + durMins;
+                if (endEl) {
+                    let h = Math.floor(endMins / 60) % 24;
+                    let m = endMins % 60;
+                    endEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                }
+
+                currentMins = endMins + travelMins;
+            });
+        }
+
+        // 2. 交通工具圖示切換
+        function toggleTransportMode(btn, event) {
+            if(event) event.stopPropagation();
+            if(!isEditMode && !document.body.classList.contains('view-mode-active')) return;
+            const modes = ['directions_walk', 'directions_transit', 'directions_car', 'two_wheeler', 'flight'];
+            let current = btn.innerText.trim();
+            let idx = modes.indexOf(current);
+            btn.innerText = modes[(idx + 1) % modes.length];
+            saveData();
+        }
+
+        // 3. 拖曳排序初始化 (Sortable.js)
+        function initSortable() {
+            if (typeof Sortable === 'undefined') return;
+            window.sortableInstances.forEach(s => s.destroy());
+            window.sortableInstances = [];
+
+            let daysContainer = document.getElementById('itinerary-days-container');
+            if (daysContainer) {
+                window.sortableInstances.push(new Sortable(daysContainer, {
+                    animation: 150, handle: '.section-title', disabled: !isEditMode,
+                    onEnd: function() { updateDayTabs(); saveData(); }
+                }));
+            }
+
+            document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
+                window.sortableInstances.push(new Sortable(container, {
+                    animation: 150, filter: '.section-title, .add-btn, .todo-category-header, .checkbox-wrapper', preventOnFilter: false, disabled: !isEditMode,
+                    onEnd: function(evt) {
+                        let card = evt.item.closest('.day-card');
+                        if (card) recalculateDayTime(card);
+                        saveData();
+                    }
+                }));
+            });
+
+            document.querySelectorAll('.sub-items-container').forEach(container => {
+                window.sortableInstances.push(new Sortable(container, { animation: 150, disabled: !isEditMode, onEnd: function() { saveData(); } }));
+            });
+        }
+
+        // 4. 記帳功能 (付款人管理)
+        function renderPayerTags() {
+            let container = document.getElementById('payer-tags-container');
+            if (!container) return;
+            container.innerHTML = '';
+            payers.forEach(p => {
+                let tag = document.createElement('div');
+                tag.className = 'payer-tag';
+                tag.innerHTML = `${p} <span class="payer-del-btn" onclick="deletePayer(this, event, '${p}')" style="margin-left:4px; color:var(--danger-color); cursor:pointer;">×</span>`;
+                container.appendChild(tag);
+            });
+            updatePayerDropdowns();
+        }
+
+        function addPayer() {
+            let p = prompt("請輸入付款人名稱：");
+            if (p && p.trim()) {
+                p = p.trim();
+                if (!payers.includes(p)) {
+                    payers.push(p); renderPayerTags(); saveData(); calcBudget();
+                } else { alert("此付款人已存在！"); }
+            }
+        }
+
+        function deletePayer(btn, event, payerName) {
+            event.stopPropagation();
+            if (confirm(`確定要刪除付款人「${payerName}」嗎？\n(這不會刪除已記帳的項目，但會從選單消失)`)) {
+                payers = payers.filter(p => p !== payerName);
+                renderPayerTags(); saveData(); calcBudget();
+            }
+        }
+
+        function updatePayerDropdowns() {
+            document.querySelectorAll('.payer-select').forEach(select => {
+                let currentVal = select.value;
+                select.innerHTML = '';
+                payers.forEach(p => {
+                    let opt = document.createElement('option');
+                    opt.value = p; opt.innerText = p; select.appendChild(opt);
+                });
+                if (payers.includes(currentVal)) select.value = currentVal;
+            });
+        }
+
+        // 5. 記帳項目新增與計算
+        function addBudgetRow(itemName = '輸入項目', payer = payers[0] || '', splitType = '個人', currency = currentTravelCurrency, amount = '0') {
+            let tbody = document.getElementById('budget-tbody');
+            if(!tbody) return;
+            let tr = document.createElement('tr');
+            let payerOptions = payers.map(p => `<option value="${p}" ${p === payer ? 'selected' : ''}>${p}</option>`).join('');
+            
+            tr.innerHTML = `
+                <td><input type="text" class="editable" value="${itemName}" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--primary-color);" onchange="saveData()"></td>
+                <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOptions}</select></td>
+                <td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${splitType==='平分'?'selected':''}>平分</option><option value="個人" ${splitType==='個人'?'selected':''}>個人</option></select></td>
+                <td style="white-space:nowrap;">
+                    <select class="curr-select" onchange="saveData(); calcBudget();">
+                        <option value="TWD" ${currency==='TWD'?'selected':''}>TWD</option>
+                        <option value="${currentTravelCurrency}" ${currency===currentTravelCurrency?'selected':''}>${currentTravelCurrency}</option>
+                    </select>
+                    <input type="text" class="amount-input" value="${amount}" inputmode="decimal" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'; this.value=parseFloat(this.value.replace(/,/g, '')||0).toLocaleString('en-US'); saveData(); calcBudget();">
+                </td>
+                <td>
+                    <div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span></div>
+                    <span class="material-icons-round delete-btn" onclick="deleteBudgetRow(this)" style="font-size:16px; color:var(--danger-color); cursor:pointer; vertical-align:middle; margin-left:4px;">delete</span>
+                </td>
+            `;
+            tbody.appendChild(tr); saveData(); calcBudget();
+        }
+
+        function deleteBudgetRow(btn) {
+            if(confirm("確定刪除此記帳項目？")) {
+                let tr = btn.closest('tr');
+                let imgs = tr.querySelectorAll('img');
+                imgs.forEach(img => deleteImageFromCloud(img.src));
+                tr.remove(); saveData(); calcBudget();
+            }
+        }
+
+        function updateCurrencyOptionsInTable() {
+            document.querySelectorAll('.curr-select').forEach(select => {
+                let currentVal = select.value;
+                select.innerHTML = `<option value="TWD" ${currentVal === 'TWD' ? 'selected' : ''}>TWD</option><option value="${currentTravelCurrency}" ${currentVal === currentTravelCurrency ? 'selected' : ''}>${currentTravelCurrency}</option>`;
+            });
+        }
+
+        function calcBudget() {
+            let tbody = document.getElementById('budget-tbody');
+            let resultDiv = document.getElementById('budget-result');
+            if(!tbody || !resultDiv) return;
+
+            let totalTWD = 0; let sharedTotalTWD = 0;
+            let balancesShared = {};
+            payers.forEach(p => balancesShared[p] = 0);
+
+            let rows = tbody.querySelectorAll('tr');
+            rows.forEach(tr => {
+                let payer = tr.querySelector('.payer-select').value;
+                let splitType = tr.querySelector('.split-select').value;
+                let curr = tr.querySelector('.curr-select').value;
+                let amount = parseFloat(tr.querySelector('.amount-input').value.replace(/,/g, '')) || 0;
+                
+                let rate = allRatesToTWD[curr] || 1;
+                if (curr === 'TWD') rate = 1;
+                let twdAmount = amount * rate;
+
+                totalTWD += twdAmount;
+
+                // 只有選擇「平分」的項目才會進入公費池計算
+                if (splitType === '平分' && balancesShared[payer] !== undefined) {
+                    sharedTotalTWD += twdAmount;
+                    balancesShared[payer] += twdAmount;
+                }
+            });
+
+            if (payers.length === 0) { resultDiv.innerHTML = '請先新增付款人！'; return; }
+
+            let avgShared = sharedTotalTWD / payers.length;
+            let settleText = `<div style="font-size:13px; font-weight:800; margin-bottom:8px; color:var(--primary-color);">結算金額 (約略 NT$)</div>`;
+            settleText += `<div style="font-size:11px; margin-bottom:8px;">總支出：$${Math.round(totalTWD).toLocaleString()} (公費：$${Math.round(sharedTotalTWD).toLocaleString()})</div>`;
+
+            let debtors = []; let creditors = [];
+            payers.forEach(p => {
+                let diff = balancesShared[p] - avgShared;
+                if (diff > 1) creditors.push({name: p, amount: diff});
+                else if (diff < -1) debtors.push({name: p, amount: -diff});
+            });
+
+            if (debtors.length === 0 && creditors.length === 0) {
+                settleText += `<div style="color:#10b981; font-weight:800; font-size:12px;">✅ 目前公費無欠款，大家互不相欠！</div>`;
+            } else {
+                debtors.sort((a,b)=>b.amount - a.amount);
+                creditors.sort((a,b)=>b.amount - a.amount);
+                
+                let i=0, j=0;
+                while(i < debtors.length && j < creditors.length) {
+                    let d = debtors[i]; let c = creditors[j];
+                    let settle = Math.min(d.amount, c.amount);
+                    settleText += `<div style="background:rgba(220,38,38,0.05); padding:6px 10px; border-radius:8px; margin-bottom:4px; font-size:12px;"><span style="color:var(--danger-color); font-weight:800;">${d.name}</span> 應給 <span style="color:#0284c7; font-weight:800;">${c.name}</span> $${Math.round(settle).toLocaleString()}</div>`;
+                    d.amount -= settle; c.amount -= settle;
+                    if(d.amount < 1) i++;
+                    if(c.amount < 1) j++;
+                }
+            }
+            resultDiv.innerHTML = settleText;
+        }
+
+        // 6. 待辦事項人員切換
+        function switchTodoPerson(personName) {
+            document.querySelectorAll('.person-todo-list').forEach(list => {
+                list.style.display = list.dataset.person === personName ? 'block' : 'none';
+            });
+            saveData();
+        }
+
+        function addNewTodoPerson() {
+            let name = prompt("請輸入新人員名稱：");
+            if (!name || !name.trim()) return;
+            name = name.trim();
+            
+            let select = document.getElementById('todo-person-select');
+            let exists = Array.from(select.options).some(opt => opt.value === name);
+            if (exists) { alert("此人員已存在！"); return; }
+            
+            let opt = document.createElement('option');
+            opt.value = name; opt.innerText = name;
+            select.appendChild(opt);
+            
+            let container = document.getElementById('person-todo-container');
+            let templateList = container.querySelector('.person-todo-list');
+            let newList = templateList.cloneNode(true);
+            newList.dataset.person = name;
+            
+            newList.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('completed'));
+            
+            container.appendChild(newList);
+            select.value = name;
+            switchTodoPerson(name);
+            initSortable();
+        }
+
+        function deleteTodoPerson() {
+            let select = document.getElementById('todo-person-select');
+            let name = select.value;
+            if (name === '預設範本') { alert("預設範本無法刪除！"); return; }
+            
+            if (confirm(`確定要刪除「${name}」的待辦清單嗎？`)) {
+                let list = document.querySelector(`.person-todo-list[data-person="${name}"]`);
+                if (list) list.remove();
+                
+                select.querySelector(`option[value="${name}"]`).remove();
+                select.value = '預設範本';
+                switchTodoPerson('預設範本');
+            }
+        }
+
         window.onload = loadData;
 // 🌟 處理核取方塊切換，並支援唯讀模式下的延遲存檔例外
         function toggleComplete(item, event) {
