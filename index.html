@@ -1188,6 +1188,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 
                 document.querySelectorAll('.payer-tag').forEach(tag => { if(tag.querySelector('span') && !tag.querySelector('.payer-del-btn')) { tag.querySelector('span').className = 'payer-del-btn'; } });
 
+// 🌟 修正：只在「舊版 5 欄」時才補上日期表頭，如果是 6 欄就保留，這樣就不會洗掉使用者手動拉的寬度！
+                let budgetTheadRow = document.querySelector('#budget-table thead tr');
+                if (budgetTheadRow && budgetTheadRow.children.length === 5) {
+                    budgetTheadRow.innerHTML = `<th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th>`;
+                }
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => { if(!tr.querySelector('.split-select')) { let tds = tr.querySelectorAll('td'); if(tds.length === 5) { let splitTd = document.createElement('td'); splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`; tr.insertBefore(splitTd, tds[2]); let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input'); let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap'; if (currEl) { currEl.style.display = 'inline-block'; mergedTd.appendChild(currEl); } if (amtEl) { amtEl.style.display = 'inline-block'; mergedTd.appendChild(amtEl); } tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]); } } });
 // 🌟 新增舊資料升級：自動在每筆記帳項目最前面加上「日期」欄位，並套用點擊清空功能
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => {
