@@ -141,7 +141,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.04); color: var(--primary-color); border: none; border-radius: 50px; font-weight: 800; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.05); color: #a1a1aa;}
         
         /* 🌟 右側：操作按鈕群組 (直向疊加) */
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: 2px; justify-content: flex-start;} 
+        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: auto; justify-content: flex-start;}
         
         .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
@@ -1045,16 +1045,33 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 document.querySelectorAll('.duration-wrap').forEach(wrap => { Array.from(wrap.childNodes).forEach(node => { if (node.nodeType === 3 && node.nodeValue.includes('分')) { node.nodeValue = node.nodeValue.replace(/分鐘|分/g, '').trim(); } }); });
                 document.querySelectorAll('.travel-time-wrap').forEach(wrap => { Array.from(wrap.childNodes).forEach(node => { if (node.nodeType === 3 && (node.nodeValue.includes('分') || node.nodeValue.includes('鐘'))) { node.nodeValue = node.nodeValue.replace(/分鐘|分/g, '').trim(); } }); });
 
-                document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
+               document.querySelectorAll('.timeline-item, .hotel-card, .todo-category-header').forEach(item => {
                     let contentBox = item.querySelector('.content-box');
                     
-                    let rightGroup = Array.from(item.children).find(c => c.classList && c.classList.contains('right-action-group'));
+                    // 🌟 住宿卡片的標題與按鈕需對齊頂部
+                    if (item.classList.contains('hotel-card')) {
+                        let headerFlex = item.querySelector('.flex-between');
+                        if (headerFlex) headerFlex.style.alignItems = 'flex-start';
+                    }
+                    
+                    // 🌟 使用 querySelector 確保能抓到所有深淺層級的 right-action-group
+                    let rightGroup = item.querySelector('.right-action-group');
                     if (!rightGroup) {
                         rightGroup = document.createElement('div');
                         rightGroup.className = 'right-action-group';
-                        item.appendChild(rightGroup);
+                        if (item.classList.contains('hotel-card')) {
+                            let headerFlex = item.querySelector('.flex-between');
+                            if (headerFlex) headerFlex.appendChild(rightGroup);
+                            else item.appendChild(rightGroup);
+                        } else {
+                            item.appendChild(rightGroup);
+                        }
                     }
-                    rightGroup.style.cssText = 'display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: flex-start; flex-shrink: 0; margin-left: 2px;';
+                    
+                    // 🌟 強制覆蓋舊資料的行內樣式，統一改為垂直排列 (預設分類標題除外)
+                    if (!item.classList.contains('todo-category-header')) {
+                        rightGroup.style.cssText = 'display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: flex-start; flex-shrink: 0; margin-left: auto;';
+                    }
 
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
@@ -1270,9 +1287,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
 
-        function addHotelCard() {
+       function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
-            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group" style="flex-direction:row;"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: 800; font-size: 14px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 50px;"><span class="material-icons-round" style="font-size:12px;">place</span> 導航至飯店</button>`;
+            div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px; align-items: flex-start;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0; line-height: 1.4;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: 800; font-size: 14px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 50px;"><span class="material-icons-round" style="font-size:12px;">place</span> 導航至飯店</button>`;
             container.appendChild(div); saveData();
         }
 
