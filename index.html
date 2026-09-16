@@ -168,7 +168,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         #budget-table td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; } #budget-table td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
        #budget-table th:nth-child(1) { width: 10%; text-align: center; } #budget-table th:nth-child(2) { width: 30%; text-align: left; padding-left: 4px; } #budget-table th:nth-child(3) { width: 12%; } #budget-table th:nth-child(4) { width: 10%; } #budget-table th:nth-child(5) { width: 30%; text-align: right; padding-right: 4px;} #budget-table th:nth-child(6) { width: 8%; } #budget-table td:nth-child(1) { text-align: center; } #budget-table td:nth-child(2) { text-align: left; padding-left: 4px; } #budget-table td:nth-child(5) { text-align: right; padding-right: 4px; }
 
-        .resizer { position: absolute; top: 0; right: -8px; width: 16px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(0, 0, 0, 0.1); border-radius: 4px; transition: 0.2s var(--spring); } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
+        .resizer { position: absolute; top: 0; right: -12px; width: 24px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(0, 0, 0, 0.1); border-radius: 4px; transition: 0.2s var(--spring); } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         .amount-input, .curr-select, .payer-select, .split-select { background: rgba(0,0,0,0.04); border-radius: 50px; padding: 4px 8px; font-family: inherit; font-weight: 800; border: none; outline: none; appearance: none; -webkit-appearance: none; transition: all 0.3s var(--spring); text-align: center; text-align-last: center;} 
         .amount-input { width: 68%; font-size: 13px; text-align: right; color: var(--primary-color); background: transparent; padding: 2px 0;} .curr-select { width: 32%; font-size: 10px; padding: 2px 4px; text-align: left; text-align-last: left; }
         .payer-select, .split-select { font-size: 11px; padding: 4px 2px; width: 100%; box-sizing: border-box; }
@@ -1188,28 +1188,50 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 
                 document.querySelectorAll('.payer-tag').forEach(tag => { if(tag.querySelector('span') && !tag.querySelector('.payer-del-btn')) { tag.querySelector('span').className = 'payer-del-btn'; } });
 
-// 🌟 終極表頭修復術：無視 thead/tbody 結構差異，直接抓表格的「第一橫列」，沒有日期就強制洗掉！
-                let budgetFirstRow = document.querySelector('#budget-table tr');
-                if (budgetFirstRow && !budgetFirstRow.innerText.includes('日期')) {
-                    budgetFirstRow.innerHTML = `<th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th>`;
-                }
-                document.querySelectorAll('#budget-tbody tr').forEach(tr => { if(!tr.querySelector('.split-select')) { let tds = tr.querySelectorAll('td'); if(tds.length === 5) { let splitTd = document.createElement('td'); splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`; tr.insertBefore(splitTd, tds[2]); let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input'); let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap'; if (currEl) { currEl.style.display = 'inline-block'; mergedTd.appendChild(currEl); } if (amtEl) { amtEl.style.display = 'inline-block'; mergedTd.appendChild(amtEl); } tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]); } } });
-// 🌟 新增舊資料升級：自動在每筆記帳項目最前面加上「日期」欄位，並套用點擊清空功能
-                document.querySelectorAll('#budget-tbody tr').forEach(tr => {
-                    let tds = tr.querySelectorAll('td');
-                    if(tds.length === 5 && !tr.querySelector('.date-input')) {
-                        let dateTd = document.createElement('td');
-                        dateTd.innerHTML = `<input type="text" class="date-input editable" value="" placeholder="-" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px; padding:0;" onchange="saveData()" onfocus="this.select()">`;
-                        tr.insertBefore(dateTd, tds[0]);
-
-                        let itemInput = tds[0].querySelector('input[type="text"]');
-                        if (itemInput) {
-                            itemInput.setAttribute('onfocus', "if(this.value==='輸入項目')this.value=''");
-                            itemInput.setAttribute('onblur', "if(this.value==='')this.value='輸入項目'; saveData();");
-                            itemInput.style.padding = '0';
+/// 🌟 終極表格清洗與升級術
+                let budgetTable = document.getElementById('budget-table');
+                if (budgetTable) {
+                    // 1. 偵測並修復損壞的表頭：只要第一個格子不叫「日期」，代表這是錯位的幽靈存檔，直接重置乾淨！
+                    let theadRow = budgetTable.querySelector('thead tr');
+                    if (theadRow) {
+                        let firstTh = theadRow.firstElementChild;
+                        if (!firstTh || !firstTh.innerText.includes('日期')) {
+                            theadRow.innerHTML = `<th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th>`;
                         }
                     }
-                });
+
+                    // 2. 解除下拉選單封印：清除所有可能卡死選項的隱形屬性
+                    budgetTable.querySelectorAll('select').forEach(sel => {
+                        sel.removeAttribute('disabled');
+                        sel.style.pointerEvents = '';
+                    });
+
+                    // 3. 升級資料列結構
+                    budgetTable.querySelectorAll('tbody tr').forEach(tr => {
+                        // 處理極早期沒有分攤選項的資料
+                        if (!tr.querySelector('.split-select')) {
+                            let tds = tr.querySelectorAll('td');
+                            if (tds.length === 5) {
+                                let splitTd = document.createElement('td'); splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`; tr.insertBefore(splitTd, tds[2]); let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input'); let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap'; if (currEl) { currEl.style.display = 'inline-block'; mergedTd.appendChild(currEl); } if (amtEl) { amtEl.style.display = 'inline-block'; mergedTd.appendChild(amtEl); } tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]);
+                            }
+                        }
+
+                        // 處理缺「日期」的舊資料，幫它加上點擊清空屬性
+                        let currentTds = tr.querySelectorAll('td');
+                        if (currentTds.length === 5 && !tr.querySelector('.date-input')) {
+                            let dateTd = document.createElement('td');
+                            dateTd.innerHTML = `<input type="text" class="date-input editable" value="" placeholder="-" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px; padding:0;" onchange="saveData()" onfocus="this.select()">`;
+                            tr.insertBefore(dateTd, currentTds[0]);
+
+                            let itemInput = currentTds[0].querySelector('input[type="text"]');
+                            if (itemInput) {
+                                itemInput.setAttribute('onfocus', "if(this.value==='輸入項目')this.value=''");
+                                itemInput.setAttribute('onblur', "if(this.value==='')this.value='輸入項目'; saveData();");
+                                itemInput.style.padding = '0';
+                            }
+                        }
+                    });
+                }
                 document.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 document.querySelectorAll('.amount-input').forEach(input => { let val = parseFloat(input.value.replace(/,/g, '')) || 0; input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value); });
                 calcBudget();
