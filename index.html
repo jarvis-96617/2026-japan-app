@@ -168,7 +168,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         #budget-table td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; } #budget-table td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
        #budget-table th:nth-child(1) { width: 10%; text-align: center; } #budget-table th:nth-child(2) { width: 30%; text-align: left; padding-left: 4px; } #budget-table th:nth-child(3) { width: 12%; } #budget-table th:nth-child(4) { width: 10%; } #budget-table th:nth-child(5) { width: 30%; text-align: right; padding-right: 4px;} #budget-table th:nth-child(6) { width: 8%; } #budget-table td:nth-child(1) { text-align: center; } #budget-table td:nth-child(2) { text-align: left; padding-left: 4px; } #budget-table td:nth-child(5) { text-align: right; padding-right: 4px; }
 
-        .resizer { position: absolute; top: 0; right: -12px; width: 24px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(0, 0, 0, 0.1); border-radius: 4px; transition: 0.2s var(--spring); } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
+        .resizer { position: absolute; top: 50%; right: -12px; width: 24px; height: 24px; transform: translateY(-50%); cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(0, 0, 0, 0.1); border-radius: 4px; transition: 0.2s var(--spring); } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         .amount-input, .curr-select, .payer-select, .split-select { background: rgba(0,0,0,0.04); border-radius: 50px; padding: 4px 8px; font-family: inherit; font-weight: 800; border: none; outline: none; appearance: none; -webkit-appearance: none; transition: all 0.3s var(--spring); text-align: center; text-align-last: center;} 
         .amount-input { width: 68%; font-size: 13px; text-align: right; color: var(--primary-color); background: transparent; padding: 2px 0;} .curr-select { width: 32%; font-size: 10px; padding: 2px 4px; text-align: left; text-align-last: left; }
         .payer-select, .split-select { font-size: 11px; padding: 4px 2px; width: 100%; box-sizing: border-box; }
@@ -1188,22 +1188,25 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 
                 document.querySelectorAll('.payer-tag').forEach(tag => { if(tag.querySelector('span') && !tag.querySelector('.payer-del-btn')) { tag.querySelector('span').className = 'payer-del-btn'; } });
 
-/// 🌟 終極表格清洗與升級術
+// 🌟 終極表格清洗與升級術
                 let budgetTable = document.getElementById('budget-table');
                 if (budgetTable) {
                     // 1. 偵測並修復損壞的表頭：只要第一個格子不叫「日期」，代表這是錯位的幽靈存檔，直接重置乾淨！
+                    // ⚠️ 改用 textContent，避免切換分頁隱藏時 innerText 抓不到字的問題，確保不洗掉手拉寬度
                     let theadRow = budgetTable.querySelector('thead tr');
                     if (theadRow) {
                         let firstTh = theadRow.firstElementChild;
-                        if (!firstTh || !firstTh.innerText.includes('日期')) {
+                        if (!firstTh || !firstTh.textContent.includes('日期')) {
                             theadRow.innerHTML = `<th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th>`;
                         }
                     }
 
-                    // 2. 解除下拉選單封印：清除所有可能卡死選項的隱形屬性
-                    budgetTable.querySelectorAll('select').forEach(sel => {
-                        sel.removeAttribute('disabled');
-                        sel.style.pointerEvents = '';
+                    // 2. 解除下拉選單與輸入框封印：強制加上 pointer-events auto 與圖層優先級
+                    budgetTable.querySelectorAll('select, input').forEach(el => {
+                        el.removeAttribute('disabled');
+                        el.style.pointerEvents = 'auto';
+                        el.style.position = 'relative';
+                        el.style.zIndex = '20';
                     });
 
                     // 3. 升級資料列結構
