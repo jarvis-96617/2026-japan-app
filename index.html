@@ -32,12 +32,17 @@
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.04); --safe-bottom: env(safe-area-inset-bottom, 16px); 
             --danger-color: #dc2626; --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        body.dark-mode {
+       body.dark-mode {
             --bg-color: #09090b; --primary-color: #a1a1aa; --text-main: #f4f4f5; --text-muted: #a1a1aa;
             --glass-bg: rgba(24, 24, 27, 0.75); --glass-border: rgba(255, 255, 255, 0.05);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-       /* 🌟 禁用手機長按藍字反白，但保留輸入框與可編輯區的正常選取拷貝功能 */
+        
+        /* 👇 就是這兩行核心地基被誤刪了，補回來就正常了！ */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: calc(75px + var(--safe-bottom)); overflow-x: hidden; transition: 0.3s ease; }
+        
+        /* 🌟 禁用手機長按藍字反白，但保留輸入框與可編輯區的正常選取拷貝功能 */
         body { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         .editable, input, select, textarea { -webkit-touch-callout: default !important; -webkit-user-select: auto !important; user-select: auto !important; }
 
