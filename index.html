@@ -166,7 +166,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         #budget-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; table-layout: fixed; word-break: break-word; margin-bottom: 6px;} #budget-table th { padding: 2px 0px; font-size: 10px; color: #71717a; text-align: center; font-weight: 800; transition: 0.3s; position: relative; } body.dark-mode #budget-table th { color: #a1a1aa; } #budget-table td { padding: 6px 0px; font-size: 12px; font-weight: 600; text-align: center; vertical-align: middle; transition: 0.3s; background: rgba(0,0,0,0.02);} body.dark-mode #budget-table td { background: rgba(255,255,255,0.03); }
         #budget-table td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; } #budget-table td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
-        #budget-table th:nth-child(1) { width: 40%; text-align: left; padding-left: 6px; } #budget-table th:nth-child(2) { width: 12%; } #budget-table th:nth-child(3) { width: 10%; } #budget-table th:nth-child(4) { width: 30%; text-align: right; padding-right: 6px;} #budget-table th:nth-child(5) { width: 8%; } #budget-table td:nth-child(1) { text-align: left; padding-left: 6px; } #budget-table td:nth-child(4) { text-align: right; padding-right: 6px; }
+       #budget-table th:nth-child(1) { width: 10%; text-align: center; } #budget-table th:nth-child(2) { width: 30%; text-align: left; padding-left: 4px; } #budget-table th:nth-child(3) { width: 12%; } #budget-table th:nth-child(4) { width: 10%; } #budget-table th:nth-child(5) { width: 30%; text-align: right; padding-right: 4px;} #budget-table th:nth-child(6) { width: 8%; } #budget-table td:nth-child(1) { text-align: center; } #budget-table td:nth-child(2) { text-align: left; padding-left: 4px; } #budget-table td:nth-child(5) { text-align: right; padding-right: 4px; }
 
         .resizer { position: absolute; top: 0; right: -8px; width: 16px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; display: flex; align-items: center; justify-content: center; touch-action: none; } .resizer::after { content: ''; width: 2px; height: 40%; background: rgba(0, 0, 0, 0.1); border-radius: 4px; transition: 0.2s var(--spring); } .resizer.resizing::after, .resizer:active::after { background: var(--primary-color); height: 80%; width: 4px; box-shadow: 0 0 6px rgba(0,0,0,0.3); }
         .amount-input, .curr-select, .payer-select, .split-select { background: rgba(0,0,0,0.04); border-radius: 50px; padding: 4px 8px; font-family: inherit; font-weight: 800; border: none; outline: none; appearance: none; -webkit-appearance: none; transition: all 0.3s var(--spring); text-align: center; text-align-last: center;} 
@@ -698,7 +698,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     </div>
                 </div>
                 <table id="budget-table">
-                    <thead><tr><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr></thead>
+                    <thead><tr><th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr></thead>
                     <tbody id="budget-tbody"></tbody>
                 </table>
                 <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 6px;">+ 新增記帳項目</button>
@@ -1189,6 +1189,22 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 document.querySelectorAll('.payer-tag').forEach(tag => { if(tag.querySelector('span') && !tag.querySelector('.payer-del-btn')) { tag.querySelector('span').className = 'payer-del-btn'; } });
 
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => { if(!tr.querySelector('.split-select')) { let tds = tr.querySelectorAll('td'); if(tds.length === 5) { let splitTd = document.createElement('td'); splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`; tr.insertBefore(splitTd, tds[2]); let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input'); let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap'; if (currEl) { currEl.style.display = 'inline-block'; mergedTd.appendChild(currEl); } if (amtEl) { amtEl.style.display = 'inline-block'; mergedTd.appendChild(amtEl); } tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]); } } });
+// 🌟 新增舊資料升級：自動在每筆記帳項目最前面加上「日期」欄位，並套用點擊清空功能
+                document.querySelectorAll('#budget-tbody tr').forEach(tr => {
+                    let tds = tr.querySelectorAll('td');
+                    if(tds.length === 5 && !tr.querySelector('.date-input')) {
+                        let dateTd = document.createElement('td');
+                        dateTd.innerHTML = `<input type="text" class="date-input editable" value="" placeholder="-" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px; padding:0;" onchange="saveData()" onfocus="this.select()">`;
+                        tr.insertBefore(dateTd, tds[0]);
+
+                        let itemInput = tds[0].querySelector('input[type="text"]');
+                        if (itemInput) {
+                            itemInput.setAttribute('onfocus', "if(this.value==='輸入項目')this.value=''");
+                            itemInput.setAttribute('onblur', "if(this.value==='')this.value='輸入項目'; saveData();");
+                            itemInput.style.padding = '0';
+                        }
+                    }
+                });
                 document.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 document.querySelectorAll('.amount-input').forEach(input => { let val = parseFloat(input.value.replace(/,/g, '')) || 0; input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value); });
                 calcBudget();
@@ -1541,14 +1557,18 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         }
 
         // 5. 記帳項目新增與計算
-        function addBudgetRow(itemName = '輸入項目', payer = payers[0] || '', splitType = '個人', currency = currentTravelCurrency, amount = '0') {
+       // 5. 記帳項目新增與計算
+        function addBudgetRow(itemName = '輸入項目', payer = payers[0] || '', splitType = '個人', currency = currentTravelCurrency, amount = '0', dateDay = '') {
+            if (!dateDay) dateDay = new Date().getDate().toString(); // 如果沒有給日期，自動抓取今天的天數
+
             let tbody = document.getElementById('budget-tbody');
             if(!tbody) return;
             let tr = document.createElement('tr');
             let payerOptions = payers.map(p => `<option value="${p}" ${p === payer ? 'selected' : ''}>${p}</option>`).join('');
             
             tr.innerHTML = `
-                <td><input type="text" class="editable" value="${itemName}" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--primary-color);" onchange="saveData()"></td>
+                <td><input type="text" class="date-input editable" value="${dateDay}" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px; padding:0;" onchange="saveData()" onfocus="this.select()"></td>
+                <td><input type="text" class="editable" value="${itemName}" style="width:100%; border:none; background:transparent; font-weight:800; color:var(--primary-color); padding:0;" onchange="saveData()" onfocus="if(this.value==='輸入項目')this.value=''" onblur="if(this.value==='')this.value='輸入項目'; saveData();"></td>
                 <td><select class="payer-select" onchange="saveData(); calcBudget();">${payerOptions}</select></td>
                 <td><select class="split-select" onchange="saveData(); calcBudget();"><option value="平分" ${splitType==='平分'?'selected':''}>平分</option><option value="個人" ${splitType==='個人'?'selected':''}>個人</option></select></td>
                 <td style="white-space:nowrap;">
@@ -1560,7 +1580,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 </td>
                 <td>
                     <div class="receipt-box" onclick="triggerReceiptUpload(this)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span></div>
-                    <span class="material-icons-round delete-btn" onclick="deleteBudgetRow(this)" style="font-size:16px; color:var(--danger-color); cursor:pointer; vertical-align:middle; margin-left:4px;">delete</span>
+                    <span class="material-icons-round delete-btn" onclick="deleteBudgetRow(this)" style="font-size:16px; color:var(--danger-color); cursor:pointer; vertical-align:middle; margin-left:2px;">delete</span>
                 </td>
             `;
             tbody.appendChild(tr); saveData(); calcBudget();
