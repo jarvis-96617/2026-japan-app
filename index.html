@@ -407,10 +407,19 @@
                     }
                 });
             } else {
-                saveData(true);
-                disableEditUI();
-                lockRef.remove(); // 釋放鎖
-                lockRef.onDisconnect().cancel();
+                // 先完成雲端儲存，再解除編輯鎖，避免儲存尚未完成就把 Lock 移除。
+                setStatus('sync', '儲存並鎖定中...');
+                saveData(true, false, true).then((saved) => {
+                    if (!saved) throw new Error('雲端儲存未完成');
+                    disableEditUI();
+                    return lockRef.remove().then(() => lockRef.onDisconnect().cancel());
+                }).then(() => {
+                    setStatus('cloud_done', '已儲存並鎖定');
+                }).catch((e) => {
+                    console.error('鎖定前儲存失敗：', e);
+                    setStatus('cloud_off', '儲存失敗，仍保持編輯模式', true);
+                    alert('❌ 儲存失敗，因此不會解除編輯權限。\n\n請確認網路連線後再試一次。');
+                });
             }
             adjustStickyTabs();
         }
@@ -453,8 +462,7 @@
         function handleLockStolen() {
             disableEditUI();
             setStatus('cloud_off', '權限已被接管', true);
-            alert("⚠️ 【編輯權限已被接管】\n\n您的編輯權限已被其他裝置強制接管！\n為了防止您的心血白費，系統即將為您自動下載實體備份檔，並將畫面恢復為唯讀模式。");
-            if (typeof exportBackup === 'function') exportBackup(); 
+            alert("⚠️ 【編輯權限已被接管】\n\n您的編輯權限已被其他裝置強制接管！\n為了避免資料遺失，系統將恢復為唯讀模式。\n\n如需備份，請使用「更多選項 → 下載」手動下載實體備份檔。");
         }
 
         function updateEditToggleButton() {
@@ -748,64 +756,83 @@
         }
 
         // 🌟 最終版 saveData (寫入 Firebase 即時資料庫)
-        function saveData(isManual = false, skipHistory = false) {
-            if (new URLSearchParams(window.location.search).get('readonly')) return;
-            if (!isAppReady) return;
-            if (typeof LZString === 'undefined') return;
-            if (!isEditMode && !isManual) return;
-            if (isInitializing && !isManual) return;
-            
+        function saveData(isManual = false, skipHistory = false, waitForResult = false) {
+            const done = (value) => waitForResult ? Promise.resolve(value) : value;
+
+            if (new URLSearchParams(window.location.search).get('readonly')) return done(false);
+            if (!isAppReady) return done(false);
+            if (typeof LZString === 'undefined') return done(false);
+            if (!isEditMode && !isManual) return done(false);
+            if (isInitializing && !isManual) return done(false);
+
             if (!skipHistory && typeof recordHistory === 'function') { recordHistory(); }
-            
-            let newCompressedData; 
-            let payload; // 給本機備份用的
+
+            let newCompressedData;
+            let payload;
 
             try {
-                const state = captureState(); 
+                const state = captureState();
                 newCompressedData = LZString.compressToUTF16(JSON.stringify(state));
-                
-                // 智慧攔截：如果目前的資料跟雲端完全一樣，提早結束！
-                if (!isManual && newCompressedData === lastCloudDataHash) return; 
-                
-                payload = JSON.stringify({ 
-                    isCompressed: true, 
-                    data: newCompressedData 
+
+                if (!isManual && newCompressedData === lastCloudDataHash) return done(true);
+
+                payload = JSON.stringify({
+                    isCompressed: true,
+                    data: newCompressedData
                 });
-            } catch(e) { return; }
+            } catch(e) {
+                console.error('準備儲存資料失敗：', e);
+                return done(false);
+            }
 
             try {
-                // 本地備份照常執行
                 localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
                 localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
             } catch(e) {}
-            
-            setStatus('sync', '背景同步中...'); 
+
+            setStatus('sync', '背景同步中...');
             clearTimeout(syncTimeout);
-            
-            // 延遲 1.5 秒送出，避免打字卡頓
-            syncTimeout = setTimeout(() => {
-                // 先檢查鎖是不是還在我們手上
-                lockRef.once('value').then(snapshot => {
-                    const currentLock = snapshot.val();
-                    if (currentLock && currentLock.deviceId === myDeviceId) {
-                        // 鎖在手上，大膽存入 Firebase！
-                        tripRef.set({
-                            compressedData: newCompressedData,
-                            lastModified: Date.now()
-                        }).then(() => {
-                            lastCloudDataHash = newCompressedData; 
-                            setStatus('cloud_done', '雲端已同步'); 
-                            if(isManual) showToast("✅ 同步成功！"); 
-                        }).catch(err => {
-                            setStatus('cloud_off', '連線失敗', true); 
-                            if(isManual) alert("❌ 存檔失敗，請檢查網路！");
-                        });
-                    } else {
-                        // 鎖被搶走了！
-                        handleLockStolen();
-                    }
-                });
-            }, isManual ? 0 : 1500); 
+
+            const savePromise = new Promise((resolve) => {
+                syncTimeout = setTimeout(() => {
+                    lockRef.once('value').then(snapshot => {
+                        const currentLock = snapshot.val();
+
+                        if (currentLock && currentLock.deviceId === myDeviceId) {
+                            tripRef.set({
+                                compressedData: newCompressedData,
+                                lastModified: Date.now()
+                            }).then(() => {
+                                lastCloudDataHash = newCompressedData;
+                                setStatus('cloud_done', '雲端已同步');
+                                if(isManual) showToast("✅ 同步成功！");
+                                resolve(true);
+                            }).catch(err => {
+                                console.error('Firebase 儲存失敗：', err);
+                                setStatus('cloud_off', '連線失敗', true);
+                                if(isManual) alert("❌ 存檔失敗，請檢查網路！");
+                                resolve(false);
+                            });
+                        } else {
+                            // 手動「儲存並鎖定」時，這裡不再誤判成被其他裝置接管。
+                            if (isManual && waitForResult) {
+                                setStatus('cloud_off', '編輯權限已失效', true);
+                                resolve(false);
+                            } else {
+                                handleLockStolen();
+                                resolve(false);
+                            }
+                        }
+                    }).catch(err => {
+                        console.error('讀取 Firebase Lock 失敗：', err);
+                        setStatus('cloud_off', '連線失敗', true);
+                        if(isManual) alert("❌ 存檔失敗，請檢查網路！");
+                        resolve(false);
+                    });
+                }, isManual ? 0 : 1500);
+            });
+
+            return waitForResult ? savePromise : undefined;
         }
 
         // 🌟 最終版 loadData (載入 Firebase 資料與自動搬家)
@@ -1089,14 +1116,13 @@
                 if(typeof updateCurrencyOptionsInTable === 'function') updateCurrencyOptionsInTable(); 
                 
                 updateDayTabs(); 
-                // 一般開啟 APP 時固定顯示行程第 1 天；分享／唯讀連結則顯示第一個被授權的日期。
                 let startDayIdx = 0;
                 let shareMatch = window.location.href.match(/[?&](share|readonly)=([0-9,，、]+)/);
                 if (shareMatch) {
                     let allowed = shareMatch[2].replace(/，/g, ',').replace(/、/g, ',').split(',').map(d => parseInt(d.trim()) - 1).filter(d => !isNaN(d));
                     if (allowed.length > 0) startDayIdx = allowed[0];
                 }
-                switchDayCard(startDayIdx);
+                switchDayCard(startDayIdx); 
                 updateDayTabs();
                 
                 document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); 
@@ -1284,30 +1310,11 @@
             cards.forEach((card, idx) => { if (card.style.display !== 'none') activeIndex = idx; }); if (allowedIndexes && !allowedIndexes.includes(activeIndex)) activeIndex = allowedIndexes.length > 0 ? allowedIndexes[0] : 0;
             cards.forEach((card, index) => { if (allowedIndexes && !allowedIndexes.includes(index)) return; let title = card.querySelector('.section-title') ? card.querySelector('.section-title').innerText : ''; let dateStr = title.match(/\d{1,2}\/\d{1,2}/) ? title.match(/\d{1,2}\/\d{1,2}/)[0] : '日期'; html += `<div class="day-tab ${index === activeIndex ? 'active' : ''}" data-day-index="${index}" onclick="switchDayCard(${index})"><div class="day-num">${index + 1}</div><div class="day-date">${dateStr}</div></div>`; });
             container.innerHTML = html;
-            if (cards.length > 0) {
-                if (activeIndex === -1 || activeIndex >= cards.length) {
-                    activeIndex = allowedIndexes ? allowedIndexes[0] : 0;
-                }
-                switchDayCard(activeIndex);
-            }
+            if (cards.length > 0) { if (activeIndex === -1 || activeIndex >= cards.length) activeIndex = allowedIndexes ? allowedIndexes[0] : 0; switchDayCard(activeIndex); }
             setTimeout(adjustStickyTabs, 50);
         }
 
-        function switchDayCard(targetIndex) {
-    document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => {
-        let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`);
-        if (idx === targetIndex) {
-            card.style.display = 'block';
-            if (tab) {
-                tab.classList.add('active');
-                tab.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-            }
-        } else {
-            card.style.display = 'none';
-            if (tab) tab.classList.remove('active');
-        }
-    });
-}
+        function switchDayCard(targetIndex) { document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => { let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`); if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); } }); saveData(); }
         function addNewDayCard() { let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1; let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`; container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); }
         function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
 
