@@ -1188,10 +1188,10 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 
                 document.querySelectorAll('.payer-tag').forEach(tag => { if(tag.querySelector('span') && !tag.querySelector('.payer-del-btn')) { tag.querySelector('span').className = 'payer-del-btn'; } });
 
-// 🌟 終極修正：改用語意判斷！只要表頭找不到「日期」這兩個字，就強制重置為完整的 6 欄表頭！這能完美避開瀏覽器自動補空欄位的干擾。
-                let budgetTheadRow = document.querySelector('#budget-table thead tr');
-                if (budgetTheadRow && !budgetTheadRow.innerHTML.includes('日期')) {
-                    budgetTheadRow.innerHTML = `<th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th>`;
+// 🌟 終極表頭修復術：無視 thead/tbody 結構差異，直接抓表格的「第一橫列」，沒有日期就強制洗掉！
+                let budgetFirstRow = document.querySelector('#budget-table tr');
+                if (budgetFirstRow && !budgetFirstRow.innerText.includes('日期')) {
+                    budgetFirstRow.innerHTML = `<th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th>`;
                 }
                 document.querySelectorAll('#budget-tbody tr').forEach(tr => { if(!tr.querySelector('.split-select')) { let tds = tr.querySelectorAll('td'); if(tds.length === 5) { let splitTd = document.createElement('td'); splitTd.innerHTML = `<select class="split-select" onchange="saveData(); calcBudget();"><option value="平分">平分</option><option value="個人" selected>個人</option></select>`; tr.insertBefore(splitTd, tds[2]); let currEl = tds[2].querySelector('.curr-select'); let amtEl = tds[3].querySelector('.amount-input'); let mergedTd = document.createElement('td'); mergedTd.style.whiteSpace = 'nowrap'; if (currEl) { currEl.style.display = 'inline-block'; mergedTd.appendChild(currEl); } if (amtEl) { amtEl.style.display = 'inline-block'; mergedTd.appendChild(amtEl); } tr.insertBefore(mergedTd, tds[3].nextSibling); tr.removeChild(tds[2]); tr.removeChild(tds[3]); } } });
 // 🌟 新增舊資料升級：自動在每筆記帳項目最前面加上「日期」欄位，並套用點擊清空功能
