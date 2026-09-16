@@ -17,6 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 
     <!-- 🚀 引入 Firebase 官方極速套件 -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -665,7 +666,13 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 window.print(); 
             }
         }
-        function exportBackup() { let data = null; try{ data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); }catch(e){} if(!data) { alert("目前沒有資料可以備份喔！"); return; } let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+        function exportBackup() { 
+            localforage.getItem('travelAppSave_Keihan_vCloudFinal').then(function(data) {
+                if(!data) data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); // 兼容舊版
+                if(!data) { alert("目前沒有資料可以備份喔！"); return; } 
+                let blob = new Blob([data], {type: "application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = "2026_古京阪之旅_備份檔.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); 
+            });
+        }
         function triggerImportBackup() { document.getElementById('backup-file-input').click(); }
         function handleBackupUpload(event) { let file = event.target.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(e) { try { let content = e.target.result; JSON.parse(content); try { localStorage.setItem('travelAppSave_Keihan_vCloudFinal', content); }catch(e){} alert("✅ 備份檔還原成功！即將重新載入頁面。"); location.reload(); } catch(err) { alert("❌ 備份檔格式不正確，請確認檔案是否有毀損！"); } }; reader.readAsText(file); }
     </script>
@@ -833,8 +840,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             }
 
             try {
-                localStorage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
-                localStorage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
+                localforage.setItem('travelAppSave_Keihan_vCloudFinal', payload);
+                localforage.setItem('travelAppPayers_vCloudFinal', JSON.stringify(payers));
             } catch(e) {}
 
             setStatus('sync', '背景同步中...');
@@ -929,28 +936,30 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 } else if (!data && isInitializing) {
                     // 🚀 Firebase 裡面沒東西！觸發【自動搬家精靈】
                     updateProgress(60, '執行舊資料無痛搬家...');
-                    const saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal');
-                    if (saved) {
-                        try {
-                            let parsed = JSON.parse(saved);
-                            if (parsed.data) {
-                                // 把本機的舊資料直接推上 Firebase
-                                tripRef.set({ compressedData: parsed.data, lastModified: Date.now() });
-                                lastCloudDataHash = parsed.data;
-                                let state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
-                                if(state && state.html) {
-                                    document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
-                                    if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
-                                    if(state.payersData) payers = state.payersData;
-                                    renderPayerTags(); rebindEvents();
+                    localforage.getItem('travelAppSave_Keihan_vCloudFinal').then(function(saved) {
+                        if (!saved) saved = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); // 兼容讀取舊版
+                        if (saved) {
+                            try {
+                                let parsed = JSON.parse(saved);
+                                if (parsed.data) {
+                                    // 把本機的舊資料直接推上 Firebase
+                                    tripRef.set({ compressedData: parsed.data, lastModified: Date.now() });
+                                    lastCloudDataHash = parsed.data;
+                                    let state = JSON.parse(LZString.decompressFromUTF16(parsed.data));
+                                    if(state && state.html) {
+                                        document.getElementById('main-container').innerHTML = sanitizeHTML(state.html);
+                                        if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml);
+                                        if(state.payersData) payers = state.payersData;
+                                        renderPayerTags(); rebindEvents();
+                                    }
                                 }
-                            }
-                        } catch(e) {}
-                    } else {
-                        addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580');
-                    }
-                    finalizeLoad();
-                    isInitializing = false;
+                            } catch(e) {}
+                        } else {
+                            addBudgetRow('住宿訂金', payers[0], '平分', 'JPY', '60580');
+                        }
+                        finalizeLoad();
+                        isInitializing = false;
+                    });
                 }
             });
             
@@ -1751,6 +1760,17 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             }
         }
 
+// 🌟 強制攔截貼上事件：只允許貼上「純文字」，防止外部網頁的字體大小、顏色或 HTML 標籤破壞排版
+        document.addEventListener('paste', function(e) {
+            // 確保只有在「可編輯區域 (contenteditable)」貼上時才觸發過濾
+            if (e.target.isContentEditable) {
+                e.preventDefault(); // 阻擋預設的「帶格式貼上」行為
+                // 抓取剪貼簿裡的「純文字」版本
+                let text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                // 將純文字安插進目前的游標位置
+                document.execCommand('insertText', false, text);
+            }
+        });
         window.onload = loadData;
 // 🌟 處理核取方塊切換，並支援唯讀模式下的延遲存檔例外
         function toggleComplete(item, event) {
