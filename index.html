@@ -105,9 +105,9 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before, .sub-item::before { display: none !important; }
         
         /* 🌟 終極把手：防反白選字 (-webkit-user-select) + 巨大觸控區 (padding) */
-        .drag-handle { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); color: #a1a1aa; font-size: 16px; letter-spacing: -2px; cursor: grab; padding: 20px 12px 20px 0px; z-index: 20; touch-action: none; -webkit-user-select: none; user-select: none; }
-        body.dark-mode .drag-handle { color: #52525b; }
-        .drag-handle:active { cursor: grabbing; }
+        .drag-handle, .sub-drag-handle { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); color: #a1a1aa; font-size: 16px; letter-spacing: -2px; cursor: grab; padding: 20px 12px 20px 0px; z-index: 20; touch-action: none; -webkit-user-select: none; user-select: none; }
+body.dark-mode .drag-handle, body.dark-mode .sub-drag-handle { color: #52525b; }
+.drag-handle:active, .sub-drag-handle:active { cursor: grabbing; }
         
         /* 🌟 左側：時間區塊 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
@@ -1500,7 +1500,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             let sub = document.createElement('div');
             sub.className = 'sub-item';
             sub.innerHTML = `
-                <div class="drag-handle">⋮⋮</div>
+                <div class="sub-drag-handle">⋮⋮</div>
                 <div style="flex-grow:1; display:flex; flex-direction:column; min-width:0;">
                     <div style="display:flex; align-items:center; gap:4px;">
                         <span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">subdirectory_arrow_right</span>
@@ -1586,6 +1586,18 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         function deleteHotelCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除住宿區塊嗎？")) { btn.closest('.hotel-card').remove(); saveData(); } }
         function deleteItem(btnElement, event) { event.stopPropagation(); if(confirm("確定刪除項目嗎？")) { let item = btnElement.closest('.timeline-item, .todo-category-header'); let imgs = item.querySelectorAll('img'); imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); let card = btnElement.closest('.day-card'); item.remove(); if(card) recalculateDayTime(card); saveData(); } }
+        
+        function deleteSubItem(btn, event) { 
+    event.stopPropagation(); 
+    if(confirm("確定刪除此子地點嗎？")) { 
+        let subItem = btn.closest('.sub-item'); 
+        let imgs = subItem.querySelectorAll('img'); 
+        imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); 
+        subItem.remove(); 
+        saveData(); 
+    } 
+}
+        
         
         function triggerItemUpload(boxElement, event) { if(event) event.stopPropagation(); if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentItemThumbBox = boxElement; const input = document.getElementById('item-file-input'); input.value = ''; input.click(); }
         function triggerReceiptUpload(boxElement) { if(isImageProcessing) { alert('⏳ 圖片處理中...'); return; } currentReceiptBox = boxElement; const input = document.getElementById('receipt-file-input'); input.value = ''; input.click(); }
@@ -1703,14 +1715,25 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             window.sortableInstances = [];
 
             // 🌟 動態幫舊有項目補上「實體拖曳把手」
-            document.querySelectorAll('.timeline-item, .sub-item').forEach(item => {
-                if (!item.querySelector('.drag-handle')) {
-                    let handle = document.createElement('div');
-                    handle.className = 'drag-handle';
-                    handle.innerHTML = '⋮⋮';
-                    item.appendChild(handle); 
-                }
-            });
+document.querySelectorAll('.timeline-item').forEach(item => {
+    if (!item.querySelector('.drag-handle')) {
+        let handle = document.createElement('div');
+        handle.className = 'drag-handle';
+        handle.innerHTML = '⋮⋮';
+        item.appendChild(handle); 
+    }
+});
+document.querySelectorAll('.sub-item').forEach(item => {
+    let oldHandle = item.querySelector('.drag-handle');
+    if (oldHandle) {
+        oldHandle.className = 'sub-drag-handle'; // 轉換舊資料
+    } else if (!item.querySelector('.sub-drag-handle')) {
+        let handle = document.createElement('div');
+        handle.className = 'sub-drag-handle';
+        handle.innerHTML = '⋮⋮';
+        item.appendChild(handle); 
+    }
+});
 
             // 🌟 1. 天數大卡片排序 (解開標題限制，抓取卡片空白處即可拖曳)
             let daysContainer = document.getElementById('itinerary-days-container');
@@ -1743,7 +1766,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.querySelectorAll('.sub-items-container').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, { 
                     animation: 150, disabled: !isEditMode, 
-                    handle: '.drag-handle',
+                    handle: '.sub-drag-handle',
                     delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5,
                     onEnd: function() { saveData(); } 
                 }));
