@@ -555,7 +555,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         function openAlbumModal(containerElement, event) {
             if(event) event.stopPropagation();
-            const viewer = new Viewer(containerElement, { inline: false, toolbar: 1, navbar: 1, title: false, button: true, viewed() { addViewerDeleteBtn(viewer, containerElement, containerElement.closest('.action-box'), false); }, hidden: function () { viewer.destroy(); } });
+            // 🌟 自動判斷是「行程照片牆」還是「記帳發票牆」
+            let parentBox = containerElement.closest('.action-box') || containerElement.closest('.receipt-thumb-wrap');
+            const viewer = new Viewer(containerElement, { inline: false, toolbar: 1, navbar: 1, title: false, button: true, viewed() { addViewerDeleteBtn(viewer, containerElement, parentBox, false); }, hidden: function () { viewer.destroy(); } });
             viewer.show();
         }
 
@@ -755,8 +757,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
     </template>
 
     <input type="file" id="global-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleImageUpload(event)">
-    <input type="file" id="receipt-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleReceiptUpload(event)">
-    <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" style="display: none;" onchange="handleItemUpload(event)">
+   <input type="file" id="receipt-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleReceiptUpload(event)">
+    <input type="file" id="item-file-input" accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple style="display: none;" onchange="handleItemUpload(event)">
     <input type="file" id="backup-file-input" accept=".json,.txt" style="display: none;" onchange="handleBackupUpload(event)">
 
     <nav class="bottom-nav">
@@ -1031,44 +1033,113 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             }
         }
 
-        // 替換原本的 handleItemUpload 內容
-        function handleItemUpload(event) {
-            const file = event.target.files[0];
-            if (file && currentItemThumbBox) {
-                isImageProcessing = true; let originalHTML = currentItemThumbBox.innerHTML; let isNew = !currentItemThumbBox.classList.contains('has-photo');
-                if (isNew) { currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`; } else { let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; }
+        // 🌟 全新升級：行程項目圖片上傳 (支援一次多選)
+        async function handleItemUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0 || !currentItemThumbBox) return;
 
-                compressImage(file, 800, 0.6, function(base64DataUrl) {
-                    uploadImageToCloud(base64DataUrl, file.name, function(driveUrl) {
-                        if (isNew) {
-                            currentItemThumbBox.className = 'action-box has-photo photo-box';
-                            currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:8px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-4px; left:-4px; background:var(--primary-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
-                        } else {
-                            let addBadge = currentItemThumbBox.querySelector('.img-add-badge'); if(addBadge) addBadge.innerHTML = '+';
-                            let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
-                            if (albumContainer) {
-                                let newImg = document.createElement('img'); newImg.src = driveUrl; newImg.style.display = 'none'; newImg.setAttribute('onerror', 'handleImageError(this)'); albumContainer.appendChild(newImg);
-                                let countBadge = albumContainer.querySelector('.album-count-badge'); let imgCount = albumContainer.querySelectorAll('img').length;
-                                if (!countBadge) { countBadge = document.createElement('div'); countBadge.className = 'album-count-badge'; countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; line-height:1.2;'; albumContainer.appendChild(countBadge); }
-                                countBadge.innerText = '+' + (imgCount - 1);
+            isImageProcessing = true;
+            let originalHTML = currentItemThumbBox.innerHTML;
+            let isNew = !currentItemThumbBox.classList.contains('has-photo');
+
+            // 顯示轉圈圈狀態
+            if (isNew) {
+                currentItemThumbBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
+            } else {
+                let addBadge = currentItemThumbBox.querySelector('.img-add-badge');
+                if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`;
+            }
+
+            try {
+                // 依序處理每一張選取的圖片
+                for (let file of files) {
+                    const driveUrl = await new Promise((resolve, reject) => {
+                        compressImage(file, 800, 0.6, function(base64DataUrl) {
+                            uploadImageToCloud(base64DataUrl, file.name, resolve, reject);
+                        }, reject);
+                    });
+
+                    // 每次成功傳完一張，就即時更新畫面
+                    let currentlyNew = !currentItemThumbBox.classList.contains('has-photo');
+                    if (currentlyNew) {
+                        currentItemThumbBox.className = 'action-box has-photo photo-box';
+                        currentItemThumbBox.innerHTML = `<div class="photo-album-container" style="width:100%; height:100%; position:relative; border-radius:8px; overflow:hidden;" onclick="openAlbumModal(this, event)"><img src="${driveUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="handleImageError(this)"></div><div onclick="triggerItemUpload(this.closest('.action-box'), event)" class="img-add-badge" style="position:absolute; bottom:-4px; left:-4px; background:var(--primary-color); color:white; width:16px; height:16px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; cursor:pointer;" title="新增圖片">+</div>`;
+                    } else {
+                        let addBadge = currentItemThumbBox.querySelector('.img-add-badge');
+                        if(addBadge) addBadge.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:10px;">sync</span>`; // 保持轉圈直到全部傳完
+                        let albumContainer = currentItemThumbBox.querySelector('.photo-album-container');
+                        if (albumContainer) {
+                            let newImg = document.createElement('img');
+                            newImg.src = driveUrl;
+                            newImg.style.display = 'none'; // 第一張以後隱藏
+                            newImg.setAttribute('onerror', 'handleImageError(this)');
+                            albumContainer.appendChild(newImg);
+                            
+                            // 更新右上角數字標籤
+                            let countBadge = albumContainer.querySelector('.album-count-badge');
+                            let imgCount = albumContainer.querySelectorAll('img').length;
+                            if (!countBadge) {
+                                countBadge = document.createElement('div');
+                                countBadge.className = 'album-count-badge';
+                                countBadge.style.cssText = 'position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; line-height:1.2;';
+                                albumContainer.appendChild(countBadge);
                             }
-                        } saveData(); isImageProcessing = false;
-                    }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
-                }, function() { currentItemThumbBox.innerHTML = originalHTML; isImageProcessing = false; });
+                            countBadge.innerText = '+' + (imgCount - 1);
+                        }
+                    }
+                }
+                saveData();
+            } catch (error) {
+                console.error("上傳失敗", error);
+                if (!currentItemThumbBox.classList.contains('has-photo')) {
+                    currentItemThumbBox.innerHTML = originalHTML; // 若第一張就失敗則還原
+                }
+            } finally {
+                let addBadge = currentItemThumbBox.querySelector('.img-add-badge');
+                if(addBadge) addBadge.innerHTML = '+'; // 恢復加號圖示
+                isImageProcessing = false;
+                event.target.value = ''; // 清除輸入狀態，允許重複上傳相同檔案
             }
         }
 
-        // 替換原本的 handleReceiptUpload 內容
-        function handleReceiptUpload(event) {
-            const file = event.target.files[0];
-            if (file && currentReceiptBox) {
-                isImageProcessing = true; currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
-                compressImage(file, 800, 0.6, function(base64DataUrl) {
-                    uploadImageToCloud(base64DataUrl, file.name, function(driveUrl) {
-                        currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap"><img src="${driveUrl}" onclick="openImageModal(this, event)" onerror="handleImageError(this)"></div>`; 
-                        saveData(); isImageProcessing = false;
-                    }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
-                }, function() { currentReceiptBox.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; isImageProcessing = false; });
+        // 🌟 全新升級：記帳發票上傳 (支援一次多選)
+        async function handleReceiptUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0 || !currentReceiptBox) return;
+
+            isImageProcessing = true;
+            let isNew = !currentReceiptBox.classList.contains('receipt-thumb-wrap');
+            let originalHTML = currentReceiptBox.outerHTML;
+
+            if (isNew) {
+                currentReceiptBox.innerHTML = `<span class="material-icons-round spin-icon" style="font-size:14px; color:var(--primary-color);">sync</span>`;
+            }
+
+            try {
+                let newImgUrls = [];
+                for (let file of files) {
+                    const url = await new Promise((resolve, reject) => {
+                        compressImage(file, 800, 0.6, function(base64) {
+                            uploadImageToCloud(base64, file.name, resolve, reject);
+                        }, reject);
+                    });
+                    newImgUrls.push(url);
+                }
+
+                if (isNew) {
+                    // 把多張發票組裝成迷你相簿
+                    let imgTags = newImgUrls.map((url, i) => `<img src="${url}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; ${i===0?'':'display:none;'}" onerror="handleImageError(this)">`).join('');
+                    let badge = newImgUrls.length > 1 ? `<div class="album-count-badge" style="position:absolute; bottom:-4px; right:-4px; background:rgba(0,0,0,0.7); color:white; font-size:9px; padding:2px 4px; border-radius:8px; font-weight:bold; pointer-events:none; z-index:5;">+${newImgUrls.length - 1}</div>` : '';
+                    
+                    currentReceiptBox.outerHTML = `<div class="receipt-thumb-wrap" style="position:relative; width:24px; height:24px; margin:0 auto; flex-shrink:0; cursor:pointer;" onclick="openAlbumModal(this, event)">${imgTags}${badge}</div>`;
+                }
+                saveData();
+            } catch(e) {
+                console.error(e);
+                if (isNew) currentReceiptBox.outerHTML = originalHTML;
+            } finally {
+                isImageProcessing = false;
+                event.target.value = '';
             }
         }
 
