@@ -147,8 +147,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         
         .add-btn { width: 100%; padding: 12px; background: rgba(0,0,0,0.04); color: var(--primary-color); border: none; border-radius: 50px; font-weight: 800; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer; margin-top: 8px; margin-bottom: 4px; transition: all 0.3s var(--spring);} body.dark-mode .add-btn { background: rgba(255,255,255,0.05); color: #a1a1aa;}
         
-        /* 🌟 右側：操作按鈕群組 (直向疊加) */
-        .right-action-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex-shrink: 0; margin-left: auto; justify-content: flex-start;}
+       /* 🌟 右側：操作按鈕群組 (橫向網格排列) */
+        .right-action-group { display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end; flex-shrink: 0; margin-left: auto; max-width: 100px; }
         
         .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
@@ -1207,9 +1207,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         }
                     }
                     
-                    // 🌟 強制覆蓋舊資料的行內樣式，統一改為垂直排列 (預設分類標題除外)
+                    // 🌟 強制覆蓋舊資料的行內樣式，統一改為「橫向網格排列」
                     if (!item.classList.contains('todo-category-header')) {
-                        rightGroup.style.cssText = 'display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: flex-start; flex-shrink: 0; margin-left: auto;';
+                        rightGroup.style.cssText = 'display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end; flex-shrink: 0; margin-left: auto; max-width: 100px;';
                     }
 
                     if (contentBox && item.closest('#itinerary-days-container')) {
