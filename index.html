@@ -78,7 +78,7 @@
         .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
-        .timeline-item { display: flex; flex-wrap: nowrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
+        .timeline-item { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
         body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
         .timeline-item:last-child { border-bottom: none; } .timeline-item.completed { opacity: 0.4; filter: grayscale(100%);}
         #tab-transport .timeline-item { padding: 8px 0; } #tab-transport .item-title { font-size: 13px; margin-bottom: 2px; line-height: 1.2;}
@@ -160,7 +160,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .img-delete-badge { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 14px; height: 14px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; cursor: pointer; pointer-events: auto; transition: 0.2s var(--spring);}
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
-        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 20px; box-sizing: border-box; }
+        .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 28px; box-sizing: border-box; }
         .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 16px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid #71717a; transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: #a1a1aa;}
         .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
@@ -324,6 +324,13 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             return `${mins}分`;
         }
 
+// 🌟 提升手機版體驗：輸入時間後按下鍵盤 Enter，立刻自動計算並存檔
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.classList.contains('editable')) {
+                e.preventDefault(); // 防止文字換行
+                e.target.blur(); // 強制觸發 focusout，啟動自動時間計算
+            }
+        });
         document.addEventListener('focusout', function(e) {
             if (!isEditMode) return;
             if (e.target.classList.contains('editable') || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
@@ -1262,7 +1269,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         }
 
                         let subCont = item.querySelector('.sub-items-container');
-                        if (subCont && subCont.parentNode !== contentBox) { contentBox.appendChild(subCont); }
+                        if (subCont && subCont.parentNode !== item) { item.appendChild(subCont); }
                     }
 
                     let dashBox = rightGroup.querySelector('.action-dash-box');
@@ -1474,7 +1481,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             if(!container) { 
                 container = document.createElement('div'); 
                 container.className = 'sub-items-container'; 
-                timelineItem.querySelector('.content-box').appendChild(container); 
+                timelineItem.appendChild(container); 
             }
             
             let sub = document.createElement('div');
@@ -1496,17 +1503,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             container.appendChild(sub);
             initSortable();
             saveData();
-        }
-
-        function deleteSubItem(btn, event) {
-            event.stopPropagation();
-            if(confirm("確定移除此子項目？")) {
-                let item = btn.closest('.sub-item');
-                let imgs = item.querySelectorAll('img');
-                imgs.forEach(img => { if(img && img.src) deleteImageFromCloud(img.src); });
-                item.remove();
-                saveData();
-            }
         }
 
         function autoNavigateSub(btn, event) {
@@ -1680,7 +1676,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             saveData();
         }
 
-        // 3. 拖曳排序初始化 (Sortable.js)
+       // 3. 拖曳排序初始化 (Sortable.js)
         function initSortable() {
             if (typeof Sortable === 'undefined') return;
             window.sortableInstances.forEach(s => s.destroy());
@@ -1689,14 +1685,16 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             let daysContainer = document.getElementById('itinerary-days-container');
             if (daysContainer) {
                 window.sortableInstances.push(new Sortable(daysContainer, {
-                    animation: 150, handle: '.section-title', disabled: !isEditMode,
+                    animation: 150, handle: '.section-title', disabled: !isEditMode, 
+                    delay: 250, delayOnTouchOnly: true, // 🌟 新增：手機版長按 0.25 秒才啟動拖曳，防誤觸
                     onEnd: function() { updateDayTabs(); saveData(); }
                 }));
             }
 
             document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, {
-                    animation: 150, filter: '.section-title, .add-btn, .todo-category-header, .checkbox-wrapper', preventOnFilter: false, disabled: !isEditMode,
+                    animation: 150, filter: '.section-title, .add-btn, .todo-category-header, .checkbox-wrapper', preventOnFilter: false, disabled: !isEditMode, 
+                    delay: 250, delayOnTouchOnly: true, // 🌟 新增：手機版防誤觸
                     onEnd: function(evt) {
                         let card = evt.item.closest('.day-card');
                         if (card) recalculateDayTime(card);
@@ -1706,7 +1704,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             });
 
             document.querySelectorAll('.sub-items-container').forEach(container => {
-                window.sortableInstances.push(new Sortable(container, { animation: 150, disabled: !isEditMode, onEnd: function() { saveData(); } }));
+                window.sortableInstances.push(new Sortable(container, { 
+                    animation: 150, disabled: !isEditMode, 
+                    delay: 250, delayOnTouchOnly: true, // 🌟 新增：手機版防誤觸
+                    onEnd: function() { saveData(); } 
+                }));
             });
         }
 
