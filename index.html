@@ -1500,7 +1500,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
                 </div>
-                <div class="right-action-group" style="flex-direction:column; margin-left:auto; gap:4px; align-items:center;">
+                <div class="right-action-group" style="flex-direction:row; flex-wrap:wrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end;">
                     <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">image</span></div>
                     <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--danger-color);">close</span></div>
                 </div>
@@ -1709,9 +1709,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, {
                     animation: 150, 
-                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳，徹底杜絕 iPhone 文字選取衝突！
-                    filter: '.add-btn, .todo-category-header', preventOnFilter: false, disabled: !isEditMode, 
-                    delay: 50, delayOnTouchOnly: true, // 因為有了實體把手，延遲可以縮短，拖曳手感更即時
+                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳
+                    filter: '.action-box, .btn-nav, .add-btn, .todo-category-header, input, select, textarea, .editable', // 🌟 擴大防護網，保護所有按鈕
+                    preventOnFilter: false, // 🌟 絕對不要吃掉按鈕的點擊事件！
+                    disabled: !isEditMode, 
+                    delay: 50, delayOnTouchOnly: true,
                     onEnd: function(evt) {
                         let card = evt.item.closest('.day-card');
                         if (card) recalculateDayTime(card);
@@ -1723,13 +1725,14 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.querySelectorAll('.sub-items-container').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, { 
                     animation: 150, disabled: !isEditMode, 
-                    handle: '.drag-handle', // 🌟 子項目同樣加入把手控制
+                    handle: '.drag-handle',
+                    filter: '.action-box, .btn-nav, input, select, textarea, .editable', // 🌟 防護網：確保刪除鍵(X)不會被拖曳系統吃掉
+                    preventOnFilter: false, // 🌟 解除封印！
                     delay: 50, delayOnTouchOnly: true,
                     onEnd: function() { saveData(); } 
                 }));
             });
-        }
-        // 4. 記帳功能 (付款人管理)
+        }        // 4. 記帳功能 (付款人管理)
         function renderPayerTags() {
             let container = document.getElementById('payer-tags-container');
             if (!container) return;
