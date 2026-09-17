@@ -1,4 +1,4 @@
-const CACHE_NAME = 'keihan-offline-v12'; // 🌟 強制更新版號
+const CACHE_NAME = 'keihan-offline-v13'; // 🌟 強制更新版號
 
 const urlsToCache = [
     './',
@@ -7,7 +7,6 @@ const urlsToCache = [
     './splash.png'
 ];
 
-// 1. 安裝階段：只打包我們自己的核心檔案
 self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
@@ -15,7 +14,6 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// 2. 啟動階段：清掉舊的、壞掉的快取包
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -31,32 +29,51 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// 3. 攔截請求：🌟 終極防護網！
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
+    const url = event.request.url;
 
-    // 🚨 核心防護：如果這個檔案不是來自我們自己的網站 (例如 Google 字體、Firebase 圖片)
-    // 就直接 `return` 放行！讓 Safari 瀏覽器原生處理，絕對不要丟進 Service Worker 快取！
-    if (!event.request.url.startsWith(self.location.origin)) {
-        return; 
+    // 🚫 絕對不快取 Firebase 資料庫，確保資料即時性
+    if (url.includes('firebasedatabase.app') || url.includes('firestore')) {
+        return;
     }
 
-    event.respondWith(
-        fetch(event.request)
-            .then((response) => {
-                const responseClone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseClone);
+    // 🎯 終極修復：針對 Google 字體給予「快取優先」VIP 待遇！
+    if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com')) {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                if (cachedResponse) {
+                    return cachedResponse; // 背包有字體就直接拿出來用
+                }
+                return fetch(event.request).then((response) => {
+                    // 第一次連網時抓到字體，立刻存進背包
+                    if (response && response.status === 200) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return response;
                 });
-                return response;
             })
-            .catch(() => {
+        );
+        return;
+    }
+
+    // 🌐 其他我們自己的檔案 (HTML, 圖片)
+    if (url.startsWith(self.location.origin)) {
+        event.respondWith(
+            fetch(event.request).then((response) => {
+                const responseClone = response.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+                return response;
+            }).catch(() => {
                 return caches.match(event.request).then((cachedResponse) => {
                     return cachedResponse || new Response('【離線模式】請連上網路', {
-                        status: 503,
-                        headers: new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
+                        status: 503, headers: new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
                     });
                 });
             })
-    );
+        );
+    }
 });
