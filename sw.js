@@ -1,4 +1,4 @@
-const CACHE_NAME = 'keihan-offline-v11'; // 🌟 強制更新版號
+const CACHE_NAME = 'keihan-offline-v12'; // 🌟 強制更新版號
 
 const urlsToCache = [
     './',
