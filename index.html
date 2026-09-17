@@ -978,7 +978,36 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 }
             }, 5000);
         }
+        // 🌟 圖片壓縮功能 (解決上傳無限轉圈的問題)
+        function compressImage(file, maxWidth, quality, callback, errorCallback) {
+            if (!file) { if(errorCallback) errorCallback(); return; }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth) {
+                        height = Math.round((height *= maxWidth / width));
+                        width = maxWidth;
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    callback(dataUrl);
+                };
+                img.onerror = function() { if (errorCallback) errorCallback(); };
+            };
+            reader.onerror = function() { if (errorCallback) errorCallback(); };
+        }
 
+        // 🌟 最終版圖片上傳 (直接上傳 Firebase Storage)
+        // ... (下方是你原本的 uploadImageToCloud)
         // 🌟 最終版圖片上傳 (直接上傳 Firebase Storage)
         function uploadImageToCloud(base64Str, filename, callback, errorCallback) {
             setStatus('sync', '圖片上傳中...');
@@ -1279,7 +1308,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             let localISOTime = (new Date(mockDate - tzOffset)).toISOString().slice(0, 16);
                             let displayDate = `${mockDate.getMonth()+1}/${mockDate.getDate()}`;
                             
+                            // 暴力升級成新版 DOM 結構
                             dateTd.style.position = 'relative';
+                            dateTd.style.overflow = 'hidden';
                             dateTd.innerHTML = `
                                 <div class="date-display" style="width:100%; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px;">${displayDate}</div>
                                 <input type="datetime-local" class="real-date-input" value="${localISOTime}" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:5;" onchange="updateBudgetRowDate(this)">
@@ -1679,7 +1710,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             let payerOptions = payers.map(p => `<option value="${p}" ${p === payer ? 'selected' : ''}>${p}</option>`).join('');
             
             tr.innerHTML = `
-                <td style="position:relative;">
+                <td style="position:relative; overflow:hidden;">
                     <div class="date-display" style="width:100%; font-weight:800; color:var(--text-muted); text-align:center; font-size:11px;">${displayDate}</div>
                     <input type="datetime-local" class="real-date-input" value="${localISOTime}" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; z-index:5;" onchange="updateBudgetRowDate(this)">
                 </td>
