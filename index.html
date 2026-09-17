@@ -775,23 +775,36 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             let moreBar = document.getElementById('more-options-bar');
             if(moreBar) { moreBar.style.display = 'none'; document.getElementById('more-options-icon').innerText = 'more_vert'; }
 
-            // 🌟 核心修正：在擷取存檔前，強制將所有輸入框與下拉選單的「當前畫面值」寫入底層 HTML 屬性
-            document.querySelectorAll('#main-container input').forEach(el => {
-                if (el.type === 'checkbox' || el.type === 'radio') {
-                    if (el.checked) el.setAttribute('checked', 'checked');
-                    else el.removeAttribute('checked');
-                } else {
-                    el.setAttribute('value', el.value);
-                }
-            });
-            document.querySelectorAll('#main-container select').forEach(el => {
-                Array.from(el.options).forEach(opt => opt.removeAttribute('selected'));
-                if (el.selectedIndex > -1) el.options[el.selectedIndex].setAttribute('selected', 'selected');
-            });
-
+            // 🌟 第一步：先拍下當前畫面的快照 (建立替身 DOM)
             let tempMain = document.createElement('div'); tempMain.innerHTML = document.getElementById('main-container').innerHTML;
             let tempHero = document.createElement('div'); tempHero.innerHTML = document.getElementById('hero-container').innerHTML;
 
+            // 🌟 核心修正：把「當前畫面值」寫入【備份的替身】中，絕對不干擾活著的畫面！
+            let liveInputs = document.querySelectorAll('#main-container input');
+            let tempInputs = tempMain.querySelectorAll('input');
+            liveInputs.forEach((liveEl, i) => {
+                if(tempInputs[i]) {
+                    if (liveEl.type === 'checkbox' || liveEl.type === 'radio') {
+                        if (liveEl.checked) tempInputs[i].setAttribute('checked', 'checked');
+                        else tempInputs[i].removeAttribute('checked');
+                    } else {
+                        tempInputs[i].setAttribute('value', liveEl.value);
+                    }
+                }
+            });
+
+            let liveSelects = document.querySelectorAll('#main-container select');
+            let tempSelects = tempMain.querySelectorAll('select');
+            liveSelects.forEach((liveEl, i) => {
+                if(tempSelects[i]) {
+                    Array.from(tempSelects[i].options).forEach(opt => opt.removeAttribute('selected'));
+                    if (liveEl.selectedIndex > -1) {
+                        tempSelects[i].options[liveEl.selectedIndex].setAttribute('selected', 'selected');
+                    }
+                }
+            });
+
+            // 第三步：針對替身進行其他的還原與清理
             [tempMain, tempHero].forEach(container => {
                 // ...後面保持原樣
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
