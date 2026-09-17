@@ -162,7 +162,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
        /* 🌟 右側：操作按鈕群組 (橫向網格排列) */
         .right-action-group { display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end; flex-shrink: 0; margin-left: auto; max-width: 100px; }
         
-        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; } 
+        /* 🌟 加上防護：強化按鈕圖層與觸控屬性，防止被拖曳系統蓋住 */
+        .action-box { width: 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--spring); background: rgba(0,0,0,0.04); position: relative; user-select: none; z-index: 100; touch-action: manipulation; } 
         body.dark-mode .action-box { background: rgba(255,255,255,0.05); } 
         .action-box:active { transform: scale(0.9); } 
         .action-box.has-link { background: #e4e4e7; color: #3f3f46; } 
@@ -1499,6 +1500,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             let sub = document.createElement('div');
             sub.className = 'sub-item';
             sub.innerHTML = `
+                <div class="drag-handle">⋮⋮</div>
                 <div style="flex-grow:1; display:flex; flex-direction:column; min-width:0;">
                     <div style="display:flex; align-items:center; gap:4px;">
                         <span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">subdirectory_arrow_right</span>
@@ -1529,6 +1531,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         function addItineraryItem(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
             newItem.innerHTML = `
+                <div class="drag-handle">⋮⋮</div>
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                 <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div></div>
                 <div class="content-box">
@@ -1547,11 +1550,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         function addTransportText(btn) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
+            newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
 
-       function addHotelCard() {
+        function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
             div.innerHTML = `<div class="flex-between" style="margin-bottom: 12px; align-items: flex-start;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0; line-height: 1.4;"><span class="material-icons-round">bed</span> 新增住宿 (日期)</h2><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteHotelCard(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div></div><div class="editable item-name-target" contenteditable="true" style="font-weight: 800; font-size: 14px;">輸入飯店名稱</div><div class="item-note editable" contenteditable="true" style="margin-top:8px;">入住/退房/房型：</div><button class="btn-nav" onclick="autoNavigate(this, event)" style="margin-top: 10px; width: fit-content; padding: 4px 10px; border-radius: 50px;"><span class="material-icons-round" style="font-size:12px;">place</span> 導航至飯店</button>`;
             container.appendChild(div); saveData();
@@ -1559,13 +1562,13 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         function addGeneralItemWithNote(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
+            newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入新項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             document.getElementById('shopping-list').appendChild(newItem); saveData();
         }
 
         function addTodoItemToContainer(containerId) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
+            newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入預訂項目</span></div><div class="item-note editable" contenteditable="true">備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             document.getElementById(containerId).appendChild(newItem); saveData();
         }
 
@@ -1577,7 +1580,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         function addTodoItemHere(btnElement) {
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
+            newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title editable luggage-item-title" contenteditable="true">輸入新項目</div></div><select class="luggage-select"><option value="背包" selected>背包</option><option value="小包包">小包包</option><option value="託運">託運</option></select><div class="right-action-group"><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             const header = btnElement.closest('.todo-category-header'); header.parentNode.insertBefore(newItem, header.nextSibling); saveData();
         }
 
@@ -1634,6 +1637,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 img.onclick = function(e) { openImageModal(this, e); };
             });
             document.querySelectorAll('.photo-album-container img').forEach(img => { img.onclick = null; });
+            
+            // 🌟 終極防護：攔截所有按鈕的觸控訊號，讓拖曳系統完全無法吃掉點擊事件！
+            document.querySelectorAll('.action-box, .btn-nav, .custom-checkbox').forEach(el => {
+                el.ontouchstart = (e) => e.stopPropagation();
+            });
         }
         
 // ==========================================
@@ -1694,7 +1702,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             window.sortableInstances.forEach(s => s.destroy());
             window.sortableInstances = [];
 
-            // 🌟 動態幫所有項目裝上「實體拖曳把手」
+            // 🌟 動態幫舊有項目補上「實體拖曳把手」
             document.querySelectorAll('.timeline-item, .sub-item').forEach(item => {
                 if (!item.querySelector('.drag-handle')) {
                     let handle = document.createElement('div');
@@ -1704,21 +1712,26 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 }
             });
 
+            // 🌟 1. 天數大卡片排序 (解開標題限制，抓取卡片空白處即可拖曳)
             let daysContainer = document.getElementById('itinerary-days-container');
             if (daysContainer) {
                 window.sortableInstances.push(new Sortable(daysContainer, {
-                    animation: 150, handle: '.section-title', disabled: !isEditMode, 
+                    animation: 150, 
+                    filter: '.editable, .delete-btn, .add-btn', // 避開輸入框與按鈕
+                    preventOnFilter: false,
+                    disabled: !isEditMode, 
                     delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5,
                     onEnd: function() { updateDayTabs(); saveData(); }
                 }));
             }
 
+            // 🌟 2. 內部項目排序 (嚴格規定只能抓取 ⋮⋮ 把手)
             document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, {
                     animation: 150, 
-                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳，不設 filter 讓點擊事件回歸正常
+                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳
                     disabled: !isEditMode, 
-                    delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5, // 🌟 容許手指微小抖動，拯救 iPhone 拖曳
+                    delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5, 
                     onEnd: function(evt) {
                         let card = evt.item.closest('.day-card');
                         if (card) recalculateDayTime(card);
