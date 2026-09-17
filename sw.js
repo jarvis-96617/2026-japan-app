@@ -1,4 +1,4 @@
-const CACHE_NAME = 'keihan-offline-v2'; // 🌟 更新版本號，強制手機重新下載
+const CACHE_NAME = 'keihan-offline-v3'; // 🌟 更新版本號，強制手機重新下載
 
 // 1. 安裝階段：事前把重要的檔案直接塞進快取背包 (Pre-cache)
 self.addEventListener('install', (event) => {
