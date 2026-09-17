@@ -88,14 +88,19 @@
         body.dark-mode .todo-category-header { color: #d4d4d8; border-bottom-color: rgba(255,255,255,0.05); }
         .checkbox-wrapper { flex-shrink: 0; padding-top: 2px; }
         .custom-checkbox { width: 18px; height: 18px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s var(--spring); }
-        .completed .custom-checkbox { background: var(--primary-color); transform: scale(1.1); } .completed .custom-checkbox::after { content: "✓"; color: white; font-size: 11px; font-weight: bold;}
+       .completed .custom-checkbox { background: var(--primary-color); transform: scale(1.1); } 
+        /* 🌟 改成圓潤的 Material Icon 打勾 */
+        .completed .custom-checkbox::after { content: "check"; font-family: 'Material Icons Round'; color: white; font-size: 14px; font-weight: bold;}
         
         .sortable-ghost { opacity: 0.4; background-color: rgba(0,0,0,0.03) !important; border-radius: 12px; } body.dark-mode .sortable-ghost { background-color: rgba(255,255,255,0.05) !important; }
         .sortable-drag { background-color: var(--glass-bg) !important; backdrop-filter: blur(20px); box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important; transform: scale(1.02); z-index: 1000; border-radius: 16px; border: 1px solid var(--glass-border); } body.dark-mode .sortable-drag { background-color: #18181b !important; }
         #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 20px !important; }
         
-        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before { content: '⋮⋮'; position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; pointer-events: none; }
-        body.dark-mode #itinerary-days-container .timeline-item::before { color: #52525b; }
+        /* 🌟 隱藏舊的假圖案，換成可觸控的實體把手 */
+        #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before, .sub-item::before { display: none !important; }
+        .drag-handle { position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; cursor: grab; padding: 10px 8px 10px 0px; z-index: 20; touch-action: none; }
+        body.dark-mode .drag-handle { color: #52525b; }
+        .drag-handle:active { cursor: grabbing; }
         
         /* 🌟 左側：時間區塊 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
@@ -1676,25 +1681,37 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             saveData();
         }
 
-       // 3. 拖曳排序初始化 (Sortable.js)
+// 3. 拖曳排序初始化 (Sortable.js)
         function initSortable() {
             if (typeof Sortable === 'undefined') return;
             window.sortableInstances.forEach(s => s.destroy());
             window.sortableInstances = [];
 
+            // 🌟 動態幫所有項目裝上「實體拖曳把手」
+            document.querySelectorAll('.timeline-item, .sub-item').forEach(item => {
+                if (!item.querySelector('.drag-handle')) {
+                    let handle = document.createElement('div');
+                    handle.className = 'drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    item.appendChild(handle); 
+                }
+            });
+
             let daysContainer = document.getElementById('itinerary-days-container');
             if (daysContainer) {
                 window.sortableInstances.push(new Sortable(daysContainer, {
                     animation: 150, handle: '.section-title', disabled: !isEditMode, 
-                    delay: 250, delayOnTouchOnly: true, // 🌟 新增：手機版長按 0.25 秒才啟動拖曳，防誤觸
+                    delay: 200, delayOnTouchOnly: true, 
                     onEnd: function() { updateDayTabs(); saveData(); }
                 }));
             }
 
             document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, {
-                    animation: 150, filter: '.section-title, .add-btn, .todo-category-header, .checkbox-wrapper', preventOnFilter: false, disabled: !isEditMode, 
-                    delay: 250, delayOnTouchOnly: true, // 🌟 新增：手機版防誤觸
+                    animation: 150, 
+                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳，徹底杜絕 iPhone 文字選取衝突！
+                    filter: '.add-btn, .todo-category-header', preventOnFilter: false, disabled: !isEditMode, 
+                    delay: 50, delayOnTouchOnly: true, // 因為有了實體把手，延遲可以縮短，拖曳手感更即時
                     onEnd: function(evt) {
                         let card = evt.item.closest('.day-card');
                         if (card) recalculateDayTime(card);
@@ -1706,12 +1723,12 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.querySelectorAll('.sub-items-container').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, { 
                     animation: 150, disabled: !isEditMode, 
-                    delay: 250, delayOnTouchOnly: true, // 🌟 新增：手機版防誤觸
+                    handle: '.drag-handle', // 🌟 子項目同樣加入把手控制
+                    delay: 50, delayOnTouchOnly: true,
                     onEnd: function() { saveData(); } 
                 }));
             });
         }
-
         // 4. 記帳功能 (付款人管理)
         function renderPayerTags() {
             let container = document.getElementById('payer-tags-container');
@@ -1961,17 +1978,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         window.onload = loadData;
 // 🌟 處理核取方塊切換，並支援唯讀模式下的延遲存檔例外
         function toggleComplete(item, event) {
-            // 避免點擊到按鈕、連結或輸入框時誤觸打勾
-            if (event && (
-                event.target.closest('.editable') || 
-                event.target.tagName === 'BUTTON' || 
-                event.target.closest('.action-box') || 
-                event.target.closest('.sub-item') || 
-                event.target.closest('select') || 
-                event.target.closest('input') || 
-                event.target.closest('.transport-icon') ||
-                event.target.closest('.link-box')
-            )) {
+            // 🌟 核心防護：嚴格規定「只能點擊核取方塊本人」才算數，點擊空白處一律無視！
+            if (event && !event.target.closest('.checkbox-wrapper') && !event.target.closest('.custom-checkbox')) {
                 return;
             }
             
@@ -1982,16 +1990,13 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             item.saveTimeout = setTimeout(() => {
                 if (typeof saveData === 'function') {
                     if (!isEditMode) {
-                        // 唯讀模式例外：背景直接更新至雲端，不要求解鎖
                         forceSaveCheckboxState();
                     } else {
-                        // 編輯模式下正常存檔
                         saveData();
                     }
                 }
             }, 3000);
         }
-
         // 🌟 專為唯讀模式設計的背景無感存檔
         function forceSaveCheckboxState() {
             // 如果是分享出去的純唯讀網址 (帶有 readonly 參數) 則完全不存檔
