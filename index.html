@@ -9,33 +9,11 @@
     <meta name="apple-mobile-web-app-title" content="古京阪">
     
     <link rel="apple-touch-icon" href="icon.png">
-    <!-- 🌟 加上跨網域安全聲明，讓 Safari 願意快取外部字體 -->
+    <!-- 🌟 乾淨且標準的字體載入方式 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
-    
-    <!-- 🌟 1. 強制破除 Safari 快取的字體連結 -->
-    <link id="mi-font" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <script>
-        // 每次打開網頁都加一串隨機亂碼，強迫 Safari「以為這是新檔案」重新下載圖示！
-        document.getElementById('mi-font').href = "https://fonts.googleapis.com/icon?family=Material+Icons+Round&v=" + Math.random();
-    </script>
-
-    <!-- 🌟 2. 終極除蟲按鈕：用來徹底殺死 Safari 的頑固快取 -->
-    <script>
-        if (window.location.search.includes('reset=1')) {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-            }
-            if ('caches' in window) {
-                caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-            }
-            setTimeout(() => {
-                alert('✅ 頑固的快取已徹底清除！請點擊確定重新載入。');
-                window.location.href = window.location.pathname; // 清洗完畢，重新載入乾淨畫面
-            }, 500);
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
     <!-- 引入外部套件 -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
