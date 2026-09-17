@@ -94,11 +94,15 @@
         
         .sortable-ghost { opacity: 0.4; background-color: rgba(0,0,0,0.03) !important; border-radius: 12px; } body.dark-mode .sortable-ghost { background-color: rgba(255,255,255,0.05) !important; }
         .sortable-drag { background-color: var(--glass-bg) !important; backdrop-filter: blur(20px); box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important; transform: scale(1.02); z-index: 1000; border-radius: 16px; border: 1px solid var(--glass-border); } body.dark-mode .sortable-drag { background-color: #18181b !important; }
-        #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 20px !important; }
+        
+        /* 🌟 調整左側縮排，給實體把手足夠的空間 */
+        #itinerary-days-container .timeline-item, #transport-text-list .timeline-item, #shopping-list .timeline-item, #booking-list .timeline-item, .person-todo-list .timeline-item { padding-left: 28px !important; }
         
         /* 🌟 隱藏舊的假圖案，換成可觸控的實體把手 */
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before, .sub-item::before { display: none !important; }
-        .drag-handle { position: absolute; left: 0px; top: 18px; transform: translateY(-50%); color: #d4d4d8; font-size: 13px; letter-spacing: -1.5px; cursor: grab; padding: 10px 8px 10px 0px; z-index: 20; touch-action: none; }
+        
+        /* 🌟 終極把手：防反白選字 (-webkit-user-select) + 巨大觸控區 (padding) */
+        .drag-handle { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); color: #a1a1aa; font-size: 16px; letter-spacing: -2px; cursor: grab; padding: 20px 12px 20px 0px; z-index: 20; touch-action: none; -webkit-user-select: none; user-select: none; }
         body.dark-mode .drag-handle { color: #52525b; }
         .drag-handle:active { cursor: grabbing; }
         
@@ -166,7 +170,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
         .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 28px; box-sizing: border-box; }
-        .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 16px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid #71717a; transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
+        .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 24px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid #71717a; transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: #a1a1aa;}
         .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
         body.dark-mode .sub-item::before { color: #52525b; }
@@ -1701,7 +1705,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             if (daysContainer) {
                 window.sortableInstances.push(new Sortable(daysContainer, {
                     animation: 150, handle: '.section-title', disabled: !isEditMode, 
-                    delay: 200, delayOnTouchOnly: true, 
+                    delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5,
                     onEnd: function() { updateDayTabs(); saveData(); }
                 }));
             }
@@ -1709,11 +1713,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, {
                     animation: 150, 
-                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳
-                    filter: '.action-box, .btn-nav, .add-btn, .todo-category-header, input, select, textarea, .editable', // 🌟 擴大防護網，保護所有按鈕
-                    preventOnFilter: false, // 🌟 絕對不要吃掉按鈕的點擊事件！
+                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳，不設 filter 讓點擊事件回歸正常
                     disabled: !isEditMode, 
-                    delay: 50, delayOnTouchOnly: true,
+                    delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5, // 🌟 容許手指微小抖動，拯救 iPhone 拖曳
                     onEnd: function(evt) {
                         let card = evt.item.closest('.day-card');
                         if (card) recalculateDayTime(card);
@@ -1726,13 +1728,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 window.sortableInstances.push(new Sortable(container, { 
                     animation: 150, disabled: !isEditMode, 
                     handle: '.drag-handle',
-                    filter: '.action-box, .btn-nav, input, select, textarea, .editable', // 🌟 防護網：確保刪除鍵(X)不會被拖曳系統吃掉
-                    preventOnFilter: false, // 🌟 解除封印！
-                    delay: 50, delayOnTouchOnly: true,
+                    delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5,
                     onEnd: function() { saveData(); } 
                 }));
             });
-        }        // 4. 記帳功能 (付款人管理)
+        }        }        // 4. 記帳功能 (付款人管理)
         function renderPayerTags() {
             let container = document.getElementById('payer-tags-container');
             if (!container) return;
