@@ -1924,9 +1924,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     onEnd: function() { saveData(); } 
                 }));
             });
-        }
-    console.log('✅ initSortable 完成，共建立', window.sortableInstances.length, '個拖曳實例，disabled =', !isEditMode);
-}               
+            
+            // 👇 確保這行放在最後一個大括號的「裡面」
+            console.log('✅ initSortable 完成，共建立', window.sortableInstances.length, '個拖曳實例，disabled =', !isEditMode);
+        } 
+        // 👆 整個 initSortable 函式到這裡結束（不要有額外的大括號）               
 
 // 4. 記帳功能 (付款人管理)
         function renderPayerTags() {
