@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
     <!-- 引入外部套件 -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
@@ -105,50 +105,9 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before, .sub-item::before { display: none !important; }
         
         /* 🌟 終極把手：防反白選字 (-webkit-user-select) + 巨大觸控區 (padding) */
-        .drag-handle,
-.sub-drag-handle {
-    position: absolute;
-    left: 0;
-    top: 50%;
-
-    width: 34px;
-    height: 56px;
-
-    transform: translateY(-50%);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: #a1a1aa;
-    font-size: 16px;
-    letter-spacing: -2px;
-
-    cursor: grab;
-
-    z-index: 999;
-
-    touch-action: none !important;
-
-    -webkit-user-select: none !important;
-    user-select: none !important;
-
-    -webkit-touch-callout: none !important;
-
-    -webkit-tap-highlight-color: transparent;
-
-    -webkit-user-drag: none;
-}
-
-body.dark-mode .drag-handle,
-body.dark-mode .sub-drag-handle {
-    color: #71717a;
-}
-
-.drag-handle:active,
-.sub-drag-handle:active {
-    cursor: grabbing;
-}
+        .drag-handle, .sub-drag-handle { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); color: #a1a1aa; font-size: 16px; letter-spacing: -2px; cursor: grab; padding: 20px 12px 20px 0px; z-index: 20; touch-action: none; -webkit-user-select: none; user-select: none; }
+body.dark-mode .drag-handle, body.dark-mode .sub-drag-handle { color: #52525b; }
+.drag-handle:active, .sub-drag-handle:active { cursor: grabbing; }
         
         /* 🌟 左側：時間區塊 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
@@ -1752,490 +1711,72 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         }
 
 // 3. 拖曳排序初始化 (Sortable.js)
-function initSortable() {
+        function initSortable() {
+            if (typeof Sortable === 'undefined') return;
+            window.sortableInstances.forEach(s => s.destroy());
+            window.sortableInstances = [];
 
-    // =====================================================
-    // 0. 確認 Sortable.js 是否正常載入
-    // =====================================================
+            // 🌟 動態幫舊有項目補上「實體拖曳把手」
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                if (!item.querySelector('.drag-handle')) {
+                    let handle = document.createElement('div');
+                    handle.className = 'drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    item.insertBefore(handle, item.firstChild); // 確保把手插在最前面
+                }
+            });
+            document.querySelectorAll('.sub-item').forEach(item => {
+                let oldHandle = item.querySelector('.drag-handle');
+                if (oldHandle) {
+                    oldHandle.className = 'sub-drag-handle'; 
+                } else if (!item.querySelector('.sub-drag-handle')) {
+                    let handle = document.createElement('div');
+                    handle.className = 'sub-drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    item.insertBefore(handle, item.firstChild); 
+                }
+            });
 
-    if (typeof Sortable === 'undefined') {
-        console.error('❌ Sortable.js 尚未載入');
-        return;
-    }
-
-
-    // =====================================================
-    // 1. 清除舊的 Sortable
-    // =====================================================
-
-    if (!Array.isArray(window.sortableInstances)) {
-        window.sortableInstances = [];
-    }
-
-    window.sortableInstances.forEach(function (s) {
-        try {
-            if (s) {
-                s.destroy();
+            // 🌟 1. 天數大卡片排序
+            let daysContainer = document.getElementById('itinerary-days-container');
+            if (daysContainer) {
+                window.sortableInstances.push(new Sortable(daysContainer, {
+                    animation: 150, 
+                    handle: '.section-title', // 抓取標題列拖曳
+                    disabled: !isEditMode, 
+                    // 移除 delay！有明確把手，電腦與手機都會瞬間流暢拖曳
+                    onEnd: function() { updateDayTabs(); saveData(); }
+                }));
             }
-        } catch (e) {
-            console.warn('⚠️ Sortable destroy 失敗：', e);
-        }
-    });
 
-    window.sortableInstances = [];
-
-
-    // =====================================================
-    // 2. 動態補上「行程拖曳把手」
-    // =====================================================
-
-    document.querySelectorAll('.timeline-item').forEach(function (item) {
-
-        if (!item.querySelector('.drag-handle')) {
-
-            const handle = document.createElement('div');
-
-            handle.className = 'drag-handle';
-
-            handle.innerHTML = '⋮⋮';
-
-            handle.setAttribute(
-                'aria-label',
-                '拖曳行程'
-            );
-
-            item.insertBefore(
-                handle,
-                item.firstChild
-            );
-        }
-    });
-
-
-    // =====================================================
-    // 3. 動態補上「子項目拖曳把手」
-    // =====================================================
-
-    document.querySelectorAll('.sub-item').forEach(function (item) {
-
-        // 舊版如果存在 .drag-handle
-        const oldHandle =
-            item.querySelector('.drag-handle');
-
-        if (oldHandle) {
-            oldHandle.className =
-                'sub-drag-handle';
-        }
-
-
-        // 如果沒有子項目拖曳把手
-        if (!item.querySelector('.sub-drag-handle')) {
-
-            const handle =
-                document.createElement('div');
-
-            handle.className =
-                'sub-drag-handle';
-
-            handle.innerHTML = '⋮⋮';
-
-            handle.setAttribute(
-                'aria-label',
-                '拖曳子地點'
-            );
-
-            item.insertBefore(
-                handle,
-                item.firstChild
-            );
-        }
-    });
-
-
-    // =====================================================
-    // 4. 共用拖曳設定
-    // =====================================================
-
-    const commonOptions = {
-
-        // 拖曳動畫
-        animation: 180,
-
-        // ★★★★★
-        // 不使用瀏覽器原生 HTML5 Drag
-        // 改由 Sortable.js 接管
-        forceFallback: true,
-
-        // 手機拖曳容錯
-        fallbackTolerance: 5,
-
-        // Fallback 拖曳元素放到 body
-        fallbackOnBody: true,
-
-        // 拖曳中的 CSS class
-        dragClass: 'sortable-drag',
-
-        // 原位置佔位 CSS class
-        ghostClass: 'sortable-ghost',
-
-        // 被選取的 CSS class
-        chosenClass: 'sortable-chosen',
-
-        // 手機長按 150ms 後開始拖曳
-        delay: 150,
-
-        // 只有手機觸控才套用 delay
-        delayOnTouchOnly: true,
-
-        // 手指稍微晃動 6px 以內仍視為拖曳
-        touchStartThreshold: 6,
-
-        // 保留原本的「解鎖才能拖曳」
-        disabled: !isEditMode
-    };
-
-
-    // =====================================================
-    // 5. Day 大卡片排序
-    // =====================================================
-
-    const daysContainer =
-        document.getElementById(
-            'itinerary-days-container'
-        );
-
-
-    if (daysContainer) {
-
-        const daySortable =
-            new Sortable(
-                daysContainer,
-                {
-
-                    ...commonOptions,
-
-                    // 只能拖曳 Day 卡片
-                    draggable: '.day-card',
-
-                    // 從標題拖曳
-                    handle: '.section-title',
-
-
-                    // -------------------------------------
-                    // 開始拖曳
-                    // -------------------------------------
-
-                    onStart: function () {
-
-                        document.body.classList.add(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            true;
-
-                        console.log(
-                            '🟢 開始拖曳 Day'
-                        );
-                    },
-
-
-                    // -------------------------------------
-                    // 拖曳完成
-                    // -------------------------------------
-
-                    onEnd: function () {
-
-                        document.body.classList.remove(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            false;
-
-                        console.log(
-                            '🔵 Day 拖曳完成'
-                        );
-
-
-                        if (
-                            typeof updateDayTabs ===
-                            'function'
-                        ) {
-                            updateDayTabs();
-                        }
-
-
-                        if (
-                            typeof saveData ===
-                            'function'
-                        ) {
-                            saveData();
-                        }
-                    },
-
-
-                    // -------------------------------------
-                    // 取消拖曳
-                    // -------------------------------------
-
-                    onCancel: function () {
-
-                        document.body.classList.remove(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            false;
+            // 🌟 2. 內部項目排序 (主行程、交通、購物等)
+            document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
+                window.sortableInstances.push(new Sortable(container, {
+                    animation: 150, 
+                    draggable: '.timeline-item', 
+                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳
+                    disabled: !isEditMode, 
+                    // 移除 delay！直接拖曳不卡頓
+                    onEnd: function(evt) {
+                        let card = evt.item.closest('.day-card');
+                        if (card) recalculateDayTime(card);
+                        saveData();
                     }
-                }
-            );
+                }));
+            });
 
-
-        window.sortableInstances.push(
-            daySortable
-        );
-    }
-
-
-    // =====================================================
-    // 6. 行程項目排序
-    // =====================================================
-
-    document.querySelectorAll(
-        '.day-card,' +
-        ' #transport-text-list,' +
-        ' #shopping-list,' +
-        ' #booking-list,' +
-        ' .person-todo-list'
-    ).forEach(function (container) {
-
-
-        const itemSortable =
-            new Sortable(
-                container,
-                {
-
-                    ...commonOptions,
-
-                    // ★ 只有 timeline-item 可以拖
-                    draggable: '.timeline-item',
-
-                    // ★ 只能從 ⋮⋮ 拖
-                    handle: '.drag-handle',
-
-
-                    // 不允許跨區拖曳
-                    group: {
-                        name: 'itinerary-items',
-                        pull: false,
-                        put: false
-                    },
-
-
-                    // -------------------------------------
-                    // 開始拖曳
-                    // -------------------------------------
-
-                    onStart: function (evt) {
-
-                        document.body.classList.add(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            true;
-
-                        console.log(
-                            '🟢 開始拖曳行程',
-                            evt.item
-                        );
-                    },
-
-
-                    // -------------------------------------
-                    // 拖曳完成
-                    // -------------------------------------
-
-                    onEnd: function (evt) {
-
-                        document.body.classList.remove(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            false;
-
-                        console.log(
-                            '🔵 行程拖曳完成'
-                        );
-
-
-                        // 找到目前所在 Day
-                        const card =
-                            evt.item.closest(
-                                '.day-card'
-                            );
-
-
-                        // 重新計算時間
-                        if (
-                            card &&
-                            typeof recalculateDayTime ===
-                            'function'
-                        ) {
-
-                            recalculateDayTime(
-                                card
-                            );
-                        }
-
-
-                        // 儲存資料
-                        if (
-                            typeof saveData ===
-                            'function'
-                        ) {
-
-                            saveData();
-                        }
-                    },
-
-
-                    // -------------------------------------
-                    // 取消拖曳
-                    // -------------------------------------
-
-                    onCancel: function () {
-
-                        document.body.classList.remove(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            false;
-                    }
-                }
-            );
-
-
-        window.sortableInstances.push(
-            itemSortable
-        );
-    });
-
-
-    // =====================================================
-    // 7. 子項目排序
-    // =====================================================
-
-    document.querySelectorAll(
-        '.sub-items-container'
-    ).forEach(function (container) {
-
-
-        const subSortable =
-            new Sortable(
-                container,
-                {
-
-                    ...commonOptions,
-
-                    // 只能拖曳 sub-item
+            // 🌟 3. 子項目排序
+            document.querySelectorAll('.sub-items-container').forEach(container => {
+                window.sortableInstances.push(new Sortable(container, { 
+                    animation: 150, 
                     draggable: '.sub-item',
-
-                    // 只能從子項目拖曳把手開始
                     handle: '.sub-drag-handle',
-
-
-                    // 不允許跨容器拖曳
-                    group: {
-                        name: 'sub-items',
-                        pull: false,
-                        put: false
-                    },
-
-
-                    // -------------------------------------
-                    // 開始拖曳
-                    // -------------------------------------
-
-                    onStart: function () {
-
-                        document.body.classList.add(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            true;
-
-                        console.log(
-                            '🟢 開始拖曳子地點'
-                        );
-                    },
-
-
-                    // -------------------------------------
-                    // 拖曳完成
-                    // -------------------------------------
-
-                    onEnd: function () {
-
-                        document.body.classList.remove(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            false;
-
-                        console.log(
-                            '🔵 子地點拖曳完成'
-                        );
-
-
-                        if (
-                            typeof saveData ===
-                            'function'
-                        ) {
-
-                            saveData();
-                        }
-                    },
-
-
-                    // -------------------------------------
-                    // 取消拖曳
-                    // -------------------------------------
-
-                    onCancel: function () {
-
-                        document.body.classList.remove(
-                            'is-dragging'
-                        );
-
-                        window.isSortableDragging =
-                            false;
-                    }
-                }
-            );
-
-
-        window.sortableInstances.push(
-            subSortable
-        );
-    });
-
-
-    // =====================================================
-    // 8. 初始化完成
-    // =====================================================
-
-    console.log(
-        '✅ Sortable 初始化完成，共建立 ' +
-        window.sortableInstances.length +
-        ' 個拖曳區域'
-    );
-}                
+                    disabled: !isEditMode, 
+                    // 移除 delay！直接拖曳不卡頓
+                    onEnd: function() { saveData(); } 
+                }));
+            });
+        }               
 
 // 4. 記帳功能 (付款人管理)
         function renderPayerTags() {
@@ -2486,18 +2027,21 @@ function initSortable() {
         window.onload = loadData;
 // 🌟 處理核取方塊切換，並支援唯讀模式下的延遲存檔例外
         function toggleComplete(item, event) {
-            // 🌟 核心防護 1：防禦 iOS 行內事件傳遞失效的問題
+            // 🌟 核心防護 1：抓取真實點擊事件，如果系統漏發事件，寧可不動作也不要誤判
             let e = event || window.event;
             if (!e) return; 
-            
-            // 🌟 核心防護 2：嚴格檢查點擊的源頭是不是圈圈，不是的話一律無效！
-            let target = e.target;
-            let isCheckbox = target.closest('.checkbox-wrapper') || target.classList.contains('custom-checkbox');
-            
+
+            // 🌟 核心防護 2：鎖定點擊的「最底層元素」
+            let target = e.target || e.srcElement;
+            if (!target) return;
+
+            // 🌟 核心防護 3：嚴格比對，只有精準點在「圈圈」或「圈圈外框」才放行
+            let isCheckbox = target.classList.contains('custom-checkbox') || target.closest('.checkbox-wrapper');
             if (!isCheckbox) {
-                return; // 點擊到空白處、文字、按鈕等，直接中斷，絕對不打勾！
+                return; // 點到空白處、文字、按鈕等，一律直接中斷！絕對不打勾！
             }
             
+            // 通過層層安檢，執行打勾
             item.classList.toggle('completed');
             
             // 延遲存檔：讓使用者能快速連續打勾，3秒後再一次性背景儲存
@@ -2511,8 +2055,7 @@ function initSortable() {
                     }
                 }
             }, 3000);
-        }
-        // 🌟 專為唯讀模式設計的背景無感存檔
+        }        // 🌟 專為唯讀模式設計的背景無感存檔
         function forceSaveCheckboxState() {
             // 如果是分享出去的純唯讀網址 (帶有 readonly 參數) 則完全不存檔
             if (new URLSearchParams(window.location.search).get('readonly')) return; 
