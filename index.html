@@ -1842,86 +1842,89 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         }
 
 // 3. 拖曳排序初始化 (Sortable.js)
-       function initSortable() {
-    if (typeof Sortable === 'undefined') { console.warn('⚠️ Sortable.js 尚未載入成功，拖曳功能無法啟用（請檢查網路連線或 CDN 是否被擋）'); return; }
-    console.log('🔧 initSortable 執行中，isEditMode =', isEditMode);
-    window.sortableInstances.forEach(s => s.destroy());
-    window.sortableInstances = [];
+        function initSortable() {
+            if (typeof Sortable === 'undefined') { console.warn('⚠️ Sortable.js 尚未載入成功，拖曳功能無法啟用（請檢查網路連線或 CDN 是否被擋）'); return; }
+            
+            window.sortableInstances.forEach(s => s.destroy());
+            window.sortableInstances = [];
 
-    // 🌟 1. 動態幫「天數卡片」與「行程項目」補上實體拖曳把手
-    document.querySelectorAll('.day-card').forEach(card => {
-        let flexHeader = card.querySelector('.flex-between');
-        if (flexHeader && !flexHeader.querySelector('.day-drag-handle')) {
-            let handle = document.createElement('span');
-            handle.className = 'material-icons-round day-drag-handle';
-            handle.innerHTML = 'drag_indicator';
-            // 確保把手有足夠觸控範圍且不會反白
-            handle.style.cssText = 'color:var(--text-muted); cursor:grab; font-size:20px; touch-action:none; padding:8px 8px 8px 0; user-select:none; -webkit-user-select:none;';
-            flexHeader.insertBefore(handle, flexHeader.firstChild);
-        }
-    });
+            // 1. 動態幫「天數卡片」與「行程項目」補上實體拖曳把手
+            document.querySelectorAll('.day-card').forEach(card => {
+                let flexHeader = card.querySelector('.flex-between');
+                if (flexHeader && !flexHeader.querySelector('.day-drag-handle')) {
+                    let handle = document.createElement('span');
+                    handle.className = 'material-icons-round day-drag-handle';
+                    handle.innerHTML = 'drag_indicator';
+                    handle.style.cssText = 'color:var(--text-muted); cursor:grab; font-size:20px; touch-action:none; padding:8px 8px 8px 0; user-select:none; -webkit-user-select:none;';
+                    flexHeader.insertBefore(handle, flexHeader.firstChild);
+                }
+            });
 
-    document.querySelectorAll('.timeline-item').forEach(item => {
-        if (!item.querySelector('.drag-handle')) {
-            let handle = document.createElement('div');
-            handle.className = 'drag-handle';
-            handle.innerHTML = '⋮⋮';
-            item.insertBefore(handle, item.firstChild); 
-        }
-    });
-    document.querySelectorAll('.sub-item').forEach(item => {
-        let oldHandle = item.querySelector('.drag-handle');
-        if (oldHandle) oldHandle.className = 'sub-drag-handle'; 
-        else if (!item.querySelector('.sub-drag-handle')) {
-            let handle = document.createElement('div');
-            handle.className = 'sub-drag-handle';
-            handle.innerHTML = '⋮⋮';
-            item.insertBefore(handle, item.firstChild); 
-        }
-    });
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                if (!item.querySelector('.drag-handle')) {
+                    let handle = document.createElement('div');
+                    handle.className = 'drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    item.insertBefore(handle, item.firstChild); 
+                }
+            });
+            document.querySelectorAll('.sub-item').forEach(item => {
+                let oldHandle = item.querySelector('.drag-handle');
+                if (oldHandle) oldHandle.className = 'sub-drag-handle'; 
+                else if (!item.querySelector('.sub-drag-handle')) {
+                    let handle = document.createElement('div');
+                    handle.className = 'sub-drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    item.insertBefore(handle, item.firstChild); 
+                }
+            });
 
-    // 🌟 2. 天數大卡片排序 (補上 forceFallback 與新把手)
-    let daysContainer = document.getElementById('itinerary-days-container');
-    if (daysContainer) {
-        window.sortableInstances.push(new Sortable(daysContainer, {
-            animation: 150, 
-            handle: '.day-drag-handle', // 改用獨立把手，避開 contenteditable
-            disabled: !isEditMode, 
-            forceFallback: true, // 🚨 手機端瞬間拖曳核心
-            fallbackClass: "sortable-drag",
-            onEnd: function() { updateDayTabs(); saveData(); }
-        }));
-    }
-
-    // 🌟 3. 內部項目排序 (補上 forceFallback)
-    document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
-        window.sortableInstances.push(new Sortable(container, {
-            animation: 150, 
-            draggable: '.timeline-item', 
-            handle: '.drag-handle', 
-            disabled: !isEditMode, 
-            forceFallback: true, // 🚨 手機端瞬間拖曳核心
-            fallbackClass: "sortable-drag",
-            onEnd: function(evt) {
-                let card = evt.item.closest('.day-card');
-                if (card) recalculateDayTime(card);
-                saveData();
+            // 🌟 2. 天數大卡片排序
+            let daysContainer = document.getElementById('itinerary-days-container');
+            if (daysContainer) {
+                window.sortableInstances.push(new Sortable(daysContainer, {
+                    animation: 150, 
+                    handle: '.day-drag-handle',
+                    disabled: !isEditMode, 
+                    forceFallback: true,
+                    fallbackClass: "sortable-drag",
+                    fallbackOnBody: true, // 🚨 關鍵修正：讓拖曳卡片附著在最上層，解決座標分離問題！
+                    onEnd: function() { updateDayTabs(); saveData(); }
+                }));
             }
-        }));
-    });
 
-    // 🌟 4. 子項目排序 (補上 forceFallback)
-    document.querySelectorAll('.sub-items-container').forEach(container => {
-        window.sortableInstances.push(new Sortable(container, { 
-            animation: 150, 
-            draggable: '.sub-item',
-            handle: '.sub-drag-handle',
-            disabled: !isEditMode, 
-            forceFallback: true, // 🚨 手機端瞬間拖曳核心
-            fallbackClass: "sortable-drag",
-            onEnd: function() { saveData(); } 
-        }));
-    });
+            // 🌟 3. 內部項目排序
+            document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
+                window.sortableInstances.push(new Sortable(container, {
+                    animation: 150, 
+                    draggable: '.timeline-item', 
+                    handle: '.drag-handle', 
+                    disabled: !isEditMode, 
+                    forceFallback: true,
+                    fallbackClass: "sortable-drag",
+                    fallbackOnBody: true, // 🚨 關鍵修正：讓拖曳卡片附著在最上層，解決座標分離問題！
+                    onEnd: function(evt) {
+                        let card = evt.item.closest('.day-card');
+                        if (card) recalculateDayTime(card);
+                        saveData();
+                    }
+                }));
+            });
+
+            // 🌟 4. 子項目排序
+            document.querySelectorAll('.sub-items-container').forEach(container => {
+                window.sortableInstances.push(new Sortable(container, { 
+                    animation: 150, 
+                    draggable: '.sub-item',
+                    handle: '.sub-drag-handle',
+                    disabled: !isEditMode, 
+                    forceFallback: true,
+                    fallbackClass: "sortable-drag",
+                    fallbackOnBody: true, // 🚨 關鍵修正：讓拖曳卡片附著在最上層，解決座標分離問題！
+                    onEnd: function() { saveData(); } 
+                }));
+            });
+        }
     console.log('✅ initSortable 完成，共建立', window.sortableInstances.length, '個拖曳實例，disabled =', !isEditMode);
 }               
 
