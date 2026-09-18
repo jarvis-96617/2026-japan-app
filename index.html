@@ -201,7 +201,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .tab-content { display: none; animation: fadeIn 0.3s var(--spring); position: relative; } .tab-content.active { display: block; } @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
         /* 🌟 唯讀保護模式專屬樣式 (排除解鎖密碼框) */
-        body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer, 
+       /* 🌟 唯讀保護模式專屬樣式 (隱藏編輯按鈕與拖曳把手) */
+        body.view-mode-active .drag-handle, body.view-mode-active .sub-drag-handle, 
+        body.view-mode-active .add-btn, body.view-mode-active .delete-btn, body.view-mode-active .resizer,
         body.view-mode-active .cat-action-icon, body.view-mode-active .img-add-badge, body.view-mode-active .img-delete-badge, 
         body.view-mode-active .add-sub-btn, body.view-mode-active .edit-only-btn, body.view-mode-active .receipt-box,
         body.view-mode-active .action-box.delete-box, body.view-mode-active .action-box.photo-box:not(.has-photo), 
@@ -1708,13 +1710,75 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             saveData();
         }
 
-function initSortable() {
+// 3. 拖曳排序初始化 (Sortable.js)
+        function initSortable() {
+            if (typeof Sortable === 'undefined') return;
+            window.sortableInstances.forEach(s => s.destroy());
+            window.sortableInstances = [];
 
+            // 🌟 動態幫舊有項目補上「實體拖曳把手」
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                if (!item.querySelector('.drag-handle')) {
+                    let handle = document.createElement('div');
+                    handle.className = 'drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    item.insertBefore(handle, item.firstChild); // 確保把手插在最前面
+                }
+            });
+            document.querySelectorAll('.sub-item').forEach(item => {
+                let oldHandle = item.querySelector('.drag-handle');
+                if (oldHandle) {
+                    oldHandle.className = 'sub-drag-handle'; 
+                } else if (!item.querySelector('.sub-drag-handle')) {
+                    let handle = document.createElement('div');
+                    handle.className = 'sub-drag-handle';
+                    handle.innerHTML = '⋮⋮';
+                    item.insertBefore(handle, item.firstChild); 
+                }
+            });
+
+            // 🌟 1. 天數大卡片排序 (用標題當作把手)
+            let daysContainer = document.getElementById('itinerary-days-container');
+            if (daysContainer) {
+                window.sortableInstances.push(new Sortable(daysContainer, {
+                    animation: 150, 
+                    handle: '.section-title', 
+                    disabled: !isEditMode, 
+                    delay: 200, 
+                    delayOnTouchOnly: true, // 🌟 電腦滑鼠免等待，手機觸控才延遲防誤觸
+                    touchStartThreshold: 5, // 🌟 允許手指微晃 5px 不會中斷拖曳
+                    onEnd: function() { updateDayTabs(); saveData(); }
+                }));
+            }
+
+            // 🌟 2. 內部項目排序 (嚴格規定只能抓取 ⋮⋮ 把手)
+            document.querySelectorAll('.day-card, #transport-text-list, #shopping-list, #booking-list, .person-todo-list').forEach(container => {
+                window.sortableInstances.push(new Sortable(container, {
+                    animation: 150, 
+                    draggable: '.timeline-item', 
+                    handle: '.drag-handle', // 🌟 指定只能抓取把手拖曳
+                    disabled: !isEditMode, 
+                    delay: 200, 
+                    delayOnTouchOnly: true, // 🌟 電腦版神速拖曳，手機版防護拖曳
+                    touchStartThreshold: 5, 
+                    onEnd: function(evt) {
+                        let card = evt.item.closest('.day-card');
+                        if (card) recalculateDayTime(card);
+                        saveData();
+                    }
+                }));
+            });
+
+            // 🌟 3. 子項目排序
             document.querySelectorAll('.sub-items-container').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, { 
-                    animation: 150, disabled: !isEditMode, 
+                    animation: 150, 
+                    draggable: '.sub-item',
                     handle: '.sub-drag-handle',
-                    delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5,
+                    disabled: !isEditMode, 
+                    delay: 200, 
+                    delayOnTouchOnly: true,
+                    touchStartThreshold: 5,
                     onEnd: function() { saveData(); } 
                 }));
             });
