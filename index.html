@@ -252,6 +252,13 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .pwd-btn:active { transform: scale(0.92); }
         @keyframes shake-anim { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
         .shake-err { animation: shake-anim 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        /* 🌟 針對 iOS Safari 的圖示強制渲染咒語 */
+        .material-icons-round {
+            font-family: 'Material Icons Round' !important;
+            font-feature-settings: 'liga' !important;
+            -webkit-font-feature-settings: 'liga' !important;
+        }
     </style>
 </head>
 <body>
