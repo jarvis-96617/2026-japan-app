@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
     <!-- 引入外部套件 -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
@@ -1722,7 +1722,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
 // 3. 拖曳排序初始化 (Sortable.js)
        function initSortable() {
-    if (typeof Sortable === 'undefined') return;
+    if (typeof Sortable === 'undefined') { console.warn('⚠️ Sortable.js 尚未載入成功，拖曳功能無法啟用（請檢查網路連線或 CDN 是否被擋）'); return; }
+    console.log('🔧 initSortable 執行中，isEditMode =', isEditMode);
     window.sortableInstances.forEach(s => s.destroy());
     window.sortableInstances = [];
 
@@ -1800,6 +1801,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             onEnd: function() { saveData(); } 
         }));
     });
+    console.log('✅ initSortable 完成，共建立', window.sortableInstances.length, '個拖曳實例，disabled =', !isEditMode);
 }               
 
 // 4. 記帳功能 (付款人管理)
