@@ -105,9 +105,50 @@
         #itinerary-days-container .timeline-item::before, #transport-text-list .timeline-item::before, #shopping-list .timeline-item::before, #booking-list .timeline-item::before, .person-todo-list .timeline-item::before, .sub-item::before { display: none !important; }
         
         /* 🌟 終極把手：防反白選字 (-webkit-user-select) + 巨大觸控區 (padding) */
-        .drag-handle, .sub-drag-handle { position: absolute; left: 2px; top: 50%; transform: translateY(-50%); color: #a1a1aa; font-size: 16px; letter-spacing: -2px; cursor: grab; padding: 20px 12px 20px 0px; z-index: 20; touch-action: none; -webkit-user-select: none; user-select: none; }
-body.dark-mode .drag-handle, body.dark-mode .sub-drag-handle { color: #52525b; }
-.drag-handle:active, .sub-drag-handle:active { cursor: grabbing; }
+        .drag-handle,
+.sub-drag-handle {
+    position: absolute;
+    left: 0;
+    top: 50%;
+
+    width: 34px;
+    height: 56px;
+
+    transform: translateY(-50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #a1a1aa;
+    font-size: 16px;
+    letter-spacing: -2px;
+
+    cursor: grab;
+
+    z-index: 999;
+
+    touch-action: none !important;
+
+    -webkit-user-select: none !important;
+    user-select: none !important;
+
+    -webkit-touch-callout: none !important;
+
+    -webkit-tap-highlight-color: transparent;
+
+    -webkit-user-drag: none;
+}
+
+body.dark-mode .drag-handle,
+body.dark-mode .sub-drag-handle {
+    color: #71717a;
+}
+
+.drag-handle:active,
+.sub-drag-handle:active {
+    cursor: grabbing;
+}
         
         /* 🌟 左側：時間區塊 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
