@@ -361,7 +361,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         document.addEventListener('focusout', function(e) {
             if (!isEditMode) return;
             if (e.target.classList.contains('editable') || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
-                if (e.target.classList.contains('duration') || e.target.classList.contains('start-time') || e.target.classList.contains('travel-time')) {
+                // 👇 這裡補上了 gap-mins，讓空檔時間也能觸發重算
+                if (e.target.classList.contains('duration') || e.target.classList.contains('start-time') || e.target.classList.contains('travel-time') || e.target.classList.contains('gap-mins')) {
                     let card = e.target.closest('.day-card');
                     if (card) recalculateDayTime(card);
                 }
@@ -1684,7 +1685,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         // 🌟 以下為遺失的記帳、待辦、時間計算核心功能
         // ==========================================
 
-        // 1. 行程時間自動計算
+        // 1. 行程時間自動計算 (支援預計時間與空檔推演)
         function recalculateDayTime(card) {
             if (!card) return;
             let items = card.querySelectorAll('.timeline-item');
@@ -1692,11 +1693,15 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
             let currentMins = 0;
             items.forEach((item, index) => {
+                let timeCol = item.querySelector('.time-column');
+                if (!timeCol) return;
+
                 let startEl = item.querySelector('.start-time');
                 let endEl = item.querySelector('.end-time');
                 let durEl = item.querySelector('.duration');
                 let travelEl = item.querySelector('.travel-time');
 
+                // 1. 計算開始時間
                 if (index === 0 && startEl) {
                     let match = startEl.innerText.match(/(\d{1,2}):(\d{2})/);
                     if (match) currentMins = parseInt(match[1]) * 60 + parseInt(match[2]);
@@ -1707,9 +1712,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     startEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                 }
 
+                // 2. 計算結束時間
                 let durMins = durEl ? parseMins(durEl.innerText) : 0;
-                let travelMins = travelEl ? parseMins(travelEl.innerText) : 0;
-
                 let endMins = currentMins + durMins;
                 if (endEl) {
                     let h = Math.floor(endMins / 60) % 24;
@@ -1717,7 +1721,60 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     endEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                 }
 
-                currentMins = endMins + travelMins;
+                // 3. 預計時間與空檔推演
+                let hasTravel = !!item.querySelector('.travel-time-wrap');
+                let autoStartEl = item.querySelector('.auto-start');
+                let gapTextEl = item.querySelector('.gap-text');
+
+                // 清理舊資料手動打的純文字 (避免重疊)
+                Array.from(timeCol.childNodes).forEach(node => {
+                    if (node.nodeType === 3) {
+                        let text = node.nodeValue.trim();
+                        if (text.includes('預計') || text.includes('隔')) {
+                            node.nodeValue = ''; 
+                        }
+                    }
+                });
+
+                if (hasTravel) {
+                    let travelMins = travelEl ? parseMins(travelEl.innerText) : 0;
+                    let expectedMins = endMins + travelMins;
+
+                    // 產生或更新「預計時間」
+                    if (!autoStartEl) {
+                        autoStartEl = document.createElement('div');
+                        autoStartEl.className = 'auto-start';
+                        timeCol.appendChild(autoStartEl);
+                    }
+                    autoStartEl.style.display = 'block';
+                    let eh = Math.floor(expectedMins / 60) % 24;
+                    let em = expectedMins % 60;
+                    autoStartEl.innerText = `預計 ${eh.toString().padStart(2, '0')}:${em.toString().padStart(2, '0')}`;
+
+                    // 產生或更新「間隔時間」(最後一項則隱藏)
+                    if (index === items.length - 1) {
+                        if (gapTextEl) gapTextEl.style.display = 'none';
+                        currentMins = expectedMins;
+                    } else {
+                        if (!gapTextEl) {
+                            gapTextEl = document.createElement('div');
+                            gapTextEl.className = 'gap-text';
+                            gapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">0分</span>`;
+                            timeCol.appendChild(gapTextEl);
+                        }
+                        gapTextEl.style.display = 'inline-block';
+                        let gapMinsEl = gapTextEl.querySelector('.gap-mins');
+                        let gapMins = gapMinsEl ? parseMins(gapMinsEl.innerText) : 0;
+                        if (gapMinsEl) gapMinsEl.innerText = formatMins(gapMins);
+                        
+                        // 🌟 核心：將空檔時間加入，讓下一個行程自動往後推延！
+                        currentMins = expectedMins + gapMins; 
+                    }
+                } else {
+                    if (autoStartEl) autoStartEl.style.display = 'none';
+                    if (gapTextEl) gapTextEl.style.display = 'none';
+                    currentMins = endMins;
+                }
             });
         }
 
