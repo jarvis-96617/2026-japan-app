@@ -417,8 +417,18 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             if(tabId === 'tab-itinerary') adjustStickyTabs(); 
         }
 
-        function showToast(msg, isError = false) {
-            let el = document.getElementById('toast-msg');
+        // 🌟 補回遺失的函式：動態調整「Day 頁籤列」的黏性定位高度，
+        // 避免它在編輯模式切換／展開更多選項後跟上方控制列重疊
+        function adjustStickyTabs() {
+            const header = document.querySelector('.global-controls');
+            const tabsWrapper = document.querySelector('.day-tabs-wrapper');
+            if (header && tabsWrapper) {
+                const headerBottom = header.getBoundingClientRect().bottom;
+                tabsWrapper.style.top = Math.max(headerBottom, 0) + 'px';
+            }
+        }
+
+        function showToast(msg, isError = false) {            let el = document.getElementById('toast-msg');
             if(!el) {
                 el = document.createElement('div'); el.id = 'toast-msg';
                 el.style.cssText = `position:fixed; top:85px; left:50%; transform:translateX(-50%) scale(0.9); background:${isError ? 'rgba(220,38,38,0.95)' : 'rgba(39,39,42,0.9)'}; color:white; padding:10px 20px; border-radius:50px; font-size:12px; font-weight:800; z-index:10000; opacity:0; pointer-events:none; transition:all 0.3s var(--spring); box-shadow:0 8px 24px rgba(0,0,0,0.15); white-space:nowrap;`;
