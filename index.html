@@ -331,10 +331,12 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             if (!str) return 0;
             str = str.toString().replace(/\s/g, '').toLowerCase();
             if (str.includes('時') || str.includes('h') || str.includes(':')) {
-                if (/\d+\.\d+(?:時|h)/.test(str)) { return Math.round(parseFloat(str.match(/(\d+\.\d+)/)[1]) * 60); }
+                if (/\d+\.\d+(?:小時|時|h)/.test(str)) { return Math.round(parseFloat(str.match(/(\d+\.\d+)/)[1]) * 60); }
                 let h = 0, m = 0;
-                let hMatch = str.match(/(\d+)(?:時|h|:)/); if (hMatch) h = parseInt(hMatch[1]) || 0;
-                let mMatch = str.match(/(?:時|h|:)(\d+)/); if (mMatch) m = parseInt(mMatch[1]) || 0;
+                // 🌟 修正：「小時」中間的「小」字會擋住原本要求數字緊貼「時」的規則，
+                // 導致「1小時」「3小時56分」這類格式算出 0 分或漏掉小時。改成優先比對「小時」整組字。
+                let hMatch = str.match(/(\d+)(?:小時|時|h|:)/); if (hMatch) h = parseInt(hMatch[1]) || 0;
+                let mMatch = str.match(/(?:小時|時|h|:)(\d+)/); if (mMatch) m = parseInt(mMatch[1]) || 0;
                 return h * 60 + m;
             }
             let numMatch = str.match(/(\d+)/); return numMatch ? parseInt(numMatch[1]) : 0;
