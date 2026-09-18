@@ -96,11 +96,13 @@
         .completed .custom-checkbox::after { content: "check"; font-family: 'Material Icons Round'; color: white; font-size: 14px; font-weight: bold;}
         
         /* 請替換 index.html 原有的 .sortable-ghost 與 .sortable-drag 設定 */
+/* 🌟 將佔位符變成完全透明的「純空白空間」，消除視覺殘影 */
 .sortable-ghost { 
-    opacity: 0.4; background-color: rgba(0,0,0,0.03) !important; border-radius: 12px; 
-    transition: none !important; /* 🌟 補上這行，停止動畫干擾 */
+    opacity: 0 !important;  /* 🌟 改成 0，讓原地的殘影完全隱形 */
+    background: transparent !important;
+    transition: none !important; 
 } 
-body.dark-mode .sortable-ghost { background-color: rgba(255,255,255,0.05) !important; }
+body.dark-mode .sortable-ghost { background: transparent !important; }
 
 .sortable-drag { 
     background-color: var(--glass-bg) !important; backdrop-filter: blur(20px); box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important; transform: scale(1.02); z-index: 1000; border-radius: 16px; border: 1px solid var(--glass-border); 
