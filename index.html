@@ -259,6 +259,39 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             font-feature-settings: 'liga' !important;
             -webkit-font-feature-settings: 'liga' !important;
         }
+
+        /* 🌟 隱私防護：在分享或唯讀模式下，隱藏匯出 PDF 與下載備份按鈕 */
+        body.share-mode-active button[onclick="exportToPDF()"],
+        body.share-mode-active button[onclick="exportBackup()"],
+        body.readonly-mode-active button[onclick="exportToPDF()"],
+        body.readonly-mode-active button[onclick="exportBackup()"] { 
+            display: none !important; 
+        }
+
+        /* 🌟 PDF 匯出專屬排版 (自動展開所有分頁與天數) */
+        @media print {
+            /* 1. 解除捲動限制與深色模式背景 */
+            body, html { overflow: visible !important; height: auto !important; background: #fff !important; color: #000 !important; padding: 0 !important; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+            
+            /* 2. 強制展開所有分頁 (行程、交通、住宿等) 與天數卡片 */
+            .tab-content { display: block !important; opacity: 1 !important; page-break-after: always; margin-bottom: 24px; }
+            .day-card { display: block !important; page-break-inside: avoid; margin-bottom: 16px; }
+            .timeline-item { break-inside: avoid; }
+            
+            /* 3. 隱藏列印時不需要的操作 UI 與輸入框外框 */
+            .global-controls, .bottom-nav, .add-btn, .delete-btn, .action-box.delete-box,
+            .drag-handle, .sub-drag-handle, .day-tabs-wrapper, #mobile-tooltip,
+            .img-delete-badge, .img-add-badge, .resizer, .receipt-box,
+            .action-box.photo-box:not(.has-photo), .action-box.link-box:not(.has-link),
+            #password-overlay, button, .toggle-more-btn { 
+                display: none !important; 
+            }
+            
+            /* 4. 微調邊界，讓列印版面更乾淨 */
+            .glass-card { border: 1px solid #e4e4e7 !important; padding: 16px !important; }
+            .container { padding: 0 !important; }
+        }
     </style>
 </head>
 <body>
@@ -361,10 +394,15 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         }
 
 // 🌟 提升手機版體驗：輸入時間後按下鍵盤 Enter，立刻自動計算並存檔
-        document.addEventListener('keypress', function(e) {
+       document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && e.target.classList.contains('editable')) {
-                e.preventDefault(); // 防止文字換行
-                e.target.blur(); // 強制觸發 focusout，啟動自動時間計算
+                // 🌟 修正：如果是「備註」相關的多行文字欄位，允許正常按 Enter 換行
+                if (e.target.classList.contains('item-note') || e.target.classList.contains('sub-item-note')) {
+                    return; 
+                }
+                // 其他短欄位 (標題、時間等) 則維持原樣，按 Enter 快速完成並計算
+                e.preventDefault(); 
+                e.target.blur(); 
             }
         });
        document.addEventListener('focusout', function(e) {
@@ -721,10 +759,23 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         function exportToPDF() { 
             // 偵測是否身處在 iOS 的「加入主畫面 (APP)」模式中
             if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
-                alert("💡 蘋果系統限制提醒：\n\n在「主畫面 APP」模式下，蘋果限制了直接列印的功能。\n\n👉 破解方法：請點擊左側的「分享」按鈕取得網址，把網址貼到 Safari 瀏覽器中打開，就可以正常列印囉！");
+                alert("💡 蘋果系統限制提醒：\n\n在「主畫面 APP」模式下，蘋果限制了直接列印的功能。\n\n👉 破解方法：請點擊左側的「分享」按鈕取得網址，把網址貼到 Safari 瀏覽器中打開，就可以正常匯出 PDF 囉！");
             } else {
-                // 如果是在一般瀏覽器，就直接執行列印
-                window.print(); 
+                // 🌟 魔法：在列印前，將網址轉為實體的 <a> 標籤，讓 PDF 引擎能抓到超連結
+                document.querySelectorAll('.action-box[data-href]').forEach(box => {
+                    if (!box.querySelector('a.pdf-link')) {
+                        let a = document.createElement('a');
+                        a.href = box.getAttribute('data-href');
+                        a.className = 'pdf-link';
+                        a.target = '_blank';
+                        // 用透明標籤覆蓋整個按鈕，讓 PDF 滑鼠移過去能點擊
+                        a.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; z-index:9999; text-decoration:none; color:transparent;';
+                        box.appendChild(a);
+                    }
+                });
+
+                // 觸發系統列印與 PDF 匯出
+                window.print();
             }
         }
         function exportBackup() { 
@@ -1669,8 +1720,89 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             setTimeout(adjustStickyTabs, 50);
         }
 
+        // 🌟 天數互換魔法：左右平移並自動重新編號
+        function moveDayCard(btn, direction) {
+            if (!isEditMode) { alert('請先解鎖編輯模式！'); return; }
+            let card = btn.closest('.day-card');
+            let container = document.getElementById('itinerary-days-container');
+            if (!card || !container) return;
+            
+            let allCards = Array.from(container.querySelectorAll('.day-card'));
+            let currentIndex = allCards.indexOf(card);
+            let targetIndex = currentIndex + direction;
+            
+            if (targetIndex >= 0 && targetIndex < allCards.length) {
+                // 執行 DOM 節點互換
+                let targetCard = allCards[targetIndex];
+                if (direction === -1) {
+                    container.insertBefore(card, targetCard);
+                } else {
+                    container.insertBefore(targetCard, card);
+                }
+                
+                // 🌟 自動修正標題上的 Day 數字 (例如把原本的 Day 2 換到前面後，文字自動變成 Day 1)
+                let updatedCards = document.querySelectorAll('#itinerary-days-container .day-card');
+                updatedCards.forEach((c, idx) => {
+                    let titleEl = c.querySelector('.section-title');
+                    if (titleEl) {
+                        titleEl.innerText = titleEl.innerText.replace(/Day\s*\d+/i, `Day ${idx + 1}`);
+                    }
+                });
+                
+                updateDayTabs();
+                switchDayCard(targetIndex); // 畫面跟著卡片一起移動
+                saveData();
+            }
+        }
+
         function switchDayCard(targetIndex) { document.querySelectorAll('#itinerary-days-container .day-card').forEach((card, idx) => { let tab = document.querySelector(`.day-tab[data-day-index="${idx}"]`); if (idx === targetIndex) { card.style.display = 'block'; if(tab) { tab.classList.add('active'); tab.scrollIntoView({ behavior: 'smooth', inline: 'center' }); } } else { card.style.display = 'none'; if(tab) tab.classList.remove('active'); } }); saveData(); }
-        function addNewDayCard() { let container = document.getElementById('itinerary-days-container'); let dayCount = container.querySelectorAll('.day-card').length + 1; let div = document.createElement('div'); div.className = 'glass-card day-card'; div.style.display = 'none'; div.innerHTML = `<div class="flex-between" style="margin-bottom: 8px;"><h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2><span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round">delete_outline</span></span></div><button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>`; container.appendChild(div); updateDayTabs(); switchDayCard(dayCount - 1); initSortable(); }
+        function addNewDayCard() { 
+            let container = document.getElementById('itinerary-days-container'); 
+            let dayCount = container.querySelectorAll('.day-card').length + 1; 
+            let div = document.createElement('div'); 
+            div.className = 'glass-card day-card'; 
+            div.style.display = 'none'; 
+            div.innerHTML = `
+                <div class="flex-between" style="margin-bottom: 8px;">
+                    <h2 class="section-title editable" contenteditable="true" style="margin-bottom: 0;"> Day ${dayCount} - 點此編輯(如 09/26)</h2>
+                    <div class="day-action-group" style="display:flex; gap:6px; align-items:center;">
+                        <span class="action-box" onclick="moveDayCard(this, -1)" title="往前一天"><span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">chevron_left</span></span>
+                        <span class="action-box" onclick="moveDayCard(this, 1)" title="往後一天"><span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">chevron_right</span></span>
+                        <span class="delete-btn" onclick="deleteDayCard(this, event)"><span class="material-icons-round" style="font-size:18px; color:var(--danger-color);">delete_outline</span></span>
+                    </div>
+                </div>
+                <button class="add-btn" onclick="addItineraryItem(this)"><span class="material-icons-round" style="font-size:18px;">add_circle</span> 新增行程</button>
+            `; 
+            container.appendChild(div); 
+            updateDayTabs(); 
+            switchDayCard(dayCount - 1); 
+            initSortable(); 
+        }
+
+        // 🌟 啟動自動修復：在每次更新頁籤時，幫舊資料補上平移按鈕
+        const originalUpdateDayTabs = updateDayTabs;
+        updateDayTabs = function() {
+            document.querySelectorAll('.day-card').forEach(card => {
+                let flexBetween = card.querySelector('.flex-between');
+                if (flexBetween && !flexBetween.querySelector('.day-action-group')) {
+                    let delBtn = flexBetween.querySelector('.delete-btn');
+                    let group = document.createElement('div');
+                    group.className = 'day-action-group';
+                    group.style.cssText = 'display:flex; gap:6px; align-items:center;';
+                    group.innerHTML = `
+                        <span class="action-box" onclick="moveDayCard(this, -1)" title="往前一天"><span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">chevron_left</span></span>
+                        <span class="action-box" onclick="moveDayCard(this, 1)" title="往後一天"><span class="material-icons-round" style="font-size:16px; color:var(--primary-color);">chevron_right</span></span>
+                    `;
+                    if (delBtn) {
+                        flexBetween.replaceChild(group, delBtn);
+                        group.appendChild(delBtn); // 將原本的垃圾桶收進群組中
+                    } else {
+                        flexBetween.appendChild(group);
+                    }
+                }
+            });
+            originalUpdateDayTabs();
+        };
         function deleteDayCard(btn, event) { event.stopPropagation(); if(confirm("確定刪除這天行程嗎？")) { btn.closest('.day-card').remove(); updateDayTabs(); saveData(); } }
 
         function rebindEvents() {
