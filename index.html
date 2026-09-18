@@ -1685,7 +1685,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         // 🌟 以下為遺失的記帳、待辦、時間計算核心功能
         // ==========================================
 
-        // 1. 行程時間自動計算 (支援手動輸入時間，自動反推空檔)
+        // 1. 行程時間自動計算 (支援手動輸入時間，自動反推空檔，並無痛升級舊版結構)
         function recalculateDayTime(card, editedEl = null) {
             if (!card) return;
             let items = card.querySelectorAll('.timeline-item');
@@ -1721,9 +1721,17 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                                 manualMins += 24 * 60;
                             }
 
-                            // 抓取上一個項目的空檔元素，準備反推
                             let prevItem = items[index - 1];
-                            let prevGapMinsEl = prevItem ? prevItem.querySelector('.gap-mins') : null;
+                            let prevTimeCol = prevItem ? prevItem.querySelector('.time-column') : null;
+                            
+                            // 🌟 防呆：強制升級舊版 HTML 結構，確保時間可以寫入
+                            let prevGapTextEl = prevTimeCol ? prevTimeCol.querySelector('.gap-text') : null;
+                            if (prevGapTextEl && !prevGapTextEl.querySelector('.gap-mins')) {
+                                let oldVal = parseMins(prevGapTextEl.innerText);
+                                prevGapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatMins(oldVal)}</span>`;
+                            }
+                            
+                            let prevGapMinsEl = prevGapTextEl ? prevGapTextEl.querySelector('.gap-mins') : null;
                             let oldGap = prevGapMinsEl ? parseMins(prevGapMinsEl.innerText) : 0;
                             
                             // 算回原本的「預計抵達時間」
@@ -1731,19 +1739,18 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             // 新空檔 = 手動輸入的時間 - 預計抵達時間
                             let newGap = manualMins - expectedMins;
                             
-                            // 安全機制：不允許時間倒流 (強制不能比預計抵達時間早)
+                            // 安全機制：不允許時間倒流
                             if (newGap < 0) newGap = 0; 
 
-                            // 將反推算出來的新空檔，悄悄寫回上一個行程的「隔 X 分」裡！
+                            // 將反推算出來的新空檔寫回上一個行程
                             if (prevGapMinsEl) {
                                 prevGapMinsEl.innerText = formatMins(newGap);
                             }
-                            // 讓後續的瀑布流依據你輸入的時間繼續往下流
                             currentMins = expectedMins + newGap;
                         }
                     }
                     
-                    // 顯示正確的開始時間 (若有手動修改，這行會確保格式整齊，若有倒流會自動修正)
+                    // 顯示正確的開始時間
                     let h = Math.floor(currentMins / 60) % 24;
                     let m = currentMins % 60;
                     startEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
@@ -1763,15 +1770,22 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 let autoStartEl = item.querySelector('.auto-start');
                 let gapTextEl = item.querySelector('.gap-text');
 
-                // 清理舊資料手動打的純文字 (避免重疊)
+                // 清理多餘的舊版文字節點
                 Array.from(timeCol.childNodes).forEach(node => {
                     if (node.nodeType === 3) {
                         let text = node.nodeValue.trim();
-                        if (text.includes('預計') || text.includes('隔')) {
-                            node.nodeValue = ''; 
-                        }
+                        if (text.includes('預計') || text.includes('隔')) node.nodeValue = ''; 
                     }
                 });
+
+                // 🌟 再次防呆：當下項目的結構也順手升級
+                if (autoStartEl && !autoStartEl.classList.contains('system-generated')) {
+                    autoStartEl.classList.add('system-generated');
+                }
+                if (gapTextEl && !gapTextEl.querySelector('.gap-mins')) {
+                    let oldVal = parseMins(gapTextEl.innerText);
+                    gapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatMins(oldVal)}</span>`;
+                }
 
                 if (hasTravel) {
                     let travelMins = travelEl ? parseMins(travelEl.innerText) : 0;
@@ -1780,7 +1794,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     // 產生或更新「預計時間」
                     if (!autoStartEl) {
                         autoStartEl = document.createElement('div');
-                        autoStartEl.className = 'auto-start';
+                        autoStartEl.className = 'auto-start system-generated';
                         timeCol.appendChild(autoStartEl);
                     }
                     autoStartEl.style.display = 'block';
