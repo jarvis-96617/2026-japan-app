@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -85,6 +87,9 @@
         .editable { padding: 2px 4px; border-radius: 6px; transition: background 0.3s var(--spring); min-height: 1.2em; margin-left: -2px;}
         .editable:focus { background: rgba(0,0,0,0.06); outline: none; } body.dark-mode .editable:focus { background: rgba(255,255,255,0.1); }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .item-date { display: block; border: none; background: rgba(0,0,0,0.06); border-radius: 8px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: var(--primary-color); font-family: inherit; margin-bottom: 4px; width: fit-content; -webkit-appearance: none; appearance: none; }
+body.dark-mode .item-date { background: rgba(255,255,255,0.1); }
+.transport-date-header { font-size: 12px; font-weight: 800; color: white; background: var(--primary-color); display: inline-block; padding: 4px 14px; border-radius: 50px; margin: 14px 0 6px 0; }
 
         .timeline-item { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0px; position: relative; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: stretch; transition: all 0.3s ease;}
         body.dark-mode .timeline-item { border-bottom-color: rgba(255,255,255,0.05); }
@@ -585,6 +590,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         let lockHeartbeatTimer = null;
         function enableEditUI() {
+            ungroupTransport();
             isEditMode = true; 
             document.body.classList.remove('view-mode-active'); 
             updateEditToggleButton(); 
@@ -605,6 +611,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             window.sortableInstances.forEach(s => s.option("disabled", true)); 
             showToast("🔒 已恢復唯讀模式");
             clearInterval(lockHeartbeatTimer);
+            groupTransportByDate();
         }
 
         function handleLockStolen() {
@@ -942,7 +949,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 container.querySelectorAll('.blur-lock').forEach(el => el.classList.remove('blur-lock'));
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
-                container.querySelectorAll('.resizer').forEach(el => el.remove());
+                container.querySelectorAll('.resizer').forEach(el => el.remove());                container.querySelectorAll('.transport-date-header').forEach(el => el.remove());
                 container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span>`; } });
                 container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; } });
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
@@ -1318,11 +1325,22 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
                 document.querySelectorAll('#tab-hotel > div').forEach(div => { if (div.innerText.includes('住宿相關連結') && !div.querySelector('.hotel-card')) div.remove(); });
                 document.querySelectorAll('#tab-shopping .glass-card > div:not(#shopping-list):not(.section-title):not(.add-btn)').forEach(div => { if (!div.classList.contains('timeline-item')) div.remove(); });
-                document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
+                                document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
                     if (!item.querySelector('.content-box')) {
                         let textNode = item.childNodes[0] && item.childNodes[0].nodeType === 3 ? item.childNodes[0].textContent.trim() : '';
                         if(!textNode) textNode = item.innerText.replace('delete', '').replace('link', '').replace('image', '').trim();
                         item.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">${textNode || '輸入交通工具'}</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div>`;
+                    }
+                    // 🌟 新增：舊項目沒有日期的話，補上今天的日期
+                    if (!item.querySelector('.item-date')) {
+                        let contentBox = item.querySelector('.content-box');
+                        if (contentBox) {
+                            let dateInput = document.createElement('input');
+                            dateInput.type = 'date'; dateInput.className = 'item-date';
+                            dateInput.value = new Date().toISOString().slice(0,10);
+                            dateInput.onchange = function(){ saveData(); };
+                            contentBox.insertBefore(dateInput, contentBox.firstChild);
+                        }
                     }
                 });
 
@@ -1536,6 +1554,54 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     sortBudgetTable(); // 執行大排序
                 }
                 
+                        function formatDateLabel(dateStr) {
+            if (!dateStr) return '未指定日期';
+            let d = new Date(dateStr + 'T00:00:00');
+            if (isNaN(d)) return dateStr;
+            const weekdays = ['日','一','二','三','四','五','六'];
+            return `${d.getMonth()+1}/${d.getDate()} (週${weekdays[d.getDay()]})`;
+        }
+
+        function groupTransportByDate() {
+            const list = document.getElementById('transport-text-list');
+            if (!list) return;
+            ungroupTransport();
+            const items = Array.from(list.querySelectorAll(':scope > .timeline-item'));
+            if (items.length === 0) return;
+            items.forEach((el, i) => { el.dataset.tOrder = i; });
+            items.sort((a, b) => {
+                let da = (a.querySelector('.item-date') || {}).value || '9999-99-99';
+                let db = (b.querySelector('.item-date') || {}).value || '9999-99-99';
+                return da.localeCompare(db);
+            });
+            let lastDate = null;
+            const frag = document.createDocumentFragment();
+            items.forEach(item => {
+                let d = (item.querySelector('.item-date') || {}).value || '';
+                if (d !== lastDate) {
+                    const header = document.createElement('div');
+                    header.className = 'transport-date-header';
+                    header.textContent = formatDateLabel(d);
+                    frag.appendChild(header);
+                    lastDate = d;
+                }
+                frag.appendChild(item);
+            });
+            list.appendChild(frag);
+            list.dataset.grouped = 'true';
+        }
+
+        function ungroupTransport() {
+            const list = document.getElementById('transport-text-list');
+            if (!list || list.dataset.grouped !== 'true') return;
+            list.querySelectorAll('.transport-date-header').forEach(h => h.remove());
+            const items = Array.from(list.querySelectorAll(':scope > .timeline-item'));
+            items.sort((a, b) => (parseInt(a.dataset.tOrder) || 0) - (parseInt(b.dataset.tOrder) || 0));
+            items.forEach(item => list.appendChild(item));
+            delete list.dataset.grouped;
+        }
+
+                
                 document.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
                 document.querySelectorAll('.amount-input').forEach(input => { let val = parseFloat(input.value.replace(/,/g, '')) || 0; input.value = val.toLocaleString('en-US'); input.setAttribute('value', input.value); });
                 calcBudget();
@@ -1560,7 +1626,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 window.scrollTo(0, 0);
 
                 if(typeof initHistory === 'function') initHistory(); initSortable(); makeTableResizable(); 
-                document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();
+                document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();                
+                if (!isEditMode) groupTransportByDate();
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
                 setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); } 
@@ -1661,10 +1728,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         }
 
         function addTransportText(btn) {
-            const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
-            document.getElementById('transport-text-list').appendChild(newItem); saveData();
-        }
+    const today = new Date().toISOString().slice(0,10);
+    const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
+    newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><input type="date" class="item-date" value="${today}" onchange="saveData()"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
+    document.getElementById('transport-text-list').appendChild(newItem); saveData();
+}
 
         function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
