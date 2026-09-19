@@ -306,11 +306,18 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 display: none !important; 
             }
             
-            /* 4. 微調邊界，讓列印版面更乾淨 */
+                        /* 4. 微調邊界，讓列印版面更乾淨 */
             .glass-card { border: 1px solid #e4e4e7 !important; padding: 16px !important; }
             .container { padding: 0 !important; }
         }
+        /* 🌟 交通指南專屬：日期標籤與分組標題樣式 */
+        .transport-date-header { font-size: 13px; font-weight: 800; color: var(--text-main); background: rgba(0,0,0,0.03); padding: 6px 12px; border-radius: 8px; margin: 16px 0 8px 0; border-left: 4px solid var(--primary-color); display: flex; align-items: center; gap: 6px; }
+        body.dark-mode .transport-date-header { background: rgba(255,255,255,0.05); }
+        .transport-date-col { display: flex; flex-direction: column; justify-content: center; margin-right: 8px; position: relative; min-width: 38px; }
+        .transport-date-display { font-size: 10px; font-weight: 800; color: var(--primary-color); background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; text-align: center; }
+        body.dark-mode .transport-date-display { background: rgba(255,255,255,0.1); color: #d4d4d8; }
     </style>
+
 </head>
 <body>
     <div id="splash-screen">
@@ -554,9 +561,12 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         enableEditUI();
                     }
                 });
-            } else {
+                        } else {
                 // 先完成雲端儲存，再解除編輯鎖，避免儲存尚未完成就把 Lock 移除。
                 setStatus('sync', '儲存並鎖定中...');
+                
+                groupTransportItems(); // 🌟 在存檔與鎖定前，自動將交通項目依日期歸類分組！
+                
                 saveData(true, false, true).then((saved) => {
                     if (!saved) throw new Error('雲端儲存未完成');
                     disableEditUI();
@@ -1318,13 +1328,32 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
                 document.querySelectorAll('#tab-hotel > div').forEach(div => { if (div.innerText.includes('住宿相關連結') && !div.querySelector('.hotel-card')) div.remove(); });
                 document.querySelectorAll('#tab-shopping .glass-card > div:not(#shopping-list):not(.section-title):not(.add-btn)').forEach(div => { if (!div.classList.contains('timeline-item')) div.remove(); });
-                document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
+                                document.querySelectorAll('#transport-text-list .timeline-item').forEach(item => {
+                    // 1. 舊版內容升級
                     if (!item.querySelector('.content-box')) {
                         let textNode = item.childNodes[0] && item.childNodes[0].nodeType === 3 ? item.childNodes[0].textContent.trim() : '';
                         if(!textNode) textNode = item.innerText.replace('delete', '').replace('link', '').replace('image', '').trim();
                         item.innerHTML = `<div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">${textNode || '輸入交通工具'}</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div>`;
                     }
+                    // 2. 強制安插萬年曆日期標籤 (無痛升級舊資料)
+                    if (!item.querySelector('.transport-date-col')) {
+                        let tzOffset = (new Date()).getTimezoneOffset() * 60000;
+                        let localISODate = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+                        let displayDate = `${localISODate.split('-')[1]}/${localISODate.split('-')[2]}`;
+                        
+                        let dateCol = document.createElement('div');
+                        dateCol.className = 'transport-date-col';
+                        dateCol.innerHTML = `<div class="transport-date-display">${displayDate}</div><input type="date" class="transport-date-input editable" value="${localISODate}" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="updateTransportDate(this)">`;
+                        
+                        let cb = item.querySelector('.checkbox-wrapper');
+                        if (cb) item.insertBefore(dateCol, cb.nextSibling);
+                        else item.insertBefore(dateCol, item.firstChild);
+                    }
                 });
+                
+                // 3. 讀取完畢後，執行一次分組與排序
+                groupTransportItems();
+
 
                 document.querySelectorAll('.duration-wrap').forEach(wrap => { Array.from(wrap.childNodes).forEach(node => { if (node.nodeType === 3 && node.nodeValue.includes('分')) { node.nodeValue = node.nodeValue.replace(/分鐘|分/g, '').trim(); } }); });
                 document.querySelectorAll('.travel-time-wrap').forEach(wrap => { Array.from(wrap.childNodes).forEach(node => { if (node.nodeType === 3 && (node.nodeValue.includes('分') || node.nodeValue.includes('鐘'))) { node.nodeValue = node.nodeValue.replace(/分鐘|分/g, '').trim(); } }); });
@@ -1660,11 +1689,71 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
         }
 
+                // 🌟 交通指南：處理日期變更
+        function updateTransportDate(input) {
+            let val = input.value;
+            if(val) {
+                let parts = val.split('-');
+                input.previousElementSibling.innerText = `${parts[1]}/${parts[2]}`;
+            } else {
+                input.previousElementSibling.innerText = '未定';
+            }
+            saveData();
+        }
+
+        // 🌟 交通指南：依日期自動排序並產生分組標題
+        function groupTransportItems() {
+            const list = document.getElementById('transport-text-list');
+            if (!list) return;
+            
+            // 先清除所有舊的分類標題，準備重新產生
+            list.querySelectorAll('.transport-date-header').forEach(el => el.remove());
+            
+            let items = Array.from(list.querySelectorAll('.timeline-item'));
+            if (items.length === 0) return;
+            
+            // 依照日期先後順序進行排序
+            items.sort((a, b) => {
+                let inputA = a.querySelector('.transport-date-input');
+                let inputB = b.querySelector('.transport-date-input');
+                let valA = inputA ? inputA.value : '9999-12-31';
+                let valB = inputB ? inputB.value : '9999-12-31';
+                return valA.localeCompare(valB);
+            });
+            
+            // 將排序好的項目依序塞回，並在日期改變時安插標題
+            let currentDate = null;
+            items.forEach(item => {
+                let input = item.querySelector('.transport-date-input');
+                let itemDate = input ? input.value : '';
+                if (itemDate !== currentDate) {
+                    currentDate = itemDate;
+                    let header = document.createElement('div');
+                    header.className = 'transport-date-header';
+                    
+                    let displayTxt = '未設定日期';
+                    if(itemDate) {
+                        let parts = itemDate.split('-');
+                        if(parts.length === 3) displayTxt = `${parts[1]}/${parts[2]} 交通安排`;
+                    }
+                    header.innerHTML = `<span class="material-icons-round" style="font-size:16px;">calendar_month</span> ${displayTxt}`;
+                    list.appendChild(header);
+                }
+                list.appendChild(item);
+            });
+        }
+
         function addTransportText(btn) {
+            // 抓取當下時區的精準日期
+            let tzOffset = (new Date()).getTimezoneOffset() * 60000;
+            let localISODate = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10);
+            let displayDate = `${localISODate.split('-')[1]}/${localISODate.split('-')[2]}`;
+            
             const newItem = document.createElement('div'); newItem.className = 'timeline-item'; newItem.setAttribute('onclick', 'toggleComplete(this, event)');
-            newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
+            newItem.innerHTML = `<div class="drag-handle">⋮⋮</div><div class="checkbox-wrapper"><div class="custom-checkbox"></div></div><div class="transport-date-col"><div class="transport-date-display">${displayDate}</div><input type="date" class="transport-date-input editable" value="${localISODate}" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;" onchange="updateTransportDate(this)"></div><div class="content-box"><div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入交通工具名稱</span></div><div class="item-note editable" contenteditable="true">班次備註：</div></div><div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>`;
             document.getElementById('transport-text-list').appendChild(newItem); saveData();
         }
+
 
         function addHotelCard() {
             let container = document.getElementById('hotel-cards-container'); let div = document.createElement('div'); div.className = 'glass-card hotel-card';
