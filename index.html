@@ -495,6 +495,15 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 tabsWrapper.style.top = Math.max(headerBottom, 0) + 'px';
             }
         }
+        
+                // 🌟 滑動或轉螢幕時，即時重新計算日期列該貼齊的高度
+        let stickyTabsRAF = null;
+        function scheduleAdjustStickyTabs() {
+            if (stickyTabsRAF) return;
+            stickyTabsRAF = requestAnimationFrame(() => { adjustStickyTabs(); stickyTabsRAF = null; });
+        }
+        window.addEventListener('scroll', scheduleAdjustStickyTabs, { passive: true });
+        window.addEventListener('resize', scheduleAdjustStickyTabs);
 
         function showToast(msg, isError = false) {            let el = document.getElementById('toast-msg');
             if(!el) {
