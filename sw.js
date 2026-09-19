@@ -38,27 +38,11 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // 🎯 終極修復：針對 Google 字體給予「快取優先」VIP 待遇！
-    if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com')) {
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                if (cachedResponse) {
-                    return cachedResponse; // 背包有字體就直接拿出來用
-                }
-                return fetch(event.request).then((response) => {
-                    // 第一次連網時抓到字體，立刻存進背包
-                    if (response && response.status === 200) {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                    }
-                    return response;
-                });
-            })
-        );
-        return;
-    }
+    // 🚫 字體交給瀏覽器原生處理，Service Worker 不插手
+if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com')) {
+    return;
+}
+
 
     // 🌐 其他我們自己的檔案 (HTML, 圖片)
     if (url.startsWith(self.location.origin)) {
