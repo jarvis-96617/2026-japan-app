@@ -2385,7 +2385,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
     <script>
     // 🌟 徹底繞過 iOS Safari 的連字圖示相容性問題：改用真正的 Unicode 碼位
     (function() {
-        fetch('https://cdn.jsdelivr.net/gh/google/material-design-icons/font/MaterialIconsRound-Regular.codepoints')
+        fetch('https://cdn.jsdelivr.net/gh/google/material-design-icons@master/font/MaterialIconsRound-Regular.codepoints')
             .then(res => res.text())
             .then(text => {
                 const map = {};
