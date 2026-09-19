@@ -495,13 +495,16 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         }
 
 // 🌟 提升手機版體驗：輸入時間後按下鍵盤 Enter，立刻自動計算並存檔
-       document.addEventListener('keypress', function(e) {
+              document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && e.target.classList.contains('editable')) {
                 // 🌟 修正：如果是「備註」相關的多行文字欄位，允許正常按 Enter 換行
                 if (e.target.classList.contains('item-note') || e.target.classList.contains('sub-item-note')) {
+                    // 👉 升級：強制瀏覽器插入純文字換行 (\n)，避免產生奇怪的 <div> 標籤破壞排版
+                    e.preventDefault();
+                    document.execCommand('insertText', false, '\n');
                     return; 
                 }
-                // 其他短欄位 (標題、時間等) 則維持原樣，按 Enter 快速完成並計算
+                // 其他短欄位 (標題、時間等) 則維持原樣，按 Enter 快速完成並存檔
                 e.preventDefault(); 
                 e.target.blur(); 
             }
