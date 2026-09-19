@@ -2379,7 +2379,41 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             });
         }
     </script>
+    ...
     <!-- 👆 補上這一段註冊服務生的程式碼 👆 -->
+
+    <script>
+    // 🌟 徹底繞過 iOS Safari 的連字圖示相容性問題：改用真正的 Unicode 碼位
+    (function() {
+        fetch('https://cdn.jsdelivr.net/gh/google/material-design-icons/font/MaterialIconsRound-Regular.codepoints')
+            .then(res => res.text())
+            .then(text => {
+                const map = {};
+                text.trim().split('\n').forEach(line => {
+                    const parts = line.trim().split(' ');
+                    if (parts.length === 2) map[parts[0]] = String.fromCodePoint(parseInt(parts[1], 16));
+                });
+                function applyIcons(root) {
+                    root.querySelectorAll('.material-icons-round').forEach(el => {
+                        const name = el.textContent.trim();
+                        if (map[name]) el.textContent = map[name];
+                    });
+                }
+                applyIcons(document);
+                new MutationObserver(muts => {
+                    muts.forEach(m => m.addedNodes.forEach(node => {
+                        if (node.nodeType === 1) {
+                            if (node.classList && node.classList.contains('material-icons-round')) {
+                                const name = node.textContent.trim();
+                                if (map[name]) node.textContent = map[name];
+                            }
+                            applyIcons(node);
+                        }
+                    }));
+                }).observe(document.body, { childList: true, subtree: true });
+            });
+    })();
+    </script>
 
 </body>
 </html>
