@@ -316,6 +316,82 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .transport-date-col { display: flex; flex-direction: column; justify-content: center; margin-right: 8px; position: relative; min-width: 38px; }
         .transport-date-display { font-size: 10px; font-weight: 800; color: var(--primary-color); background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; text-align: center; }
         body.dark-mode .transport-date-display { background: rgba(255,255,255,0.1); color: #d4d4d8; }
+
+        /* =====================================================================
+           📱 鎖定（唯讀）密集模式：交通 / 購物 / 預算
+           只在 body.view-mode-active 生效；解鎖編輯後版面完全不變。
+           想微調密度，只需要改這一區的 padding / gap / font-size。
+           ===================================================================== */
+
+        /* 🐞 修正：預算表的隱形日期選擇器被 JS 誤設成 position:relative，
+           會佔掉一整塊高度（iOS 鎖定時特別高）。強制拉回浮在儲存格上方。 */
+        #budget-table .real-date-input { position: absolute !important; top: 0; left: 0; width: 100%; height: 100% !important; }
+        body.view-mode-active #budget-table .real-date-input { display: none !important; }
+
+        /* 鎖定時收起的「編輯用說明」區塊（由 applyCompactViewHelpers 標記） */
+        body.view-mode-active .view-hide { display: none !important; }
+
+        /* --- 共用：卡片與標題縮小 --- */
+        body.view-mode-active #tab-transport .glass-card,
+        body.view-mode-active #tab-shopping .glass-card,
+        body.view-mode-active #tab-budget .glass-card { padding: 8px 10px !important; margin-bottom: 8px; border-radius: 16px; }
+        body.view-mode-active #tab-transport .section-title,
+        body.view-mode-active #tab-shopping .section-title,
+        body.view-mode-active #tab-budget .section-title { font-size: 15px; margin-bottom: 2px !important; }
+
+        /* --- 交通 & 購物：清單項目 --- */
+        body.view-mode-active #transport-text-list { margin-top: 2px !important; }
+        body.view-mode-active #transport-text-list .timeline-item,
+        body.view-mode-active #shopping-list .timeline-item { flex-wrap: nowrap; align-items: flex-start; gap: 6px; padding: 4px 0 !important; }
+        body.view-mode-active #transport-text-list .checkbox-wrapper,
+        body.view-mode-active #shopping-list .checkbox-wrapper { padding-top: 0; }
+        body.view-mode-active #transport-text-list .custom-checkbox,
+        body.view-mode-active #shopping-list .custom-checkbox { width: 16px; height: 16px; }
+        body.view-mode-active #transport-text-list .completed .custom-checkbox::after,
+        body.view-mode-active #shopping-list .completed .custom-checkbox::after { font-size: 12px; }
+
+        /* 右側按鈕群（連結）：不換行、不預留 100px 寬 */
+        body.view-mode-active #transport-text-list .timeline-item > .right-action-group,
+        body.view-mode-active #shopping-list .timeline-item > .right-action-group { max-width: none !important; margin-left: 0 !important; gap: 4px !important; flex-wrap: nowrap !important; align-self: flex-start; }
+
+        /* 標題 / 備註 / 縮圖：縮圖改放在標題右側，不再獨佔一行 */
+        body.view-mode-active #transport-text-list .item-title,
+        body.view-mode-active #shopping-list .item-title { margin-bottom: 0; line-height: 1.25; }
+        body.view-mode-active #transport-text-list .item-note,
+        body.view-mode-active #shopping-list .item-note { margin-bottom: 0; min-height: 0; line-height: 1.35; }
+        body.view-mode-active #transport-text-list .item-note.note-empty,
+        body.view-mode-active #shopping-list .item-note.note-empty,
+        body.view-mode-active #transport-text-list .item-note:empty,
+        body.view-mode-active #shopping-list .item-note:empty { display: none; }
+        body.view-mode-active #transport-text-list .action-row,
+        body.view-mode-active #shopping-list .action-row { margin: 0 !important; }
+
+        /* 交通：標題＋備註在左，縮圖在右（兩欄 grid） */
+        body.view-mode-active #transport-text-list .content-box { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 6px; row-gap: 0; align-items: start; }
+        body.view-mode-active #transport-text-list .content-box > .item-title,
+        body.view-mode-active #transport-text-list .content-box > .item-note { grid-column: 1; }
+        body.view-mode-active #transport-text-list .content-box > .action-row { grid-column: 2; grid-row: 1 / span 2; align-self: start; justify-content: flex-end; }
+
+        /* 購物：品名＋備註（給誰買）同一行，縮圖靠右；放不下才自動換行 */
+        body.view-mode-active #shopping-list .content-box { flex-flow: row wrap; align-items: baseline; column-gap: 8px; row-gap: 0; }
+        body.view-mode-active #shopping-list .item-title { flex: 0 1 auto; }
+        body.view-mode-active #shopping-list .item-note { flex: 0 1 auto; width: auto; }
+        body.view-mode-active #shopping-list .content-box > .action-row { margin-left: auto !important; align-self: center; }
+
+        /* 交通：日期標題與日期膠囊 */
+        body.view-mode-active .transport-date-header { margin: 8px 0 2px; padding: 4px 10px; font-size: 12px; }
+        body.view-mode-active #transport-text-list > .transport-date-header:first-child { margin-top: 2px; }
+        body.view-mode-active #transport-text-list .transport-date-col { justify-content: flex-start; margin-right: 0; min-width: 34px; }
+
+        /* --- 預算：表格更緊湊 --- */
+        body.view-mode-active #budget-table { border-spacing: 0 2px; margin-bottom: 2px; }
+        body.view-mode-active #budget-table th { padding: 0; }
+        body.view-mode-active #budget-table td { padding: 3px 0; line-height: 1.2; }
+        body.view-mode-active #budget-table .payer-select,
+        body.view-mode-active #budget-table .split-select { padding: 2px 2px; line-height: 1.2; }
+        body.view-mode-active #budget-table .curr-select { padding: 1px 2px; }
+        body.view-mode-active #budget-table .amount-input { padding: 0; }
+        body.view-mode-active #budget-result { margin-top: 4px !important; padding-top: 6px !important; line-height: 1.35 !important; }
     </style>
 
 </head>
@@ -608,9 +684,36 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             }, 60000); 
         }
 
+
+        // 🌟 鎖定（唯讀）密集模式輔助：標記「空白備註」與「編輯用說明區塊」，讓 CSS 在鎖定時收起來
+        function applyCompactViewHelpers() {
+            try {
+                // 1) 交通 / 購物：備註是空的，或只剩範本預設字（「備註：」「班次備註：」）→ 標記為 note-empty
+                document.querySelectorAll('#tab-transport .item-note, #tab-shopping .item-note').forEach(n => {
+                    let t = n.textContent.replace(/\u00a0/g, ' ').trim();
+                    n.classList.toggle('note-empty', t === '' || /^(班次)?備註[：:]?$/.test(t));
+                });
+                // 2) 預算：付款人管理區、金額說明文字 → 標記為 view-hide
+                const card = document.querySelector('#tab-budget .glass-card');
+                if (!card) return;
+                card.querySelectorAll('.view-hide').forEach(el => el.classList.remove('view-hide'));
+                const table = card.querySelector('#budget-table');
+                const tags = card.querySelector('#payer-tags-container');
+                if (table && tags) {
+                    let el = tags;
+                    while (el.parentElement && el.parentElement !== card && !el.parentElement.contains(table)) el = el.parentElement;
+                    if (el !== card && !el.contains(table)) el.classList.add('view-hide');
+                }
+                card.querySelectorAll('div, p, span').forEach(el => {
+                    if (!el.children.length && el.textContent.includes('輸入金額會自動套用')) el.classList.add('view-hide');
+                });
+            } catch (e) { console.warn('applyCompactViewHelpers 失敗', e); }
+        }
+
         function disableEditUI() {
             isEditMode = false; 
             document.body.classList.add('view-mode-active'); 
+            applyCompactViewHelpers(); 
             updateEditToggleButton(); 
             window.sortableInstances.forEach(s => s.option("disabled", true)); 
             showToast("🔒 已恢復唯讀模式");
@@ -1004,6 +1107,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 container.querySelectorAll('.lock-overlay').forEach(el => el.remove());
                 container.querySelectorAll('.sortable-ghost, .sortable-drag, .sortable-chosen, .sortable-fallback').forEach(el => { el.classList.remove('sortable-ghost', 'sortable-drag', 'sortable-chosen', 'sortable-fallback'); });
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
+                container.querySelectorAll('.view-hide').forEach(el => el.classList.remove('view-hide'));
+                container.querySelectorAll('.note-empty').forEach(el => el.classList.remove('note-empty'));
                 container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span>`; } });
                 container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; } });
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
@@ -1549,7 +1654,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     }
 
                     // 2. 解除下拉選單與輸入框封印
-                    budgetTable.querySelectorAll('select, input').forEach(el => {
+                    budgetTable.querySelectorAll('select, input:not(.real-date-input)').forEach(el => {
                         el.removeAttribute('disabled');
                         el.style.pointerEvents = 'auto';
                         el.style.position = 'relative';
@@ -1640,7 +1745,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 window.scrollTo(0, 0);
 
                 if(typeof initHistory === 'function') initHistory(); initSortable(); makeTableResizable(); 
-                document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode();
+                document.querySelectorAll('.day-card').forEach(card => recalculateDayTime(card)); applyShareMode(); applyCompactViewHelpers();
             } catch(error) { console.error("載入解析錯誤: ", error); } finally { 
                 fetchExchangeRate(); initMobileTooltips(); isAppReady = true; lastActiveTime = Date.now(); 
                 setTimeout(() => { const splash = document.getElementById('splash-screen'); if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); } 
