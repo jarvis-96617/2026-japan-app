@@ -793,28 +793,79 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             setStatus('sync', '產生短網址中...');
             fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(shareUrl)}`).then(res => res.text()).then(shortUrl => { setStatus('cloud_done', '已就緒'); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shortUrl).then(() => { let msg = type === "1" ? `✅ 「協作」短網址已複製！\n\n網址：${shortUrl}\n旅伴打開後可與您即時同步編輯指定天數。` : `✅ 「唯讀」短網址已複製！\n\n網址：${shortUrl}\n旅伴只能觀看指定天數，無法修改。`; alert(msg); }).catch(() => { prompt("請手動複製以下專屬短網址分享：", shortUrl); }); } else { prompt("請手動複製以下專屬短網址分享：", shortUrl); } }).catch(err => { setStatus('cloud_done', '已就緒'); prompt("縮址失敗，請手動複製以下原始網址：", shareUrl); });
         }
-        function exportToPDF() { 
-            // 偵測是否身處在 iOS 的「加入主畫面 (APP)」模式中
+                function exportToPDF() { 
             if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
                 alert("💡 蘋果系統限制提醒：\n\n在「主畫面 APP」模式下，蘋果限制了直接列印的功能。\n\n👉 破解方法：請點擊左側的「分享」按鈕取得網址，把網址貼到 Safari 瀏覽器中打開，就可以正常匯出 PDF 囉！");
-            } else {
-                // 🌟 魔法：在列印前，將網址轉為實體的 <a> 標籤，讓 PDF 引擎能抓到超連結
-                document.querySelectorAll('.action-box[data-href]').forEach(box => {
-                    if (!box.querySelector('a.pdf-link')) {
-                        let a = document.createElement('a');
-                        a.href = box.getAttribute('data-href');
-                        a.className = 'pdf-link';
-                        a.target = '_blank';
-                        // 用透明標籤覆蓋整個按鈕，讓 PDF 滑鼠移過去能點擊
-                        a.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; z-index:9999; text-decoration:none; color:transparent;';
-                        box.appendChild(a);
-                    }
-                });
-
-                // 觸發系統列印與 PDF 匯出
-                window.print();
+                return;
             }
+
+            // 🌟 1. 詢問要匯出的天數
+            let dayInput = prompt("📝 步驟 1/2：請輸入要匯出的【天數】\n\n(例如：1,2,3，或是直接保留 all 代表匯出全部天數)", "all");
+            if (dayInput === null) return; // 按取消則中止
+
+            // 🌟 2. 詢問要匯出的分頁
+            let tabInput = prompt("📝 步驟 2/2：請輸入要匯出的【分頁】\n\n1:行程 2:交通 3:住宿 4:購物 5:記帳 6:待辦\n\n(例如：1,2,5 代表只要行程、交通和記帳，或是保留 all 代表全部都要)", "all");
+            if (tabInput === null) return; // 按取消則中止
+
+            // 動態產生專屬的過濾 CSS
+            let styleStr = "@media print { ";
+
+            // 處理天數過濾
+            if (dayInput.trim().toLowerCase() !== 'all') {
+                let days = dayInput.replace(/，|、/g, ',').split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
+                if (days.length > 0) {
+                    styleStr += ".day-card { display: none !important; } "; // 先隱藏全部天數
+                    days.forEach(d => {
+                        styleStr += `.day-card:nth-child(${d}) { display: block !important; } `; // 只顯示指定天數
+                    });
+                }
+            }
+
+            // 處理分頁過濾
+            let tabMap = { 1: '#tab-itinerary', 2: '#tab-transport', 3: '#tab-hotel', 4: '#tab-shopping', 5: '#tab-budget', 6: '#tab-todo' };
+            if (tabInput.trim().toLowerCase() !== 'all') {
+                let tabs = tabInput.replace(/，|、/g, ',').split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
+                if (tabs.length > 0) {
+                    styleStr += ".tab-content { display: none !important; } "; // 先隱藏全部分頁
+                    tabs.forEach(t => {
+                        if (tabMap[t]) {
+                            styleStr += `${tabMap[t]} { display: block !important; opacity: 1 !important; } `; // 只顯示指定分頁
+                        }
+                    });
+                }
+            }
+            styleStr += "}";
+
+            // 將自訂的過濾樣式注入到畫面中
+            let filterStyle = document.getElementById('print-filter-style');
+            if (!filterStyle) {
+                filterStyle = document.createElement('style');
+                filterStyle.id = 'print-filter-style';
+                document.head.appendChild(filterStyle);
+            }
+            filterStyle.innerHTML = styleStr;
+
+            // 🌟 魔法：在列印前，將網址轉為實體的 <a> 標籤，讓 PDF 引擎能抓到超連結
+            document.querySelectorAll('.action-box[data-href]').forEach(box => {
+                if (!box.querySelector('a.pdf-link')) {
+                    let a = document.createElement('a');
+                    a.href = box.getAttribute('data-href');
+                    a.className = 'pdf-link';
+                    a.target = '_blank';
+                    a.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; z-index:9999; text-decoration:none; color:transparent;';
+                    box.appendChild(a);
+                }
+            });
+
+            // 觸發系統列印與 PDF 匯出
+            window.print();
+
+            // 結束後移除過濾樣式，恢復網頁正常畫面
+            setTimeout(() => {
+                if (filterStyle) filterStyle.remove();
+            }, 1000);
         }
+
         function exportBackup() { 
             localforage.getItem('travelAppSave_Keihan_vCloudFinal').then(function(data) {
                 if(!data) data = localStorage.getItem('travelAppSave_Keihan_vCloudFinal'); // 兼容舊版
