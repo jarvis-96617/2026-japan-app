@@ -198,6 +198,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .sub-item-title { font-size: 12px; font-weight: 800; flex-grow: 1; outline: none; color: #3f3f46;} body.dark-mode .sub-item-title{color: #f4f4f5;}
         .sub-item-note { font-size: 10px; font-weight: 500; color: #71717a; margin-top: 2px; display: block; outline: none; line-height: 1.4; word-break: break-word;}
         body.dark-mode .sub-item-note { color: #a1a1aa; }
+        .sub-item .right-action-group { flex-wrap: nowrap !important; max-width: none !important; flex-shrink: 0; gap: 4px !important; }
         .sub-item .action-box { width: 22px; height: 22px; background: rgba(255,255,255,0.8); border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);}
         body.dark-mode .sub-item .action-box { background: rgba(0,0,0,0.3); }
 
@@ -311,8 +312,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             .container { padding: 0 !important; }
         }
         /* 🌟 交通指南專屬：日期標籤與分組標題樣式 */
-        .transport-date-header { font-size: 13px; font-weight: 800; color: var(--text-main); background: rgba(0,0,0,0.03); padding: 6px 12px; border-radius: 8px; margin: 16px 0 8px 0; border-left: 4px solid var(--primary-color); display: flex; align-items: center; gap: 6px; }
-        body.dark-mode .transport-date-header { background: rgba(255,255,255,0.05); }
+        .transport-date-header { font-size: 14px; font-weight: 800; color: #b45309; background: rgba(245,158,11,0.16); padding: 7px 12px; border-radius: 8px; margin: 16px 0 8px 0; border-left: 4px solid #f59e0b; display: flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
+        body.dark-mode .transport-date-header { background: rgba(251,191,36,0.14); color: #fbbf24; border-left-color: #fbbf24; }
         .transport-date-col { display: flex; flex-direction: column; justify-content: center; margin-right: 8px; position: relative; min-width: 38px; }
         .transport-date-display { font-size: 10px; font-weight: 800; color: var(--primary-color); background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; text-align: center; }
         body.dark-mode .transport-date-display { background: rgba(255,255,255,0.1); color: #d4d4d8; }
@@ -379,7 +380,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         body.view-mode-active #shopping-list .content-box > .action-row { margin-left: auto !important; align-self: center; }
 
         /* 交通：日期標題與日期膠囊 */
-        body.view-mode-active .transport-date-header { margin: 8px 0 2px; padding: 4px 10px; font-size: 12px; }
+        body.view-mode-active .transport-date-header { margin: 8px 0 2px; padding: 4px 10px; font-size: 13px; }
         body.view-mode-active #transport-text-list > .transport-date-header:first-child { margin-top: 2px; }
         body.view-mode-active #transport-text-list .transport-date-col { justify-content: flex-start; margin-right: 0; min-width: 34px; }
 
@@ -392,6 +393,30 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         body.view-mode-active #budget-table .curr-select { padding: 1px 2px; }
         body.view-mode-active #budget-table .amount-input { padding: 0; }
         body.view-mode-active #budget-result { margin-top: 4px !important; padding-top: 6px !important; line-height: 1.35 !important; }
+
+        /* =====================================================================
+           📱 鎖定（唯讀）密集模式：待辦（預訂類 / 事前準備類）
+           解鎖編輯後版面完全不變。想微調密度，改這一區的 padding / gap / font-size。
+           ===================================================================== */
+        body.view-mode-active #tab-todo .glass-card { padding: 8px 10px !important; margin-bottom: 8px; border-radius: 16px; }
+        body.view-mode-active #tab-todo .section-title { font-size: 15px; margin-bottom: 2px !important; }
+        body.view-mode-active #tab-todo .glass-card > .flex-between { margin-bottom: 2px !important; }
+
+        body.view-mode-active #tab-todo .timeline-item { flex-wrap: nowrap; align-items: flex-start; gap: 6px; padding: 3px 0 !important; }
+        body.view-mode-active #tab-todo .checkbox-wrapper { padding-top: 0; }
+        body.view-mode-active #tab-todo .custom-checkbox { width: 16px; height: 16px; }
+        body.view-mode-active #tab-todo .completed .custom-checkbox::after { font-size: 12px; }
+        body.view-mode-active #tab-todo .timeline-item > .right-action-group { max-width: none !important; margin-left: 0 !important; gap: 4px !important; flex-wrap: nowrap !important; align-self: flex-start; }
+
+        body.view-mode-active #tab-todo .content-box { gap: 0; }
+        body.view-mode-active #tab-todo .item-title { font-size: 13px; margin-bottom: 0; line-height: 1.25; }
+        body.view-mode-active #tab-todo .item-note { margin-bottom: 0; min-height: 0; line-height: 1.35; }
+        body.view-mode-active #tab-todo .item-note.note-empty,
+        body.view-mode-active #tab-todo .item-note:empty { display: none; }
+        body.view-mode-active #tab-todo .editable { padding-top: 0; padding-bottom: 0; min-height: 0; }
+
+        body.view-mode-active #tab-todo .luggage-select { padding: 1px 6px; font-size: 10px; margin-right: 0; align-self: flex-start; }
+        body.view-mode-active #tab-todo .todo-category-header { margin: 6px 0 2px; padding-bottom: 2px; }
     </style>
 
 </head>
@@ -692,9 +717,13 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         function applyCompactViewHelpers() {
             try {
                 // 1) 交通 / 購物：備註是空的，或只剩範本預設字（「備註：」「班次備註：」）→ 標記為 note-empty
-                document.querySelectorAll('#tab-transport .item-note, #tab-shopping .item-note').forEach(n => {
+                document.querySelectorAll('#tab-transport .item-note, #tab-shopping .item-note, #tab-todo .item-note').forEach(n => {
                     let t = n.textContent.replace(/\u00a0/g, ' ').trim();
-                    n.classList.toggle('note-empty', t === '' || /^(班次)?備註[：:]?$/.test(t));
+                    n.classList.toggle('note-empty', t === '' || /^(班次)?備註(\/貼上連結)?[：:]?$/.test(t));
+                });
+                // 1b) 待辦：「新增分類標題」那一列只在編輯時需要，鎖定時整列收起
+                document.querySelectorAll('#tab-todo .flex-between').forEach(el => {
+                    if (el.querySelector(':scope > .add-btn')) el.classList.add('view-hide');
                 });
                 // 2) 預算：付款人管理區、金額說明文字 → 標記為 view-hide
                 const card = document.querySelector('#tab-budget .glass-card');
@@ -1626,6 +1655,36 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     }
                 });
 
+                // 🌟 子項目（子地點）：舊資料無痛補上「新增連結」按鈕，並統一操作按鈕列（不換行）
+                document.querySelectorAll('.sub-item').forEach(sub => {
+                    let group = sub.querySelector('.right-action-group');
+                    if (!group) { group = document.createElement('div'); group.className = 'right-action-group'; sub.appendChild(group); }
+                    group.style.cssText = 'display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;';
+
+                    // 舊格式連結（span 上綁 window.open）轉成新格式
+                    group.querySelectorAll('.action-box.has-link').forEach(lb => {
+                        let span = lb.querySelector('span');
+                        if (span && span.getAttribute('onclick') && span.getAttribute('onclick').includes('window.open')) {
+                            let m = span.getAttribute('onclick').match(/window\.open\('([^']+)'/);
+                            if (m && m[1]) { lb.setAttribute('data-href', m[1]); lb.setAttribute('onclick', 'openStoredLink(this, event)'); span.removeAttribute('onclick'); span.style.pointerEvents = 'none'; }
+                        }
+                        lb.classList.add('single-link-box');
+                        lb.classList.remove('link-box');
+                        if (!lb.hasAttribute('title') && lb.getAttribute('data-href')) lb.setAttribute('title', lb.getAttribute('data-href'));
+                    });
+
+                    // 沒有乾淨的「新增連結」按鈕就補一顆（放在圖片按鈕前面）
+                    if (!group.querySelector('.action-box.link-box:not(.has-link)')) {
+                        let addLinkBtn = document.createElement('div');
+                        addLinkBtn.className = 'action-box link-box';
+                        addLinkBtn.setAttribute('onclick', 'handleItemLink(this, event)');
+                        addLinkBtn.ontouchstart = (e) => e.stopPropagation();
+                        addLinkBtn.innerHTML = '<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">link</span>';
+                        let ref = group.querySelector('.photo-box') || group.querySelector('.delete-btn') || null;
+                        group.insertBefore(addLinkBtn, ref);
+                    }
+                });
+
                 document.querySelectorAll('img').forEach(img => { if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') { img.setAttribute('onerror', 'handleImageError(this)'); } });
                 document.querySelectorAll('.upload-area, button[onclick*="addLinkItem"]').forEach(el => el.style.display = 'none');
                 
@@ -1809,7 +1868,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
                 </div>
-                <div class="right-action-group" style="flex-direction:row; flex-wrap:wrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end;">
+                <div class="right-action-group" style="display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;">
+                    <div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">link</span></div>
                     <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">image</span></div>
                     <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--danger-color);">close</span></div>
                 </div>
@@ -1893,7 +1953,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     let displayTxt = '未設定日期';
                     if(itemDate) {
                         let parts = itemDate.split('-');
-                        if(parts.length === 3) displayTxt = `${parts[1]}/${parts[2]} 交通安排`;
+                        if(parts.length === 3) displayTxt = `${parts[1]}/${parts[2]} 交通安排與指南`;
                     }
                     header.innerHTML = `<span class="material-icons-round" style="font-size:16px;">calendar_month</span> ${displayTxt}`;
                     list.appendChild(header);
