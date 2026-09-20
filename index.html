@@ -417,6 +417,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
         body.view-mode-active #tab-todo .luggage-select { padding: 1px 6px; font-size: 10px; margin-right: 0; align-self: flex-start; }
         body.view-mode-active #tab-todo .todo-category-header { margin: 6px 0 2px; padding-bottom: 2px; }
+        /* 鎖定時仍可切換人員清單（只切換顯示，不會改動資料） */
+        body.view-mode-active #todo-person-select { pointer-events: auto !important; }
     </style>
 
 </head>
@@ -1048,11 +1050,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         <button onclick="addPayer()" class="btn-nav" style="background: rgba(0,0,0,0.05); color: var(--primary-color); width: fit-content; padding: 4px 10px; border-radius: 50px; box-shadow: none;">+ 新增付款人</button>
                     </div>
                 </div>
+                <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 0; margin-bottom: 6px;">+ 新增記帳項目</button>
                 <table id="budget-table">
                     <thead><tr><th>日期</th><th>項目</th><th>付款人</th><th>分攤</th><th>金額</th><th>發票</th></tr></thead>
                     <tbody id="budget-tbody"></tbody>
                 </table>
-                <button class="add-btn" onclick="addBudgetRow()" style="margin-top: 6px;">+ 新增記帳項目</button>
                 <div id="budget-result" style="margin-top:10px; padding-top:10px; border-top:2px dashed rgba(0,0,0,0.05); line-height: 1.5;"></div>
             </div>
         </div>
@@ -1654,6 +1656,28 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         else rightGroup.appendChild(addLinkBtn);
                     }
                 });
+
+                // 🌟 待辦人員清單：以「這支手機」上次選的人為準（雲端資料只提供內容，不決定每個人看哪一份）
+                try {
+                    let savedPerson = localStorage.getItem('travelAppTodoPerson');
+                    let personSel = document.getElementById('todo-person-select');
+                    if (savedPerson && personSel && Array.from(personSel.options).some(o => o.value === savedPerson)) {
+                        personSel.value = savedPerson;
+                        document.querySelectorAll('.person-todo-list').forEach(list => {
+                            list.style.display = list.dataset.person === savedPerson ? 'block' : 'none';
+                        });
+                    }
+                } catch(e) {}
+
+                // 🌟 預算頁：「新增記帳項目」按鈕移到表格上方（舊資料無痛升級）
+                try {
+                    let bTable = document.getElementById('budget-table');
+                    let bAddBtn = document.querySelector('#tab-budget button.add-btn[onclick*="addBudgetRow"]');
+                    if (bTable && bAddBtn && bAddBtn.nextElementSibling !== bTable) {
+                        bAddBtn.style.marginTop = '0'; bAddBtn.style.marginBottom = '6px';
+                        bTable.parentNode.insertBefore(bAddBtn, bTable);
+                    }
+                } catch(e) {}
 
                 // 🌟 子項目（子地點）：舊資料無痛補上「新增連結」按鈕，並統一操作按鈕列（不換行）
                 document.querySelectorAll('.sub-item').forEach(sub => {
@@ -2434,7 +2458,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             saveData();
         }
 
-        // 🌟 預算表自動按時間排序 (從最舊到最新)
+        // 🌟 預算表自動按時間排序 (從最新到最舊)
         function sortBudgetTable() {
             let tbody = document.getElementById('budget-tbody');
             if(!tbody) return;
@@ -2442,7 +2466,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             rows.sort((a, b) => {
                 let tsA = parseInt(a.getAttribute('data-ts')) || 0;
                 let tsB = parseInt(b.getAttribute('data-ts')) || 0;
-                return tsA - tsB; // 由舊排到新
+                return tsB - tsA; // 由新排到舊
             });
             rows.forEach(tr => tbody.appendChild(tr)); // 重新按照順序插回表格
         }
@@ -2571,6 +2595,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             document.querySelectorAll('.person-todo-list').forEach(list => {
                 list.style.display = list.dataset.person === personName ? 'block' : 'none';
             });
+            try { localStorage.setItem('travelAppTodoPerson', personName); } catch(e) {}
             saveData();
         }
 
