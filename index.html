@@ -444,6 +444,19 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         /* 🌟 行程重疊：「隔」的時間變成負數時用紅色警示 */
         .gap-text.gap-negative { background: rgba(220,38,38,0.13) !important; color: var(--danger-color) !important; }
         .gap-text.gap-negative::before { content: '⚠ '; }
+
+        /* 🌟 營業時間：橘色標籤，一眼就能看到（有填時間才上色；沒填的維持淡灰） */
+        .close-time-wrap:not(.close-time-empty) { width: fit-content; padding: 1px 7px 1px 5px; border-radius: 50px; background: #ffedd5; box-shadow: inset 0 0 0 1px #fdba74; }
+        .close-time-wrap:not(.close-time-empty) .material-icons-round,
+        .close-time-wrap:not(.close-time-empty) .close-time-text,
+        .close-time-wrap:not(.close-time-empty) .close-time-sep { color: #c2410c; }
+        .close-time-wrap:not(.close-time-empty) .close-time-text { font-weight: 800; }
+        .sub-item .close-time-wrap:not(.close-time-empty) { align-self: flex-start; }
+        body.dark-mode .close-time-wrap:not(.close-time-empty) { background: rgba(251,146,60,0.18); box-shadow: inset 0 0 0 1px rgba(251,146,60,0.45); }
+        body.dark-mode .close-time-wrap:not(.close-time-empty) .material-icons-round,
+        body.dark-mode .close-time-wrap:not(.close-time-empty) .close-time-text,
+        body.dark-mode .close-time-wrap:not(.close-time-empty) .close-time-sep { color: #fdba74; }
+        @media print { .close-time-wrap:not(.close-time-empty) { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
     </style>
 
 </head>
