@@ -131,6 +131,19 @@ body.dark-mode .drag-handle, body.dark-mode .sub-drag-handle { color: #52525b; }
         .start-time { font-weight: 800; font-size: 14px; color: var(--primary-color); margin-bottom: 2px; line-height: 1; }
         .duration-wrap { font-size: 9px; font-weight: 700; color: #71717a; background: rgba(0,0,0,0.04); padding: 2px 4px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); color: #a1a1aa; }
         .duration { font-weight: 800; color: var(--primary-color); min-width: 12px; display: inline-block; text-align: center; } .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
+        /* 🌟 關閉時間 (例如：晚上較晚的行程，提醒商家/景點打烊時間) */
+        .close-time-wrap { display: flex; align-items: center; justify-content: center; gap: 2px; margin-top: 3px; white-space: nowrap; }
+        .close-time-wrap .material-icons-round { font-size: 9px !important; color: var(--danger-color); }
+        .close-time { font-size: 9px; font-weight: 700; color: var(--danger-color); outline: none; min-width: 4px; }
+        .close-time:empty::before { content: '關門時間'; color: #a1a1aa; font-weight: 600; }
+        body.dark-mode .close-time:empty::before { color: #71717a; }
+        body.view-mode-active .close-time-wrap.close-time-empty,
+        body.view-mode-active .close-time-wrap:has(.close-time:empty),
+        body.readonly-mode-active .close-time-wrap.close-time-empty,
+        body.readonly-mode-active .close-time-wrap:has(.close-time:empty) { display: none !important; }
+        .sub-item .close-time-wrap { justify-content: flex-start; margin-top: 2px; }
+        .sub-item .close-time-wrap .material-icons-round { font-size: 8px !important; }
+        .sub-item .close-time { font-size: 9px; }
         .auto-start { font-size: 9px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 9px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
 
         /* 🌟 中間：內容與按鈕區塊 */
@@ -171,6 +184,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .day-tab { flex: 0 0 auto; width: 48px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: all 0.3s var(--spring); scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.03); } .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); } .day-tab .day-num { font-size: 14px; font-weight: 800; line-height: 1.1; } .day-tab .day-date { font-size: 9px; opacity: 0.9; margin-top: 2px; font-weight: 600; }
 
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 800; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s var(--spring); white-space: nowrap; height: 24px; } .btn-circle { width: 24px; height: 24px; padding: 0; }
+        /* 🌟 PDF 專屬：導航按鈕在列印時會被隱藏(button 一律不列印)，改用這顆真連結取代，平常完全不顯示 */
+        .pdf-nav-link { display: none; }
+        @media print { .pdf-nav-link { display: inline-flex !important; align-items: center; gap: 2px; font-size: 9px !important; color: #2563eb !important; text-decoration: underline !important; margin-left: 4px; } }
         .travel-time-wrap { font-size:10px; font-weight: 700; color:#52525b; background:rgba(0,0,0,0.04); padding:2px 6px 2px 2px; border-radius:50px; display:inline-flex; align-items:center; gap:4px; white-space: nowrap; flex-shrink: 0; height: 24px; box-sizing: border-box;} body.dark-mode .travel-time-wrap { background: rgba(255,255,255,0.05); color: #d4d4d8;}
         .transport-icon { font-size: 13px !important; background: #ffffff; color: var(--primary-color); border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s var(--spring);} body.dark-mode .transport-icon { background: #27272a; }
         
@@ -303,9 +319,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             .drag-handle, .sub-drag-handle, .day-tabs-wrapper, #mobile-tooltip,
             .img-delete-badge, .img-add-badge, .resizer, .receipt-box,
             .action-box.photo-box:not(.has-photo), .action-box.link-box:not(.has-link),
-            #password-overlay, button, .toggle-more-btn { 
+            #password-overlay, button, .toggle-more-btn,
+            .close-time-wrap.close-time-empty, .close-time-wrap:has(.close-time:empty) { 
                 display: none !important; 
             }
+            .close-time:empty::before { content: '' !important; }
             
                         /* 4. 微調邊界，讓列印版面更乾淨 */
             .glass-card { border: 1px solid #e4e4e7 !important; padding: 16px !important; }
@@ -424,7 +442,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 </head>
 <body>
     <div id="splash-screen">
-        <img id="splash-bg-img" src="splash.png" alt="" onerror="this.style.opacity='0'; setTimeout(()=>this.remove(), 300)">
         <div class="splash-text">
             <h2>2026 古京阪之旅</h2>
             <p id="splash-msg">行程載入中...</p>
@@ -723,6 +740,12 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     let t = n.textContent.replace(/\u00a0/g, ' ').trim();
                     n.classList.toggle('note-empty', t === '' || /^(班次)?備註(\/貼上連結)?[：:]?$/.test(t));
                 });
+                // 1c) 行程「關閉時間」：沒填的話標記 close-time-empty，唯讀/分享唯讀時整列收起
+                document.querySelectorAll('.close-time-wrap').forEach(w => {
+                    let t = w.querySelector('.close-time');
+                    let txt = t ? t.textContent.replace(/\u00a0/g, ' ').trim() : '';
+                    w.classList.toggle('close-time-empty', txt === '');
+                });
                 // 1b) 待辦：「新增分類標題」那一列只在編輯時需要，鎖定時整列收起
                 document.querySelectorAll('#tab-todo .flex-between').forEach(el => {
                     if (el.querySelector(':scope > .add-btn')) el.classList.add('view-hide');
@@ -994,12 +1017,73 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 }
             });
 
+            // 🌟 「導航」按鈕/圖示是用 onclick 動態產生 Google 地圖網址，本身沒有真連結；
+            // 而 button 元素列印時一律隱藏，所以導航連結原本在 PDF 裡會直接消失。
+            // 這裡補上真正的 <a href> 讓它在 PDF 中仍可點擊。
+            document.querySelectorAll('.pdf-nav-link').forEach(a => a.remove()); // 先清除舊的，避免重複匯出時疊加
+
+            function buildItemNavUrl(triggerEl) {
+                let currentItem = triggerEl.closest('.timeline-item') || triggerEl.closest('.glass-card');
+                if (!currentItem) return null;
+                let titleEl = currentItem.querySelector('.item-name-target');
+                let title = titleEl ? titleEl.innerText.trim() : '';
+                if (!title || title === '輸入行程名稱' || title === '輸入飯店名稱') return null;
+                let origin = '', dest = title;
+                let match = title.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+                if (match) { origin = match[1].trim(); dest = match[2].trim(); }
+                else {
+                    let prevItem = currentItem.previousElementSibling;
+                    while (prevItem && !prevItem.classList.contains('timeline-item')) prevItem = prevItem.previousElementSibling;
+                    if (prevItem && prevItem.querySelector('.item-name-target')) {
+                        let prevTitle = prevItem.querySelector('.item-name-target').innerText.trim();
+                        let prevMatch = prevTitle.match(/(.+?)\s*(?:到|->|to|至)\s*(.+)/i);
+                        origin = prevMatch ? prevMatch[2].trim() : prevTitle;
+                    }
+                }
+                let mode = 'transit';
+                let iconEl = currentItem.querySelector('.transport-icon');
+                if (iconEl) {
+                    let t = iconEl.innerText.trim();
+                    if (t === 'directions_walk') mode = 'walking';
+                    if (t === 'directions_car') mode = 'driving';
+                    if (t === 'two_wheeler') mode = 'driving';
+                    if (t === 'flight') mode = 'transit';
+                }
+                let url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=${mode}`;
+                if (origin && origin !== '輸入行程名稱') url += `&origin=${encodeURIComponent(origin)}`;
+                return url;
+            }
+
+            document.querySelectorAll('.btn-nav[onclick*="autoNavigate("]').forEach(btn => {
+                let url = buildItemNavUrl(btn);
+                if (!url) return;
+                let a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                a.className = 'pdf-nav-link';
+                a.textContent = '📍 Google 地圖導航';
+                btn.parentNode.insertBefore(a, btn.nextSibling);
+            });
+
+            document.querySelectorAll('.sub-item [onclick*="autoNavigateSub("]').forEach(icon => {
+                let sub = icon.closest('.sub-item');
+                let titleEl = sub ? sub.querySelector('.sub-item-title') : null;
+                let dest = titleEl ? titleEl.innerText.trim() : '';
+                if (!dest || dest === '輸入子地點/店名') return;
+                let url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest)}`;
+                let a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                a.className = 'pdf-nav-link';
+                a.textContent = '📍';
+                icon.parentNode.insertBefore(a, icon.nextSibling);
+            });
+
             // 觸發系統列印與 PDF 匯出
             window.print();
 
-            // 結束後移除過濾樣式，恢復網頁正常畫面
+            // 結束後移除過濾樣式與暫時的導航連結，恢復網頁正常畫面
             setTimeout(() => {
                 if (filterStyle) filterStyle.remove();
+                document.querySelectorAll('.pdf-nav-link').forEach(a => a.remove());
             }, 1000);
         }
 
@@ -1576,6 +1660,17 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         rightGroup.style.cssText = 'display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end; flex-shrink: 0; margin-left: auto; max-width: 100px;';
                     }
 
+                    // 🌟 舊資料無痛升級：行程項目補上「關閉時間」欄位
+                    if (item.classList.contains('timeline-item') && item.closest('#itinerary-days-container')) {
+                        let timeCol = item.querySelector('.time-column');
+                        if (timeCol && !timeCol.querySelector('.close-time-wrap')) {
+                            let wrap = document.createElement('div');
+                            wrap.className = 'close-time-wrap close-time-empty';
+                            wrap.innerHTML = '<span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span>';
+                            timeCol.appendChild(wrap);
+                        }
+                    }
+
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
                         
@@ -1684,6 +1779,16 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     let group = sub.querySelector('.right-action-group');
                     if (!group) { group = document.createElement('div'); group.className = 'right-action-group'; sub.appendChild(group); }
                     group.style.cssText = 'display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;';
+
+                    // 🌟 舊資料無痛升級：子行程補上「關閉時間」欄位
+                    if (!sub.querySelector('.close-time-wrap')) {
+                        let noteEl = sub.querySelector('.sub-item-note');
+                        let wrap = document.createElement('div');
+                        wrap.className = 'close-time-wrap close-time-empty';
+                        wrap.innerHTML = '<span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span>';
+                        if (noteEl && noteEl.parentNode) noteEl.parentNode.insertBefore(wrap, noteEl.nextSibling);
+                        else sub.insertBefore(wrap, group);
+                    }
 
                     // 舊格式連結（span 上綁 window.open）轉成新格式
                     group.querySelectorAll('.action-box.has-link').forEach(lb => {
@@ -1891,6 +1996,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         <span class="material-icons-round" style="font-size:12px; color:var(--primary-color); cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
+                    <div class="close-time-wrap close-time-empty"><span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span></div>
                 </div>
                 <div class="right-action-group" style="display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;">
                     <div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">link</span></div>
@@ -1917,7 +2023,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             newItem.innerHTML = `
                 <div class="drag-handle">⋮⋮</div>
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div></div>
+                <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty"><span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span></div></div>
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
