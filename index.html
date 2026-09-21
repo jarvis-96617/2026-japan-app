@@ -135,7 +135,7 @@ body.dark-mode .drag-handle, body.dark-mode .sub-drag-handle { color: #52525b; }
         .close-time-wrap { display: flex; align-items: center; justify-content: center; gap: 2px; margin-top: 3px; white-space: nowrap; }
         .close-time-wrap .material-icons-round { font-size: 9px !important; color: var(--danger-color); }
         .close-time { font-size: 9px; font-weight: 700; color: var(--danger-color); outline: none; min-width: 4px; }
-        .close-time:empty::before { content: '關門時間'; color: #a1a1aa; font-weight: 600; }
+        .close-time:empty::before { content: '營業時間'; color: #a1a1aa; font-weight: 600; }
         body.dark-mode .close-time:empty::before { color: #71717a; }
         body.view-mode-active .close-time-wrap.close-time-empty,
         body.view-mode-active .close-time-wrap:has(.close-time:empty),
@@ -1666,10 +1666,17 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         if (timeCol && !timeCol.querySelector('.close-time-wrap')) {
                             let wrap = document.createElement('div');
                             wrap.className = 'close-time-wrap close-time-empty';
-                            wrap.innerHTML = '<span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span>';
+                            wrap.innerHTML = '<span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span>';
                             timeCol.appendChild(wrap);
                         }
                     }
+                    // 🌟 舊版圖示/提示字更新：把先前版本的「關門時間」圖示與提示字換成新的「營業時間」
+                    item.querySelectorAll('.close-time-wrap').forEach(w => {
+                        let icon = w.querySelector('.material-icons-round');
+                        if (icon && icon.textContent.trim() === 'event_busy') icon.textContent = 'schedule';
+                        let ct = w.querySelector('.close-time');
+                        if (ct && ct.getAttribute('title') === '關門/末班時間') ct.setAttribute('title', '營業時間');
+                    });
 
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
@@ -1785,7 +1792,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         let noteEl = sub.querySelector('.sub-item-note');
                         let wrap = document.createElement('div');
                         wrap.className = 'close-time-wrap close-time-empty';
-                        wrap.innerHTML = '<span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span>';
+                        wrap.innerHTML = '<span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span>';
                         if (noteEl && noteEl.parentNode) noteEl.parentNode.insertBefore(wrap, noteEl.nextSibling);
                         else sub.insertBefore(wrap, group);
                     }
@@ -1996,7 +2003,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         <span class="material-icons-round" style="font-size:12px; color:var(--primary-color); cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
-                    <div class="close-time-wrap close-time-empty"><span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span></div>
+                    <div class="close-time-wrap close-time-empty"><span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span></div>
                 </div>
                 <div class="right-action-group" style="display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;">
                     <div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">link</span></div>
@@ -2023,7 +2030,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             newItem.innerHTML = `
                 <div class="drag-handle">⋮⋮</div>
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty"><span class="material-icons-round">event_busy</span><span class="close-time editable" contenteditable="true" title="關門/末班時間"></span></div></div>
+                <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty"><span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span></div></div>
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
