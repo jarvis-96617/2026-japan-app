@@ -132,6 +132,9 @@ body.dark-mode .drag-handle, body.dark-mode .sub-drag-handle { color: #52525b; }
         .start-time-wrap { position: relative; display: inline-block; }
         /* 🌟 蓋在「10:00」文字上方的透明 time input，點擊會跳出手機/電腦原生的捲動式時間選擇器 */
         .start-time-wrap .start-time-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; margin: 0; cursor: pointer; background: transparent; z-index: 2; }
+        .duration-field-wrap { position: relative; display: inline-block; }
+        /* 🌟 停留時間/空檔/交通時間：借用系統的時間捲動選擇器來選「幾小時幾分」，選完換算回分鐘數 */
+        .duration-field-wrap .duration-time-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; margin: 0; cursor: pointer; background: transparent; z-index: 2; }
         .duration-wrap { font-size: 9px; font-weight: 700; color: #71717a; background: rgba(0,0,0,0.04); padding: 2px 4px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); color: #a1a1aa; }
         .duration { font-weight: 800; color: var(--primary-color); min-width: 12px; display: inline-block; text-align: center; } .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
         /* 🌟 關閉時間 (例如：晚上較晚的行程，提醒商家/景點打烊時間) */
@@ -1694,6 +1697,12 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         }
                     }
 
+                    // 🌟 舊資料無痛升級：停留時間 / 交通時間補上「捲動選擇」的透明 time input（文字顯示與計算邏輯完全不變）
+                    if (item.classList.contains('timeline-item') && item.closest('#itinerary-days-container')) {
+                        ensureDurationField(item.querySelector('.duration-wrap > .duration'));
+                        ensureDurationField(item.querySelector('.travel-time-wrap > .travel-time'));
+                    }
+
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
                         
@@ -2048,14 +2057,14 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             newItem.innerHTML = `
                 <div class="drag-handle">⋮⋮</div>
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                <div class="time-column"><div class="start-time-wrap"><div class="start-time editable" contenteditable="true">12:00</div><input type="time" class="start-time-input editable" value="12:00" onchange="syncStartTime(this)"></div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty">${buildCloseTimeHTML()}</div></div>
+                <div class="time-column"><div class="start-time-wrap"><div class="start-time editable" contenteditable="true">12:00</div><input type="time" class="start-time-input editable" value="12:00" onchange="syncStartTime(this)"></div><div class="duration-wrap">停留 <span class="duration-field-wrap"><span class="duration editable" contenteditable="true">1小時</span><input type="time" class="duration-time-input editable" value="01:00" onchange="syncDurationField(this)"></span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty">${buildCloseTimeHTML()}</div></div>
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
                     <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center;">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:16px;">place</span></button>
                         <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add_location_alt</span></button>
-                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
+                        <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="duration-field-wrap"><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span><input type="time" class="duration-time-input editable" value="00:15" onchange="syncDurationField(this)"></span></div>
                     </div>
                 </div>
                 <div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>
@@ -2083,6 +2092,47 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             let card = wrap.closest('.day-card');
             if (card) recalculateDayTime(card, startEl);
             saveData();
+        }
+
+        // 🌟 停留時間 / 空檔(隔幾分) / 交通時間：借用「時間」捲動選擇器選「幾小時幾分」，選完換算回分鐘數寫回原欄位
+        function ensureDurationField(el) {
+            if (!el) return;
+            if (el.parentElement && el.parentElement.classList.contains('duration-field-wrap')) return; // 已經包過，不重複處理
+            let wrap = document.createElement('span');
+            wrap.className = 'duration-field-wrap';
+            el.parentNode.insertBefore(wrap, el);
+            wrap.appendChild(el);
+            let input = document.createElement('input');
+            input.type = 'time';
+            input.className = 'duration-time-input editable';
+            input.setAttribute('onchange', 'syncDurationField(this)');
+            let mins = parseMins(el.innerText);
+            let h = Math.min(Math.floor(mins / 60), 23);
+            let m = mins % 60;
+            input.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            wrap.appendChild(input);
+        }
+
+        function syncDurationField(input) {
+            let wrap = input.closest('.duration-field-wrap'); if (!wrap || !input.value) return;
+            let el = wrap.querySelector('.duration, .gap-mins, .travel-time'); if (!el) return;
+            let parts = input.value.split(':');
+            let mins = (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
+            el.innerText = formatMins(mins);
+            let card = wrap.closest('.day-card');
+            if (card) recalculateDayTime(card, el);
+            saveData();
+        }
+
+        // 🌟 當系統自動改寫 .duration/.gap-mins/.travel-time 的文字時（例如反推空檔），同步更新旁邊隱形的時間選擇器，
+        // 避免下次使用者點開捲動選擇時，滾輪還停在舊的數值上
+        function syncDurationInputFromText(el) {
+            if (!el || !el.parentElement || !el.parentElement.classList.contains('duration-field-wrap')) return;
+            let input = el.parentElement.querySelector('.duration-time-input');
+            if (!input) return;
+            let mins = parseMins(el.innerText);
+            let h = Math.min(Math.floor(mins / 60), 23), m = mins % 60;
+            input.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         }
 
         // 🌟 行程/子行程「營業時間」：捲動選擇起/迄時間後，更新顯示文字並判斷整列是否要在唯讀時收起
@@ -2414,6 +2464,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                                 let oldVal = parseMins(prevGapTextEl.innerText);
                                 prevGapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatMins(oldVal)}</span>`;
                             }
+                            if (prevGapTextEl) ensureDurationField(prevGapTextEl.querySelector('.gap-mins'));
                             
                             let prevGapMinsEl = prevGapTextEl ? prevGapTextEl.querySelector('.gap-mins') : null;
                             let oldGap = prevGapMinsEl ? parseMins(prevGapMinsEl.innerText) : 0;
@@ -2429,6 +2480,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             // 將反推算出來的新空檔寫回上一個行程
                             if (prevGapMinsEl) {
                                 prevGapMinsEl.innerText = formatMins(newGap);
+                                syncDurationInputFromText(prevGapMinsEl);
                             }
                             currentMins = expectedMins + newGap;
                         }
@@ -2470,6 +2522,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     let oldVal = parseMins(gapTextEl.innerText);
                     gapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatMins(oldVal)}</span>`;
                 }
+                if (gapTextEl) ensureDurationField(gapTextEl.querySelector('.gap-mins'));
 
                 if (hasTravel) {
                     let travelMins = travelEl ? parseMins(travelEl.innerText) : 0;
@@ -2497,10 +2550,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             gapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">0分</span>`;
                             timeCol.appendChild(gapTextEl);
                         }
+                        ensureDurationField(gapTextEl.querySelector('.gap-mins'));
                         gapTextEl.style.display = 'inline-block';
                         let gapMinsEl = gapTextEl.querySelector('.gap-mins');
                         let gapMins = gapMinsEl ? parseMins(gapMinsEl.innerText) : 0;
-                        if (gapMinsEl) gapMinsEl.innerText = formatMins(gapMins);
+                        if (gapMinsEl) { gapMinsEl.innerText = formatMins(gapMins); syncDurationInputFromText(gapMinsEl); }
                         
                         currentMins = expectedMins + gapMins; 
                     }
