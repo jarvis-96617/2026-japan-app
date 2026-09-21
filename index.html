@@ -129,21 +129,25 @@ body.dark-mode .drag-handle, body.dark-mode .sub-drag-handle { color: #52525b; }
         /* 🌟 左側：時間區塊 */
         .time-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 44px; flex-shrink: 0; }
         .start-time { font-weight: 800; font-size: 14px; color: var(--primary-color); margin-bottom: 2px; line-height: 1; }
+        .start-time-wrap { position: relative; display: inline-block; }
+        /* 🌟 蓋在「10:00」文字上方的透明 time input，點擊會跳出手機/電腦原生的捲動式時間選擇器 */
+        .start-time-wrap .start-time-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; margin: 0; cursor: pointer; background: transparent; z-index: 2; }
         .duration-wrap { font-size: 9px; font-weight: 700; color: #71717a; background: rgba(0,0,0,0.04); padding: 2px 4px; border-radius: 50px; margin-bottom: 2px; white-space: nowrap; } body.dark-mode .duration-wrap { background: rgba(255,255,255,0.05); color: #a1a1aa; }
         .duration { font-weight: 800; color: var(--primary-color); min-width: 12px; display: inline-block; text-align: center; } .end-time { font-size: 10px; color: #a1a1aa; font-weight: 700; line-height: 1; }
         /* 🌟 關閉時間 (例如：晚上較晚的行程，提醒商家/景點打烊時間) */
         .close-time-wrap { display: flex; align-items: center; justify-content: center; gap: 2px; margin-top: 3px; white-space: nowrap; }
-        .close-time-wrap .material-icons-round { font-size: 9px !important; color: var(--danger-color); }
-        .close-time { font-size: 9px; font-weight: 700; color: var(--danger-color); outline: none; min-width: 4px; }
-        .close-time:empty::before { content: '營業時間'; color: #a1a1aa; font-weight: 600; }
-        body.dark-mode .close-time:empty::before { color: #71717a; }
+        .close-time-wrap .material-icons-round { font-size: 9px !important; color: #71717a; }
+        body.dark-mode .close-time-wrap .material-icons-round { color: #a1a1aa; }
+        .close-time-slot { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 14px; }
+        .close-time-text { font-size: 9px; font-weight: 700; color: #71717a; pointer-events: none; }
+        body.dark-mode .close-time-text { color: #a1a1aa; }
+        .close-time-sep { font-size: 9px; color: #a1a1aa; font-weight: 700; }
+        /* 🌟 覆蓋在文字上方的透明 time input，點擊會打開手機原生的「捲動式」時間選擇器 */
+        .close-time-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; margin: 0; cursor: pointer; background: transparent; }
         body.view-mode-active .close-time-wrap.close-time-empty,
-        body.view-mode-active .close-time-wrap:has(.close-time:empty),
-        body.readonly-mode-active .close-time-wrap.close-time-empty,
-        body.readonly-mode-active .close-time-wrap:has(.close-time:empty) { display: none !important; }
+        body.readonly-mode-active .close-time-wrap.close-time-empty { display: none !important; }
         .sub-item .close-time-wrap { justify-content: flex-start; margin-top: 2px; }
         .sub-item .close-time-wrap .material-icons-round { font-size: 8px !important; }
-        .sub-item .close-time { font-size: 9px; }
         .auto-start { font-size: 9px; color: #a1a1aa; font-weight: 600; margin-top: 6px; line-height: 1.2; text-align: center; white-space: nowrap;} .gap-text { font-size: 9px; color: #71717a; font-weight: 800; line-height: 1.2; text-align: center; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 50px; margin-top: 2px; white-space: nowrap;} body.dark-mode .gap-text { background: rgba(255,255,255,0.1); color: #d4d4d8; }
 
         /* 🌟 中間：內容與按鈕區塊 */
@@ -320,10 +324,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             .img-delete-badge, .img-add-badge, .resizer, .receipt-box,
             .action-box.photo-box:not(.has-photo), .action-box.link-box:not(.has-link),
             #password-overlay, button, .toggle-more-btn,
-            .close-time-wrap.close-time-empty, .close-time-wrap:has(.close-time:empty) { 
+            .close-time-wrap.close-time-empty { 
                 display: none !important; 
             }
-            .close-time:empty::before { content: '' !important; }
             
                         /* 4. 微調邊界，讓列印版面更乾淨 */
             .glass-card { border: 1px solid #e4e4e7 !important; padding: 16px !important; }
@@ -437,50 +440,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         body.view-mode-active #tab-todo .todo-category-header { margin: 6px 0 2px; padding-bottom: 2px; }
         /* 鎖定時仍可切換人員清單（只切換顯示，不會改動資料） */
         body.view-mode-active #todo-person-select { pointer-events: auto !important; }
-
-        /* 🌟 營業時間：滾輪式時間選擇器（開始 / 結束） */
-        .close-time { pointer-events: none; }
-        body:not(.view-mode-active):not(.readonly-mode-active) .close-time-wrap { cursor: pointer; padding: 3px 4px; margin-left: -4px; border-radius: 6px; }
-        body:not(.view-mode-active):not(.readonly-mode-active) .close-time-wrap:active { background: rgba(0,0,0,0.07); }
-        body.dark-mode:not(.view-mode-active):not(.readonly-mode-active) .close-time-wrap:active { background: rgba(255,255,255,0.1); }
-
-        #hours-picker-overlay, #duration-picker-overlay { position: fixed; inset: 0; z-index: 9500; display: none; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0); transition: background 0.25s ease; }
-        #hours-picker-overlay.show, #duration-picker-overlay.show { background: rgba(0,0,0,0.45); }
-        .hp-sheet { width: 100%; max-width: 480px; background: #fff; color: var(--text-main); border-radius: 24px 24px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateY(100%); transition: transform 0.3s var(--spring); box-shadow: 0 -10px 40px rgba(0,0,0,0.2); }
-        #hours-picker-overlay.show .hp-sheet, #duration-picker-overlay.show .hp-sheet { transform: translateY(0); }
-        body.dark-mode .hp-sheet { background: #18181b; }
-        .hp-title { text-align: center; font-size: 15px; font-weight: 800; }
-        .hp-sub { text-align: center; font-size: 11px; color: var(--text-muted); margin: 2px 0 8px; min-height: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .hp-labels { display: flex; justify-content: space-around; font-size: 12px; font-weight: 700; color: var(--text-muted); padding: 0 8px; }
-        .hp-labels span { flex: 1; text-align: center; }
-        .hp-wheels { position: relative; display: flex; align-items: center; justify-content: center; gap: 2px; height: 200px; margin: 4px 0 12px; }
-        .hp-band { position: absolute; left: 8px; right: 8px; top: 80px; height: 40px; border-radius: 10px; background: rgba(0,0,0,0.06); pointer-events: none; }
-        body.dark-mode .hp-band { background: rgba(255,255,255,0.1); }
-        .hp-col { position: relative; z-index: 1; width: 58px; height: 200px; overflow-y: scroll; scroll-snap-type: y mandatory; overscroll-behavior: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-                  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 32%, #000 68%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, #000 32%, #000 68%, transparent 100%); }
-        .hp-col::-webkit-scrollbar { display: none; }
-        .hp-pad { height: 80px; }
-        .hp-item { height: 40px; line-height: 40px; text-align: center; font-size: 20px; font-weight: 700; scroll-snap-align: center; cursor: pointer; font-variant-numeric: tabular-nums; }
-        .hp-sep { position: relative; z-index: 1; font-size: 20px; font-weight: 800; color: var(--text-muted); width: 14px; text-align: center; }
-        .hp-sep.hp-dash { width: 30px; }
-        .hp-btns { display: flex; gap: 8px; }
-        .hp-btns button { flex: 1; border: none; border-radius: 14px; padding: 12px 0; font-size: 14px; font-weight: 800; cursor: pointer; background: #f4f4f5; color: var(--text-main); }
-        body.dark-mode .hp-btns button { background: #27272a; }
-        .hp-btns button.hp-ok { background: var(--primary-color); color: #fff; }
-        body.dark-mode .hp-btns button.hp-ok { color: #09090b; }
-        .hp-btns button.hp-clear { color: var(--danger-color); flex: 0 0 72px; }
-
-        /* 🌟 停留 / 移動時間：滾輪式（XX小時XX分） */
-        .duration, .travel-time { pointer-events: none; }
-        body:not(.view-mode-active):not(.readonly-mode-active) .duration-wrap,
-        body:not(.view-mode-active):not(.readonly-mode-active) .travel-time-wrap { cursor: pointer; }
-        body:not(.view-mode-active):not(.readonly-mode-active) .duration-wrap:active,
-        body:not(.view-mode-active):not(.readonly-mode-active) .travel-time-wrap:active { background: rgba(0,0,0,0.09); }
-        .hp-sep.hp-unit { width: 44px; font-size: 15px; }
-
-        /* 🌟 行程重疊：「隔」的時間變成負數時用紅色警示 */
-        .gap-text.gap-negative { background: rgba(220,38,38,0.13) !important; color: var(--danger-color) !important; }
-        .gap-text.gap-negative::before { content: '⚠ 重疊 '; font-weight: 800; }
     </style>
 
 </head>
@@ -571,19 +530,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 return h * 60 + m;
             }
             let numMatch = str.match(/(\d+)/); return numMatch ? parseInt(numMatch[1]) : 0;
-        }
-
-        // 🌟 「隔」專用：允許負數（負數 = 與下一個行程時間重疊）
-        function parseSignedMins(str) {
-            if (!str) return 0;
-            let s = str.toString().replace(/\s/g, '');
-            let neg = /^(?:隔)?[-−–－負]/.test(s);
-            let v = parseMins(s.replace(/^(?:隔)?[-−–－負]/, ''));
-            return neg ? -v : v;
-        }
-        function formatSignedMins(mins) {
-            if (isNaN(mins)) mins = 0;
-            return mins < 0 ? '-' + formatMins(-mins) : formatMins(mins);
         }
 
         function formatMins(mins) {
@@ -797,11 +743,10 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     let t = n.textContent.replace(/\u00a0/g, ' ').trim();
                     n.classList.toggle('note-empty', t === '' || /^(班次)?備註(\/貼上連結)?[：:]?$/.test(t));
                 });
-                // 1c) 行程「關閉時間」：沒填的話標記 close-time-empty，唯讀/分享唯讀時整列收起
+                // 1c) 行程「營業時間」：起訖時間都沒選的話標記 close-time-empty，唯讀/分享唯讀時整列收起
                 document.querySelectorAll('.close-time-wrap').forEach(w => {
-                    let t = w.querySelector('.close-time');
-                    let txt = t ? t.textContent.replace(/\u00a0/g, ' ').trim() : '';
-                    w.classList.toggle('close-time-empty', txt === '');
+                    let filled = Array.from(w.querySelectorAll('.close-time-input')).some(inp => inp.value);
+                    w.classList.toggle('close-time-empty', !filled);
                 });
                 // 1b) 待辦：「新增分類標題」那一列只在編輯時需要，鎖定時整列收起
                 document.querySelectorAll('#tab-todo .flex-between').forEach(el => {
@@ -1284,6 +1229,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 container.querySelectorAll('.resizer').forEach(el => el.remove());
                 container.querySelectorAll('.view-hide').forEach(el => el.classList.remove('view-hide'));
                 container.querySelectorAll('.note-empty').forEach(el => el.classList.remove('note-empty'));
+                container.querySelectorAll('.close-time-empty').forEach(el => el.classList.remove('close-time-empty'));
                 container.querySelectorAll('.photo-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span>`; } });
                 container.querySelectorAll('.receipt-box').forEach(box => { if (box.querySelector('.spin-icon')) { box.innerHTML = `<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">add_a_photo</span>`; } });
                 container.querySelectorAll('.curr-select, .amount-input').forEach(el => { el.style.width = ''; });
@@ -1717,23 +1663,36 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         rightGroup.style.cssText = 'display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-end; flex-shrink: 0; margin-left: auto; max-width: 100px;';
                     }
 
-                    // 🌟 舊資料無痛升級：行程項目補上「關閉時間」欄位
+                    // 🌟 舊資料無痛升級：行程項目補上「營業時間」欄位（起訖時間、捲動選擇）
                     if (item.classList.contains('timeline-item') && item.closest('#itinerary-days-container')) {
                         let timeCol = item.querySelector('.time-column');
                         if (timeCol && !timeCol.querySelector('.close-time-wrap')) {
                             let wrap = document.createElement('div');
                             wrap.className = 'close-time-wrap close-time-empty';
-                            wrap.innerHTML = '<span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span>';
+                            wrap.innerHTML = buildCloseTimeHTML();
                             timeCol.appendChild(wrap);
                         }
                     }
-                    // 🌟 舊版圖示/提示字更新：把先前版本的「關門時間」圖示與提示字換成新的「營業時間」
-                    item.querySelectorAll('.close-time-wrap').forEach(w => {
-                        let icon = w.querySelector('.material-icons-round');
-                        if (icon && icon.textContent.trim() === 'event_busy') icon.textContent = 'schedule';
-                        let ct = w.querySelector('.close-time');
-                        if (ct && ct.getAttribute('title') === '關門/末班時間') ct.setAttribute('title', '營業時間');
-                    });
+                    // 🌟 舊版欄位升級：把先前「自由輸入單一欄位」的營業時間換成「起訖時間捲動選擇」新版結構
+                    item.querySelectorAll('.close-time-wrap').forEach(w => upgradeCloseTimeWrap(w));
+
+                    // 🌟 舊資料無痛升級：行程開始時間補上「捲動選擇」的透明 time input（文字顯示與計算邏輯完全不變）
+                    if (item.classList.contains('timeline-item') && item.closest('#itinerary-days-container')) {
+                        let startEl = item.querySelector('.time-column > .start-time');
+                        if (startEl) {
+                            let wrap = document.createElement('div');
+                            wrap.className = 'start-time-wrap';
+                            startEl.parentNode.insertBefore(wrap, startEl);
+                            wrap.appendChild(startEl);
+                            let timeInput = document.createElement('input');
+                            timeInput.type = 'time';
+                            timeInput.className = 'start-time-input editable';
+                            let m = startEl.innerText.match(/(\d{1,2}):(\d{2})/);
+                            if (m) timeInput.value = `${m[1].padStart(2,'0')}:${m[2]}`;
+                            timeInput.setAttribute('onchange', 'syncStartTime(this)');
+                            wrap.appendChild(timeInput);
+                        }
+                    }
 
                     if (contentBox && item.closest('#itinerary-days-container')) {
                         let actionRow = contentBox.querySelector('.action-row');
@@ -1844,14 +1803,16 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     if (!group) { group = document.createElement('div'); group.className = 'right-action-group'; sub.appendChild(group); }
                     group.style.cssText = 'display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;';
 
-                    // 🌟 舊資料無痛升級：子行程補上「關閉時間」欄位
+                    // 🌟 舊資料無痛升級：子行程補上「營業時間」欄位
                     if (!sub.querySelector('.close-time-wrap')) {
                         let noteEl = sub.querySelector('.sub-item-note');
                         let wrap = document.createElement('div');
                         wrap.className = 'close-time-wrap close-time-empty';
-                        wrap.innerHTML = '<span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span>';
+                        wrap.innerHTML = buildCloseTimeHTML();
                         if (noteEl && noteEl.parentNode) noteEl.parentNode.insertBefore(wrap, noteEl.nextSibling);
                         else sub.insertBefore(wrap, group);
+                    } else {
+                        upgradeCloseTimeWrap(sub.querySelector('.close-time-wrap'));
                     }
 
                     // 舊格式連結（span 上綁 window.open）轉成新格式
@@ -2060,7 +2021,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         <span class="material-icons-round" style="font-size:12px; color:var(--primary-color); cursor:pointer;" onclick="autoNavigateSub(this, event)" title="單點搜尋">place</span>
                     </div>
                     <span class="editable sub-item-note" contenteditable="true">備註或時間...</span>
-                    <div class="close-time-wrap close-time-empty"><span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span></div>
+                    <div class="close-time-wrap close-time-empty">${buildCloseTimeHTML()}</div>
                 </div>
                 <div class="right-action-group" style="display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;">
                     <div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">link</span></div>
@@ -2087,7 +2048,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             newItem.innerHTML = `
                 <div class="drag-handle">⋮⋮</div>
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                <div class="time-column"><div class="start-time editable" contenteditable="true">12:00</div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty"><span class="material-icons-round">schedule</span><span class="close-time editable" contenteditable="true" title="營業時間"></span></div></div>
+                <div class="time-column"><div class="start-time-wrap"><div class="start-time editable" contenteditable="true">12:00</div><input type="time" class="start-time-input editable" value="12:00" onchange="syncStartTime(this)"></div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty">${buildCloseTimeHTML()}</div></div>
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
@@ -2112,6 +2073,59 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 input.previousElementSibling.innerText = '未定';
             }
             saveData();
+        }
+
+        // 🌟 行程「開始時間」：捲動選擇後，寫回原本的時間文字並觸發原本既有的時間反推/重新計算邏輯
+        function syncStartTime(input) {
+            let wrap = input.closest('.start-time-wrap'); if (!wrap || !input.value) return;
+            let startEl = wrap.querySelector('.start-time'); if (!startEl) return;
+            startEl.innerText = input.value;
+            let card = wrap.closest('.day-card');
+            if (card) recalculateDayTime(card, startEl);
+            saveData();
+        }
+
+        // 🌟 行程/子行程「營業時間」：捲動選擇起/迄時間後，更新顯示文字並判斷整列是否要在唯讀時收起
+        function syncCloseTimeText(input) {
+            let wrap = input.closest('.close-time-wrap'); if (!wrap) return;
+            let slot = input.closest('.close-time-slot');
+            let textEl = slot ? slot.querySelector('.close-time-text') : null;
+            if (textEl) textEl.textContent = input.value || '--:--';
+            let filled = Array.from(wrap.querySelectorAll('.close-time-input')).some(inp => inp.value);
+            wrap.classList.toggle('close-time-empty', !filled);
+            saveData();
+        }
+
+        // 🌟 產生「營業時間」欄位的標準 HTML（時鐘圖示 + 起/迄各一顆透明 time input，點擊會跳出手機原生捲動選擇器）
+        function buildCloseTimeHTML() {
+            return '<span class="material-icons-round">schedule</span>'
+                + '<span class="close-time-slot"><span class="close-time-text">--:--</span><input type="time" class="close-time-input close-time-start editable" onchange="syncCloseTimeText(this)"></span>'
+                + '<span class="close-time-sep">–</span>'
+                + '<span class="close-time-slot"><span class="close-time-text">--:--</span><input type="time" class="close-time-input close-time-end editable" onchange="syncCloseTimeText(this)"></span>';
+        }
+
+        // 🌟 舊版升級：把先前「自由輸入單一欄位」的營業時間，換成「起訖時間捲動選擇」新版結構（能解析出時間就保留）
+        function upgradeCloseTimeWrap(w) {
+            if (w.querySelector('.close-time-input')) return; // 已經是新版，不用處理
+            let oldText = w.querySelector('.close-time[contenteditable]');
+            let startVal = '', endVal = '';
+            if (oldText) {
+                let raw = oldText.textContent.replace(/\u00a0/g, ' ').trim();
+                let m = raw.match(/(\d{1,2}:\d{2})\s*[-–~至到]\s*(\d{1,2}:\d{2})/);
+                if (m) { startVal = m[1]; endVal = m[2]; }
+            }
+            w.innerHTML = buildCloseTimeHTML();
+            if (startVal) {
+                let si = w.querySelector('.close-time-start');
+                si.setAttribute('value', startVal); si.value = startVal;
+                si.closest('.close-time-slot').querySelector('.close-time-text').textContent = startVal;
+            }
+            if (endVal) {
+                let ei = w.querySelector('.close-time-end');
+                ei.setAttribute('value', endVal); ei.value = endVal;
+                ei.closest('.close-time-slot').querySelector('.close-time-text').textContent = endVal;
+            }
+            w.classList.toggle('close-time-empty', !(startVal || endVal));
         }
 
         // 🌟 交通指南：依日期自動排序並產生分組標題
@@ -2397,23 +2411,24 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             // 🌟 防呆：強制升級舊版 HTML 結構，確保時間可以寫入
                             let prevGapTextEl = prevTimeCol ? prevTimeCol.querySelector('.gap-text') : null;
                             if (prevGapTextEl && !prevGapTextEl.querySelector('.gap-mins')) {
-                                let oldVal = parseSignedMins(prevGapTextEl.innerText);
-                                prevGapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatSignedMins(oldVal)}</span>`;
+                                let oldVal = parseMins(prevGapTextEl.innerText);
+                                prevGapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatMins(oldVal)}</span>`;
                             }
                             
                             let prevGapMinsEl = prevGapTextEl ? prevGapTextEl.querySelector('.gap-mins') : null;
-                            let oldGap = prevGapMinsEl ? parseSignedMins(prevGapMinsEl.innerText) : 0;
+                            let oldGap = prevGapMinsEl ? parseMins(prevGapMinsEl.innerText) : 0;
                             
                             // 算回原本的「預計抵達時間」
                             let expectedMins = currentMins - oldGap;
                             // 新空檔 = 手動輸入的時間 - 預計抵達時間
                             let newGap = manualMins - expectedMins;
                             
-                            // 🌟 允許負數：手動輸入比「預計抵達」更早，代表行程重疊，用負的「隔」顯示
+                            // 安全機制：不允許時間倒流
+                            if (newGap < 0) newGap = 0; 
 
                             // 將反推算出來的新空檔寫回上一個行程
                             if (prevGapMinsEl) {
-                                prevGapMinsEl.innerText = formatSignedMins(newGap);
+                                prevGapMinsEl.innerText = formatMins(newGap);
                             }
                             currentMins = expectedMins + newGap;
                         }
@@ -2424,9 +2439,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     let m = currentMins % 60;
                     startEl.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
                 }
-
-                // 🌟 記下這個項目的「絕對開始時間」（不受 24 小時換算影響），拖曳排序時要用
-                item.dataset.absStart = currentMins;
 
                 // 2. 計算結束時間
                 let durMins = durEl ? parseMins(durEl.innerText) : 0;
@@ -2455,8 +2467,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     autoStartEl.classList.add('system-generated');
                 }
                 if (gapTextEl && !gapTextEl.querySelector('.gap-mins')) {
-                    let oldVal = parseSignedMins(gapTextEl.innerText);
-                    gapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatSignedMins(oldVal)}</span>`;
+                    let oldVal = parseMins(gapTextEl.innerText);
+                    gapTextEl.innerHTML = `隔 <span class="gap-mins editable" contenteditable="true">${formatMins(oldVal)}</span>`;
                 }
 
                 if (hasTravel) {
@@ -2476,7 +2488,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
 
                     // 產生或更新「間隔時間」(最後一項則隱藏)
                     if (index === items.length - 1) {
-                        if (gapTextEl) { gapTextEl.style.display = 'none'; gapTextEl.classList.remove('gap-negative'); }
+                        if (gapTextEl) gapTextEl.style.display = 'none';
                         currentMins = expectedMins;
                     } else {
                         if (!gapTextEl) {
@@ -2487,10 +2499,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         }
                         gapTextEl.style.display = 'inline-block';
                         let gapMinsEl = gapTextEl.querySelector('.gap-mins');
-                        let gapMins = gapMinsEl ? parseSignedMins(gapMinsEl.innerText) : 0;
-                        if (gapMinsEl) gapMinsEl.innerText = formatSignedMins(gapMins);
-                        gapTextEl.classList.toggle('gap-negative', gapMins < 0);
-                        gapTextEl.title = gapMins < 0 ? '與下一個行程的時間重疊了' : '';
+                        let gapMins = gapMinsEl ? parseMins(gapMinsEl.innerText) : 0;
+                        if (gapMinsEl) gapMinsEl.innerText = formatMins(gapMins);
                         
                         currentMins = expectedMins + gapMins; 
                     }
@@ -2500,48 +2510,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     currentMins = endMins;
                 }
             });
-        }
-
-        // 🌟 拖曳排序：每個行程「保留自己原本的開始時間」，不再像河流一樣把後面全部推移
-        //    做法：拖曳前先記下每個項目的開始時間；放開後重新排列，再用「隔」（可為負數）把每個項目的時間補回原本的樣子。
-        //    重疊的地方「隔」會變成紅色負數，一眼就看得出哪裡撞時間。
-        function snapshotDayStarts(card) {
-            const snap = new Map();
-            card.querySelectorAll('.timeline-item').forEach(item => {
-                let v = parseInt(item.dataset.absStart, 10);
-                if (isNaN(v)) {
-                    const el = item.querySelector('.start-time');
-                    const m = el && el.innerText.match(/(\d{1,2}):(\d{2})/);
-                    if (m) v = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-                }
-                if (!isNaN(v)) snap.set(item, v);
-            });
-            return snap;
-        }
-
-        function freezeDayStarts(card, snap) {
-            if (!card || !snap) return;
-            recalculateDayTime(card);   // 先整理一次，確保每個項目該有的「隔」欄位都存在
-            const items = Array.from(card.querySelectorAll('.timeline-item'));
-            if (items.length === 0 || items.some(it => !snap.has(it))) return;
-
-            // 第一個項目：直接用它自己原本的開始時間
-            const firstStart = items[0].querySelector('.start-time');
-            if (firstStart) {
-                const v = snap.get(items[0]);
-                firstStart.innerText = `${String(Math.floor(v / 60) % 24).padStart(2, '0')}:${String(((v % 60) + 60) % 60).padStart(2, '0')}`;
-            }
-            // 每個項目的「隔」＝ 下一個項目原本的開始時間 －（自己的開始 + 停留 + 移動）
-            for (let i = 0; i < items.length - 1; i++) {
-                const item = items[i];
-                if (!item.querySelector('.travel-time-wrap')) continue;   // 沒有移動時間欄位的項目沒有「隔」，只能順推
-                const gapMinsEl = item.querySelector('.gap-mins');
-                if (!gapMinsEl) continue;
-                const dur = parseMins((item.querySelector('.duration') || {}).innerText);
-                const travel = parseMins((item.querySelector('.travel-time') || {}).innerText);
-                gapMinsEl.innerText = formatSignedMins(snap.get(items[i + 1]) - (snap.get(item) + dur + travel));
-            }
-            recalculateDayTime(card);
         }
 
         // 2. 交通工具圖示切換
@@ -2595,17 +2563,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     forceFallback: true,
                     fallbackClass: "sortable-drag",
                     fallbackOnBody: true, // 🚨 解決座標分離問題
-                    onStart: function(evt) {
-                        let card = evt.from.closest('.day-card');
-                        window._dragTimeSnap = card ? snapshotDayStarts(card) : null;
-                    },
                     onEnd: function(evt) {
                         let card = evt.item.closest('.day-card');
-                        if (card) {
-                            if (evt.oldIndex !== evt.newIndex && window._dragTimeSnap) freezeDayStarts(card, window._dragTimeSnap);
-                            else recalculateDayTime(card);
-                        }
-                        window._dragTimeSnap = null;
+                        if (card) recalculateDayTime(card);
                         saveData();
                     }
                 }));
@@ -2983,274 +2943,6 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     }));
                 }).observe(document.body, { childList: true, subtree: true });
             });
-    })();
-    </script>
-
-    <script>
-    // ==========================================
-    // 🌟 營業時間：滾輪式選擇器（開始時間 ～ 結束時間，皆可滾動選擇）
-    // 點擊行程 / 子行程的「營業時間」→ 跳出底部選單，時 / 分各自可上下捲動
-    // ==========================================
-    (function () {
-        const ITEM_H = 40;      // 每一格高度（要跟 CSS .hp-item 的 height 一致）
-        const MINUTE_STEP = 5;  // 分鐘間隔：5 = 每 5 分鐘一格；想每分鐘都能選就填 1，只要 00/30 就填 30
-        const HOURS = Array.from({ length: 24 }, (_, i) => i);
-        const MINUTES = Array.from({ length: Math.floor(60 / MINUTE_STEP) }, (_, i) => i * MINUTE_STEP);
-        const pad = n => String(n).padStart(2, '0');
-
-        let overlay = null, cols = {}, currentEl = null;
-
-        // 讀取原本已填的文字（例如 08:00-18:00），讀不到就給預設 09:00–18:00
-        function parseHours(text) {
-            const m = (text || '').match(/(\d{1,2})\s*[:：]\s*(\d{2})\s*[-~～–—至到]+\s*(\d{1,2})\s*[:：]\s*(\d{2})/);
-            if (!m) return { sh: 9, sm: 0, eh: 18, em: 0 };
-            return { sh: parseInt(m[1], 10) % 24, sm: Math.min(59, parseInt(m[2], 10)), eh: parseInt(m[3], 10) % 24, em: Math.min(59, parseInt(m[4], 10)) };
-        }
-
-        function buildCol(id, values) {
-            const col = document.createElement('div');
-            col.className = 'hp-col';
-            col.innerHTML = '<div class="hp-pad"></div>' +
-                values.map((v, i) => `<div class="hp-item" data-i="${i}">${pad(v)}</div>`).join('') +
-                '<div class="hp-pad"></div>';
-            // 點某一格 → 平滑捲到該格
-            col.addEventListener('click', e => {
-                const it = e.target.closest('.hp-item');
-                if (it) col.scrollTo({ top: parseInt(it.dataset.i, 10) * ITEM_H, behavior: 'smooth' });
-            });
-            cols[id] = { el: col, values };
-            return col;
-        }
-
-        function ensureOverlay() {
-            if (overlay) return;
-            overlay = document.createElement('div');
-            overlay.id = 'hours-picker-overlay';
-            overlay.innerHTML = `
-                <div class="hp-sheet" role="dialog" aria-label="營業時間">
-                    <div class="hp-title">營業時間</div>
-                    <div class="hp-sub" id="hp-sub"></div>
-                    <div class="hp-labels"><span>開始</span><span>結束</span></div>
-                    <div class="hp-wheels" id="hp-wheels"><div class="hp-band"></div></div>
-                    <div class="hp-btns">
-                        <button type="button" class="hp-clear" data-act="clear">清除</button>
-                        <button type="button" data-act="cancel">取消</button>
-                        <button type="button" class="hp-ok" data-act="ok">確定</button>
-                    </div>
-                </div>`;
-            const wheels = overlay.querySelector('#hp-wheels');
-            const sep = (txt, cls) => { const d = document.createElement('div'); d.className = 'hp-sep ' + (cls || ''); d.textContent = txt; return d; };
-            wheels.appendChild(buildCol('sh', HOURS));
-            wheels.appendChild(sep(':'));
-            wheels.appendChild(buildCol('sm', MINUTES));
-            wheels.appendChild(sep('～', 'hp-dash'));
-            wheels.appendChild(buildCol('eh', HOURS));
-            wheels.appendChild(sep(':'));
-            wheels.appendChild(buildCol('em', MINUTES));
-
-            overlay.addEventListener('click', e => {
-                if (e.target === overlay) return closePicker();
-                const btn = e.target.closest('button[data-act]');
-                if (!btn) return;
-                const act = btn.dataset.act;
-                if (act === 'cancel') closePicker();
-                else if (act === 'clear') applyValue('');
-                else if (act === 'ok') applyValue(readValue());
-            });
-            document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closePicker(); });
-            document.body.appendChild(overlay);
-        }
-
-        function setCol(id, value) {
-            const { el, values } = cols[id];
-            let idx = values.indexOf(value);
-            if (idx < 0) idx = Math.min(values.length - 1, Math.round(value / (values[1] - values[0] || 1)));   // 分鐘不在間隔上 → 取最近的一格
-            el.style.scrollBehavior = 'auto';
-            el.scrollTop = idx * ITEM_H;
-        }
-        function getCol(id) {
-            const { el, values } = cols[id];
-            const idx = Math.max(0, Math.min(values.length - 1, Math.round(el.scrollTop / ITEM_H)));
-            return values[idx];
-        }
-        function readValue() {
-            return `${pad(getCol('sh'))}:${pad(getCol('sm'))}-${pad(getCol('eh'))}:${pad(getCol('em'))}`;
-        }
-
-        function openPicker(wrap) {
-            const el = wrap.querySelector('.close-time');
-            if (!el) return;
-            ensureOverlay();
-            currentEl = el;
-            const v = parseHours(el.textContent);
-
-            // 副標題：顯示是哪個地點
-            const host = wrap.closest('.sub-item') || wrap.closest('.timeline-item');
-            const nameEl = host && host.querySelector('.sub-item-title, .item-name-target');
-            overlay.querySelector('#hp-sub').textContent = nameEl ? nameEl.textContent.trim() : '';
-
-            document.body.style.overflow = 'hidden';
-            overlay.style.display = 'flex';
-            setCol('sh', v.sh); setCol('sm', v.sm); setCol('eh', v.eh); setCol('em', v.em);
-            requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('show')));
-        }
-
-        function closePicker() {
-            if (!overlay) return;
-            overlay.classList.remove('show');
-            document.body.style.overflow = '';
-            setTimeout(() => { if (!overlay.classList.contains('show')) overlay.style.display = 'none'; }, 300);
-            currentEl = null;
-        }
-
-        function applyValue(text) {
-            if (currentEl) {
-                const wrap = currentEl.closest('.close-time-wrap');
-                currentEl.textContent = text;
-                if (wrap) wrap.classList.toggle('close-time-empty', text === '');
-                try { if (typeof applyCompactViewHelpers === 'function') applyCompactViewHelpers(); } catch (e) {}
-                try { saveData(); } catch (e) { console.error(e); }
-            }
-            closePicker();
-        }
-
-        // 只有「編輯模式」才會開啟；用 capture 階段攔截，避免同時觸發行程卡片的「打勾完成」
-        document.addEventListener('click', function (e) {
-            const wrap = e.target.closest && e.target.closest('.close-time-wrap');
-            if (!wrap) return;
-            if (typeof isEditMode === 'undefined' || !isEditMode) return;
-            if (document.body.classList.contains('view-mode-active') || document.body.classList.contains('readonly-mode-active')) return;
-            e.stopPropagation();
-            e.preventDefault();
-            openPicker(wrap);
-        }, true);
-    })();
-    </script>
-
-    <script>
-    // ==========================================
-    // 🌟 停留時間 / 移動時間：滾輪式選擇器（XX小時 XX分）
-    // ==========================================
-    (function () {
-        const ITEM_H = 40;                 // 要跟 CSS .hp-item 的 height 一致
-        const DURATION_MINUTE_STEP = 1;    // 分鐘間隔：1 = 每分鐘（地圖給的 17 分、56 分都選得到）；想 5 分鐘一格就填 5
-        const HOURS = Array.from({ length: 25 }, (_, i) => i);   // 0 ~ 24 小時
-        const MINUTES = Array.from({ length: Math.floor(60 / DURATION_MINUTE_STEP) }, (_, i) => i * DURATION_MINUTE_STEP);
-        const pad = n => String(n).padStart(2, '0');
-
-        let overlay = null, cols = {}, currentEl = null;
-
-        function buildCol(id, values) {
-            const col = document.createElement('div');
-            col.className = 'hp-col';
-            col.innerHTML = '<div class="hp-pad"></div>' +
-                values.map((v, i) => `<div class="hp-item" data-i="${i}">${pad(v)}</div>`).join('') +
-                '<div class="hp-pad"></div>';
-            col.addEventListener('click', e => {
-                const it = e.target.closest('.hp-item');
-                if (it) col.scrollTo({ top: parseInt(it.dataset.i, 10) * ITEM_H, behavior: 'smooth' });
-            });
-            cols[id] = { el: col, values };
-            return col;
-        }
-
-        function ensureOverlay() {
-            if (overlay) return;
-            overlay = document.createElement('div');
-            overlay.id = 'duration-picker-overlay';
-            overlay.innerHTML = `
-                <div class="hp-sheet" role="dialog">
-                    <div class="hp-title" id="dp-title">停留時間</div>
-                    <div class="hp-sub" id="dp-sub"></div>
-                    <div class="hp-wheels" id="dp-wheels"><div class="hp-band"></div></div>
-                    <div class="hp-btns">
-                        <button type="button" data-act="cancel">取消</button>
-                        <button type="button" class="hp-ok" data-act="ok">確定</button>
-                    </div>
-                </div>`;
-            const wheels = overlay.querySelector('#dp-wheels');
-            const unit = txt => { const d = document.createElement('div'); d.className = 'hp-sep hp-unit'; d.textContent = txt; return d; };
-            wheels.appendChild(buildCol('h', HOURS));
-            wheels.appendChild(unit('小時'));
-            wheels.appendChild(buildCol('m', MINUTES));
-            wheels.appendChild(unit('分'));
-
-            overlay.addEventListener('click', e => {
-                if (e.target === overlay) return closePicker();
-                const btn = e.target.closest('button[data-act]');
-                if (!btn) return;
-                if (btn.dataset.act === 'cancel') closePicker();
-                else if (btn.dataset.act === 'ok') applyValue();
-            });
-            document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closePicker(); });
-            document.body.appendChild(overlay);
-        }
-
-        function setCol(id, value) {
-            const { el, values } = cols[id];
-            let idx = values.indexOf(value);
-            if (idx < 0) idx = Math.min(values.length - 1, Math.round(value / (values[1] - values[0] || 1)));
-            el.style.scrollBehavior = 'auto';
-            el.scrollTop = idx * ITEM_H;
-        }
-        function getCol(id) {
-            const { el, values } = cols[id];
-            const idx = Math.max(0, Math.min(values.length - 1, Math.round(el.scrollTop / ITEM_H)));
-            return values[idx];
-        }
-
-        function openPicker(wrap, title) {
-            const el = wrap.querySelector('.duration, .travel-time');
-            if (!el) return;
-            ensureOverlay();
-            currentEl = el;
-            const total = parseMins(el.textContent);
-
-            const host = wrap.closest('.timeline-item');
-            const nameEl = host && host.querySelector('.item-name-target');
-            overlay.querySelector('#dp-title').textContent = title;
-            overlay.querySelector('#dp-sub').textContent = nameEl ? nameEl.textContent.trim() : '';
-
-            document.body.style.overflow = 'hidden';
-            overlay.style.display = 'flex';
-            setCol('h', Math.min(24, Math.floor(total / 60)));
-            setCol('m', total % 60);
-            requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('show')));
-        }
-
-        function closePicker() {
-            if (!overlay) return;
-            overlay.classList.remove('show');
-            document.body.style.overflow = '';
-            setTimeout(() => { if (!overlay.classList.contains('show')) overlay.style.display = 'none'; }, 300);
-            currentEl = null;
-        }
-
-        function applyValue() {
-            if (currentEl) {
-                const h = getCol('h'), m = getCol('m');
-                currentEl.textContent = formatMins(h * 60 + m);
-                const card = currentEl.closest('.day-card');
-                try { if (card) recalculateDayTime(card); } catch (e) { console.error(e); }
-                try { saveData(); } catch (e) { console.error(e); }
-            }
-            closePicker();
-        }
-
-        // 只有「編輯模式」才會開啟；capture 階段攔截，避免同時觸發行程卡片的「打勾完成」
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest) return;
-            if (typeof isEditMode === 'undefined' || !isEditMode) return;
-            if (document.body.classList.contains('view-mode-active') || document.body.classList.contains('readonly-mode-active')) return;
-            if (e.target.closest('.transport-icon')) return;    // 點交通工具圖示仍然是切換 步行/電車/開車…
-            const dur = e.target.closest('.duration-wrap');
-            const trv = e.target.closest('.travel-time-wrap');
-            const wrap = dur || trv;
-            if (!wrap) return;
-            e.stopPropagation();
-            e.preventDefault();
-            openPicker(wrap, dur ? '停留時間' : '移動時間');
-        }, true);
     })();
     </script>
 
