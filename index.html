@@ -188,6 +188,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .day-tab { flex: 0 0 auto; width: 48px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; cursor: pointer; transition: all 0.3s var(--spring); scroll-snap-align: start; box-shadow: 0 2px 8px rgba(0,0,0,0.03); } .day-tab.active { background: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-4px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); } .day-tab .day-num { font-size: 14px; font-weight: 800; line-height: 1.1; } .day-tab .day-date { font-size: 9px; opacity: 0.9; margin-top: 2px; font-weight: 600; }
 
         .btn-nav { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: var(--primary-color); color: white; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 800; text-decoration: none; cursor: pointer; border: none; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.2s var(--spring); white-space: nowrap; height: 24px; } .btn-circle { width: 24px; height: 24px; padding: 0; }
+        .add-sub-btn { border-radius: 8px !important; }
         /* 🌟 PDF 專屬：導航按鈕在列印時會被隱藏(button 一律不列印)，改用這顆真連結取代，平常完全不顯示 */
         .pdf-nav-link { display: none; }
         @media print { .pdf-nav-link { display: inline-flex !important; align-items: center; gap: 2px; font-size: 9px !important; color: #2563eb !important; text-decoration: underline !important; margin-left: 4px; } }
@@ -1767,7 +1768,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                                 btn.setAttribute('onclick', 'addSubItem(this, event)');
                                 btn.setAttribute('title', '新增子地點');
                                 btn.style.background = '#0284c7';
-                                btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">add_location_alt</span>';
+                                btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">add</span>';
                                 actionRow.insertBefore(btn, actionRow.children[1] || actionRow.firstChild);
                             }
                         }
@@ -2096,7 +2097,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     <div class="item-note editable" contenteditable="true">備註：</div>
                     <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center;">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:16px;">place</span></button>
-                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add_location_alt</span></button>
+                        <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add</span></button>
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
                     </div>
                 </div>
