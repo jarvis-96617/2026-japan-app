@@ -976,7 +976,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
     <script>
         function toggleMoreOptions() { let bar = document.getElementById('more-options-bar'); let icon = document.getElementById('more-options-icon'); if(bar.style.display === 'none') { bar.style.display = 'flex'; icon.innerText = 'expand_less'; } else { bar.style.display = 'none'; icon.innerText = 'more_vert'; } adjustStickyTabs(); }
         function forceManualSave() { saveData(true); }
-        function recordHistory() { if (typeof LZString === 'undefined' || !isEditMode) return; let state = captureState(); let compressed = LZString.compressToUTF16(JSON.stringify(state)); if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== compressed) { undoStack.push(compressed); if (undoStack.length > 20) undoStack.shift(); redoStack = []; } }
+        function recordHistory() { if (typeof LZString === 'undefined' || !isEditMode) return; let state = captureState(); let compressed = LZString.compressToUTF16(JSON.stringify(state)); if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== compressed) { undoStack.push(compressed); if (undoStack.length > 50) undoStack.shift(); redoStack = []; } }
         function restoreState(compressedData) { try { let state = JSON.parse(LZString.decompressFromUTF16(compressedData)); if(state && state.html) { if (state.lastModified) lastCloudModifiedTime = state.lastModified; document.getElementById('main-container').innerHTML = sanitizeHTML(state.html); if(state.heroHtml) document.getElementById('hero-container').innerHTML = sanitizeHTML(state.heroHtml); if(state.payersData) payers = state.payersData; renderPayerTags(); rebindEvents(); calcBudget(); initSortable(); makeTableResizable(); } } catch(e) { console.error("復原失敗", e); } }
         function undoAction() { if (undoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); redoStack.push(currentState); restoreState(undoStack.pop()); saveData(false, true); } else { alert("已經是最早的狀態，無法再上一步囉！"); } }
         function redoAction() { if (redoStack.length > 0) { let currentState = LZString.compressToUTF16(JSON.stringify(captureState())); undoStack.push(currentState); restoreState(redoStack.pop()); saveData(false, true); } else { alert("沒有可以重做的動作囉！"); } }
@@ -1772,6 +1772,12 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                                 btn.style.background = '#0284c7';
                                 btn.innerHTML = '<span class="material-icons-round" style="font-size:16px;">add</span>';
                                 actionRow.insertBefore(btn, actionRow.children[1] || actionRow.firstChild);
+                            } else {
+                                // 🌟 舊資料無痛升級：既有的「新增子地點」按鈕，圖示強制同步成目前的標準樣式
+                                let addSubBtn = actionRow.querySelector('.add-sub-btn');
+                                let addSubIcon = addSubBtn.querySelector('.material-icons-round');
+                                if (addSubIcon) { addSubIcon.textContent = 'add'; addSubIcon.style.fontSize = '16px'; addSubIcon.style.color = ''; }
+                                addSubBtn.style.background = '#0284c7';
                             }
                         }
 
