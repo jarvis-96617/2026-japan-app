@@ -212,6 +212,8 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         @keyframes spin { 100% { transform: rotate(360deg); } } .spin-icon { animation: spin 1.5s linear infinite; }
 
         .sub-items-container { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 4px; padding-left: 28px; box-sizing: border-box; }
+        .sub-items-container.collapsed { display: none; }
+        .sub-toggle-btn { background: #71717a; }
         .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 24px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid #71717a; transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: #a1a1aa;}
         .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
@@ -1880,6 +1882,50 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         let ref = group.querySelector('.photo-box') || group.querySelector('.delete-btn') || null;
                         group.insertBefore(addLinkBtn, ref);
                     }
+
+                    // 🌟 舊資料無痛升級：子地點最前面的圖示，強制同步成目前的標準樣式
+                    let subTitleEl = sub.querySelector('.sub-item-title');
+                    let subIconEl = subTitleEl ? subTitleEl.previousElementSibling : null;
+                    if (subIconEl && subIconEl.classList.contains('material-icons-round')) {
+                        subIconEl.textContent = 'subdirectory_arrow_right';
+                        subIconEl.style.fontSize = '12px';
+                        subIconEl.style.color = 'var(--text-muted)';
+                    }
+                });
+
+                // 🌟 舊資料無痛升級：待辦「事前準備類」分類標題的圖示，強制同步成目前的標準樣式
+                document.querySelectorAll('.todo-category-header').forEach(header => {
+                    let addBox = header.querySelector('.action-box[onclick*="addTodoItemHere"]');
+                    if (addBox) {
+                        let icon = addBox.querySelector('.material-icons-round');
+                        if (icon) { icon.textContent = 'add_circle_outline'; icon.style.fontSize = '16px'; icon.style.color = 'var(--primary-color)'; }
+                    }
+                    let delBox = header.querySelector('.action-box.delete-box');
+                    if (delBox) {
+                        let icon = delBox.querySelector('.material-icons-round');
+                        if (icon) { icon.textContent = 'delete'; icon.style.fontSize = '16px'; icon.style.color = 'var(--danger-color)'; }
+                    }
+                });
+
+                // 🌟 舊資料無痛升級：行程項目補上「收合子地點」按鈕（沒有子地點時自動隱藏）
+                document.querySelectorAll('.timeline-item').forEach(item => {
+                    if (!item.querySelector('.action-row')) return; // 只有「行程」項目才有子地點功能
+                    let toggleBtn = item.querySelector('.sub-toggle-btn');
+                    if (!toggleBtn) {
+                        toggleBtn = document.createElement('button');
+                        toggleBtn.className = 'btn-nav btn-circle sub-toggle-btn';
+                        toggleBtn.setAttribute('onclick', 'toggleSubItems(this, event)');
+                        toggleBtn.title = '收合/展開子地點';
+                        toggleBtn.style.background = '#71717a';
+                        toggleBtn.innerHTML = '<span class="material-icons-round sub-toggle-icon" style="font-size:16px;">expand_more</span>';
+                        let addSubBtn = item.querySelector('.add-sub-btn');
+                        if (addSubBtn) addSubBtn.insertAdjacentElement('afterend', toggleBtn);
+                        else item.querySelector('.action-row').appendChild(toggleBtn);
+                    }
+                    let container = item.querySelector('.sub-items-container');
+                    let icon = toggleBtn.querySelector('.sub-toggle-icon');
+                    if (icon) icon.textContent = (container && container.classList.contains('collapsed')) ? 'expand_more' : 'expand_less';
+                    updateSubToggleVisibility(item);
                 });
 
                 document.querySelectorAll('img').forEach(img => { if(!img.hasAttribute('onerror') && img.id !== 'splash-bg-img') { img.setAttribute('onerror', 'handleImageError(this)'); } });
@@ -2073,8 +2119,33 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 </div>
             `;
             container.appendChild(sub);
+            container.classList.remove('collapsed');
+            updateSubToggleVisibility(timelineItem);
             initSortable();
             saveData();
+        }
+
+        // 🌟 收合/展開子地點清單
+        function toggleSubItems(btn, event) {
+            if(event) event.stopPropagation();
+            let timelineItem = btn.closest('.timeline-item');
+            let container = timelineItem ? timelineItem.querySelector('.sub-items-container') : null;
+            if (!container) return;
+            let collapsed = container.classList.toggle('collapsed');
+            let icon = btn.querySelector('.sub-toggle-icon');
+            if (icon) icon.textContent = collapsed ? 'expand_more' : 'expand_less';
+            btn.title = collapsed ? '展開子地點' : '收合子地點';
+            saveData();
+        }
+
+        // 🌟 根據「是否有子地點」自動顯示/隱藏收合按鈕
+        function updateSubToggleVisibility(timelineItem) {
+            if (!timelineItem) return;
+            let container = timelineItem.querySelector('.sub-items-container');
+            let btn = timelineItem.querySelector('.sub-toggle-btn');
+            if (!btn) return;
+            let hasSubs = !!(container && container.children.length > 0);
+            btn.style.display = hasSubs ? 'flex' : 'none';
         }
 
         function autoNavigateSub(btn, event) {
@@ -2098,6 +2169,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     <div class="action-row" style="margin-top:4px; display:flex; gap:4px; align-items:center;">
                         <button class="btn-nav btn-circle" onclick="autoNavigate(this, event)" title="導航"><span class="material-icons-round" style="font-size:16px;">place</span></button>
                         <button class="btn-nav btn-circle add-sub-btn" onclick="addSubItem(this, event)" title="新增子地點" style="background:#0284c7;"><span class="material-icons-round" style="font-size:16px;">add</span></button>
+                        <button class="btn-nav btn-circle sub-toggle-btn" onclick="toggleSubItems(this, event)" title="收合/展開子地點" style="background:#71717a; display:none;"><span class="material-icons-round sub-toggle-icon" style="font-size:16px;">expand_less</span></button>
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
                     </div>
                 </div>
@@ -2290,9 +2362,11 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
     event.stopPropagation(); 
     if(confirm("確定刪除此子地點嗎？")) { 
         let subItem = btn.closest('.sub-item'); 
+        let timelineItem = btn.closest('.timeline-item'); 
         let imgs = subItem.querySelectorAll('img'); 
         imgs.forEach(img => { if (img) deleteImageFromCloud(img.src); }); 
         subItem.remove(); 
+        updateSubToggleVisibility(timelineItem); 
         saveData(); 
     } 
 }
