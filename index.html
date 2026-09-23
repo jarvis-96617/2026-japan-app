@@ -215,6 +215,10 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
         .sub-items-container.collapsed { display: none; }
         .sub-toggle-btn { background: #71717a; }
         .sub-item { display: flex; align-items: flex-start; gap: 4px; padding: 4px 6px 4px 24px; background: rgba(0,0,0,0.02); border-radius: 12px; border-left: 3px solid #71717a; transition: all 0.3s var(--spring); position: relative; width: 100%; box-sizing: border-box; }
+        .sub-item.completed { opacity: 0.4; filter: grayscale(100%); }
+        .sub-item .checkbox-wrapper { padding-top: 0; }
+        .sub-item .custom-checkbox { width: 15px; height: 15px; }
+        .sub-item .completed .custom-checkbox::after, .sub-item.completed .custom-checkbox::after { font-size: 11px; }
         body.dark-mode .sub-item { background: rgba(255,255,255,0.03); border-left-color: #a1a1aa;}
         .sub-item::before { content: '⋮⋮'; position: absolute; left: 4px; top: 16px; transform: translateY(-50%); color: #d4d4d8; font-size: 11px; letter-spacing: -1px; pointer-events: none; }
         body.dark-mode .sub-item::before { color: #52525b; }
@@ -1876,6 +1880,19 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     if (!group) { group = document.createElement('div'); group.className = 'right-action-group'; sub.appendChild(group); }
                     group.style.cssText = 'display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;';
 
+                    // 🌟 舊資料無痛升級：子地點補上核取框（只有點到圈圈本身才會打勾，不影響拖曳/打字）
+                    if (!sub.getAttribute('onclick') || !sub.getAttribute('onclick').includes('toggleComplete')) {
+                        sub.setAttribute('onclick', 'toggleComplete(this, event)');
+                    }
+                    if (!sub.querySelector('.checkbox-wrapper')) {
+                        let cbWrap = document.createElement('div');
+                        cbWrap.className = 'checkbox-wrapper';
+                        cbWrap.innerHTML = '<div class="custom-checkbox"></div>';
+                        let handle = sub.querySelector('.sub-drag-handle');
+                        if (handle && handle.nextSibling) sub.insertBefore(cbWrap, handle.nextSibling);
+                        else sub.insertBefore(cbWrap, sub.firstChild);
+                    }
+
                     // 🌟 舊資料無痛升級：子行程補上「營業時間」欄位
                     if (!sub.querySelector('.close-time-wrap')) {
                         let noteEl = sub.querySelector('.sub-item-note');
@@ -2140,8 +2157,10 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             
             let sub = document.createElement('div');
             sub.className = 'sub-item';
+            sub.setAttribute('onclick', 'toggleComplete(this, event)');
             sub.innerHTML = `
                 <div class="sub-drag-handle">⋮⋮</div>
+                <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
                 <div style="flex-grow:1; display:flex; flex-direction:column; min-width:0;">
                     <div style="display:flex; align-items:center; gap:4px;">
                         <span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">subdirectory_arrow_right</span>
