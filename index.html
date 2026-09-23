@@ -3306,6 +3306,9 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 return; // 點到空白處、文字、按鈕等，一律直接中斷！絕對不打勾！
             }
             
+            // 🌟 核心防護 4：阻止事件往上冒泡，避免子項目的勾選觸發到外層主項目的 toggleComplete
+            e.stopPropagation();
+
             // 通過層層安檢，執行打勾
             item.classList.toggle('completed');
             
