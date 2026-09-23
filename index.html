@@ -1919,6 +1919,17 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         subIconEl.style.fontSize = '12px';
                         subIconEl.style.color = 'var(--text-muted)';
                     }
+
+                    // 🌟 舊資料無痛升級：子地點補上「移動到別天」按鈕
+                    if (!group.querySelector('.move-box')) {
+                        let moveBox = document.createElement('div');
+                        moveBox.className = 'action-box move-box';
+                        moveBox.setAttribute('onclick', 'openMoveSubDayMenu(this, event)');
+                        moveBox.setAttribute('title', '移動到別天的行程底下');
+                        moveBox.innerHTML = '<span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">event_repeat</span>';
+                        let delBtnRef = group.querySelector('.delete-btn') || group.querySelector('.delete-box');
+                        if (delBtnRef) group.insertBefore(moveBox, delBtnRef); else group.appendChild(moveBox);
+                    }
                 });
 
                 // 🌟 舊資料無痛升級：待辦「事前準備類」分類標題的圖示，強制同步成目前的標準樣式
@@ -2143,6 +2154,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 <div class="right-action-group" style="display:flex; flex-direction:row; flex-wrap:nowrap; margin-left:auto; gap:4px; align-items:center; justify-content:flex-end; flex-shrink:0; max-width:none;">
                     <div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">link</span></div>
                     <div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">image</span></div>
+                    <div class="action-box move-box" onclick="openMoveSubDayMenu(this, event)" title="移動到別天的行程底下"><span class="material-icons-round" style="font-size:12px; color:var(--text-muted);">event_repeat</span></div>
                     <div class="action-box delete-btn" onclick="deleteSubItem(this, event)"><span class="material-icons-round" style="font-size:12px; color:var(--danger-color);">close</span></div>
                 </div>
             `;
@@ -2257,6 +2269,104 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             if (addBtn) targetCard.insertBefore(item, addBtn); else targetCard.appendChild(item);
             if (sourceCard) recalculateDayTime(sourceCard);
             recalculateDayTime(targetCard);
+            initSortable();
+            rebindEvents();
+            saveData();
+        }
+
+        // 🌟 子地點「移動到別天」：先選天，再選那天底下要掛在哪個行程項目下面
+        function openMoveSubDayMenu(btn, event) {
+            event.stopPropagation();
+            let sub = btn.closest('.sub-item');
+            if (!sub) return;
+            let sourceParentItem = sub.closest('.timeline-item');
+            let sourceCard = sub.closest('.day-card');
+            let cards = Array.from(document.querySelectorAll('#itinerary-days-container .day-card'));
+            if (cards.length === 0) return;
+
+            let overlay = document.createElement('div');
+            overlay.className = 'move-day-overlay';
+            overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;';
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+            let menu = document.createElement('div');
+            menu.style.cssText = 'background:var(--glass-bg); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:20px; padding:16px; width:100%; max-width:280px; max-height:70vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.2); border:1px solid var(--glass-border);';
+            menu.dataset.step = 'day';
+
+            function renderDayStep() {
+                menu.innerHTML = '';
+                menu.dataset.step = 'day';
+                let title = document.createElement('div');
+                title.style.cssText = 'font-weight:800; font-size:15px; margin-bottom:10px; text-align:center; color:var(--text-color);';
+                title.textContent = '子地點要搬到哪一天？';
+                menu.appendChild(title);
+
+                cards.forEach((card) => {
+                    let titleEl = card.querySelector('.section-title');
+                    let label = titleEl ? titleEl.innerText.trim() : '未命名的一天';
+                    let isSource = (card === sourceCard);
+                    let row = document.createElement('div');
+                    row.style.cssText = 'padding:12px 14px; border-radius:14px; margin-bottom:6px; font-size:14px; font-weight:700; display:flex; justify-content:space-between; align-items:center; color:var(--text-color); background:rgba(127,127,127,0.1); cursor:pointer;';
+                    row.innerHTML = `<span>${label}</span>` + (isSource ? '<span style="font-size:11px; font-weight:600;">目前所在天</span>' : '');
+                    row.onclick = () => renderParentStep(card);
+                    menu.appendChild(row);
+                });
+
+                let cancelBtn = document.createElement('div');
+                cancelBtn.style.cssText = 'text-align:center; padding:10px; margin-top:4px; color:var(--text-muted); font-size:13px; cursor:pointer; font-weight:700;';
+                cancelBtn.textContent = '取消';
+                cancelBtn.onclick = () => overlay.remove();
+                menu.appendChild(cancelBtn);
+            }
+
+            function renderParentStep(targetCard) {
+                let parents = Array.from(targetCard.querySelectorAll(':scope > .timeline-item'));
+                if (parents.length === 0) { alert('這天還沒有任何行程項目，請先在那天新增一個行程，再把子地點搬過去。'); return; }
+
+                menu.innerHTML = '';
+                menu.dataset.step = 'parent';
+                let title = document.createElement('div');
+                title.style.cssText = 'font-weight:800; font-size:15px; margin-bottom:10px; text-align:center; color:var(--text-color);';
+                title.textContent = '要掛在哪個行程底下？';
+                menu.appendChild(title);
+
+                parents.forEach((parentItem) => {
+                    let isSource = (parentItem === sourceParentItem);
+                    let nameEl = parentItem.querySelector('.item-name-target');
+                    let label = nameEl ? nameEl.innerText.trim() : '未命名的行程';
+                    let row = document.createElement('div');
+                    row.style.cssText = 'padding:12px 14px; border-radius:14px; margin-bottom:6px; font-size:14px; font-weight:700; display:flex; justify-content:space-between; align-items:center; color:var(--text-color);' + (isSource ? 'opacity:0.4;' : 'background:rgba(127,127,127,0.1); cursor:pointer;');
+                    row.innerHTML = `<span>${label}</span>` + (isSource ? '<span style="font-size:11px; font-weight:600;">目前所在項目</span>' : '');
+                    if (!isSource) {
+                        row.onclick = () => { moveSubItemToParent(sub, sourceParentItem, parentItem); overlay.remove(); };
+                    }
+                    menu.appendChild(row);
+                });
+
+                let backBtn = document.createElement('div');
+                backBtn.style.cssText = 'text-align:center; padding:10px; margin-top:4px; color:var(--text-muted); font-size:13px; cursor:pointer; font-weight:700;';
+                backBtn.textContent = '← 換一天';
+                backBtn.onclick = () => renderDayStep();
+                menu.appendChild(backBtn);
+            }
+
+            renderDayStep();
+            overlay.appendChild(menu);
+            document.body.appendChild(overlay);
+        }
+
+        // 🌟 把子地點搬到目標行程項目底下的最後面
+        function moveSubItemToParent(sub, sourceParentItem, targetParentItem) {
+            let container = targetParentItem.querySelector('.sub-items-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'sub-items-container';
+                targetParentItem.appendChild(container);
+            }
+            container.appendChild(sub);
+            container.classList.remove('collapsed');
+            if (sourceParentItem) updateSubToggleVisibility(sourceParentItem);
+            updateSubToggleVisibility(targetParentItem);
             initSortable();
             rebindEvents();
             saveData();
@@ -2888,7 +2998,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 }));
             });
 
-            // 🌟 3. 子項目排序
+            // 🌟 3. 子項目排序（同一天內，不同行程項目底下的子地點可以互相拖曳搬過去）
             document.querySelectorAll('.sub-items-container').forEach(container => {
                 window.sortableInstances.push(new Sortable(container, { 
                     animation: 150, 
@@ -2898,7 +3008,15 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                     forceFallback: true,
                     fallbackClass: "sortable-drag",
                     fallbackOnBody: true, // 🚨 解決座標分離問題
-                    onEnd: function() { saveData(); } 
+                    group: 'sub-items-shared',
+                    onEnd: function(evt) {
+                        let fromParent = evt.from.closest('.timeline-item');
+                        let toParent = evt.to.closest('.timeline-item');
+                        evt.to.classList.remove('collapsed');
+                        if (fromParent) updateSubToggleVisibility(fromParent);
+                        if (toParent && toParent !== fromParent) updateSubToggleVisibility(toParent);
+                        saveData();
+                    } 
                 }));
             });
             
