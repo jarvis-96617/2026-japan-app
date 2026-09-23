@@ -600,7 +600,13 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 if (e.target.classList.contains('duration') || e.target.classList.contains('start-time') || e.target.classList.contains('travel-time') || e.target.classList.contains('gap-mins')) {
                     let card = e.target.closest('.day-card');
                     // 👇 修改這裡：把 e.target (你剛編輯的欄位) 傳進去給系統判斷
-                    if (card) recalculateDayTime(card, e.target);
+                    if (card) {
+                        if (e.target.classList.contains('start-time')) {
+                            adjustStartTimeKeepingDownstream(card, e.target);
+                        } else {
+                            recalculateDayTime(card, e.target);
+                        }
+                    }
                 }
                 saveData();
             }
@@ -1725,6 +1731,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             wrap.appendChild(startEl);
                             let timeInput = document.createElement('input');
                             timeInput.type = 'time';
+                            timeInput.step = '300';
                             timeInput.className = 'start-time-input editable';
                             let m = startEl.innerText.match(/(\d{1,2}):(\d{2})/);
                             if (m) timeInput.value = `${m[1].padStart(2,'0')}:${m[2]}`;
@@ -1732,6 +1739,10 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                             wrap.appendChild(timeInput);
                         }
                     }
+
+                    // 🌟 舊資料無痛升級：既有的開始時間捲動選擇，強制改成「5分鐘」為一個單位
+                    let existingStartTimeInput = item.querySelector('.start-time-input');
+                    if (existingStartTimeInput) existingStartTimeInput.step = '300';
 
                     // 🌟 舊資料無痛升級：停留時間 / 交通時間補上「捲動選擇」的透明 time input（文字顯示與計算邏輯完全不變）
                     if (item.classList.contains('timeline-item') && item.closest('#itinerary-days-container')) {
@@ -1823,6 +1834,17 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         let photoBox = rightGroup.querySelector('.photo-box');
                         if (photoBox) rightGroup.insertBefore(addLinkBtn, photoBox);
                         else rightGroup.appendChild(addLinkBtn);
+                    }
+
+                    // 🌟 舊資料無痛升級：行程項目補上「移動到別天」按鈕
+                    if (item.classList.contains('timeline-item') && item.closest('#itinerary-days-container') && !rightGroup.querySelector('.move-box')) {
+                        let moveBox = document.createElement('div');
+                        moveBox.className = 'action-box move-box';
+                        moveBox.setAttribute('onclick', 'openMoveDayMenu(this, event)');
+                        moveBox.setAttribute('title', '移動到別天');
+                        moveBox.innerHTML = '<span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">event_repeat</span>';
+                        let delBoxRef = rightGroup.querySelector('.delete-box');
+                        if (delBoxRef) rightGroup.insertBefore(moveBox, delBoxRef); else rightGroup.appendChild(moveBox);
                     }
                 });
 
@@ -2168,7 +2190,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             newItem.innerHTML = `
                 <div class="drag-handle">⋮⋮</div>
                 <div class="checkbox-wrapper"><div class="custom-checkbox"></div></div>
-                <div class="time-column"><div class="start-time-wrap"><div class="start-time editable" contenteditable="true">12:00</div><input type="time" class="start-time-input editable" value="12:00" onchange="syncStartTime(this)"></div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty">${buildCloseTimeHTML()}</div></div>
+                <div class="time-column"><div class="start-time-wrap"><div class="start-time editable" contenteditable="true">12:00</div><input type="time" step="300" class="start-time-input editable" value="12:00" onchange="syncStartTime(this)"></div><div class="duration-wrap">停留 <span class="duration editable" contenteditable="true">1小時</span></div><div class="end-time">13:00</div><div class="close-time-wrap close-time-empty">${buildCloseTimeHTML()}</div></div>
                 <div class="content-box">
                     <div class="item-title flex-between"><span class="editable item-name-target" contenteditable="true">輸入行程名稱</span></div>
                     <div class="item-note editable" contenteditable="true">備註：</div>
@@ -2179,9 +2201,65 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                         <div class="travel-time-wrap"><span class="material-icons-round transport-icon" onclick="toggleTransportMode(this, event)">directions_transit</span><span class="editable travel-time" contenteditable="true" style="min-width:15px; border-bottom:1px dashed #ccc; padding:0 2px; text-align:center;">15分</span></div>
                     </div>
                 </div>
-                <div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>
+                <div class="right-action-group"><div class="action-box link-box" onclick="handleItemLink(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">link</span></div><div class="action-box photo-box" onclick="triggerItemUpload(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">image</span></div><div class="action-box move-box" onclick="openMoveDayMenu(this, event)" title="移動到別天"><span class="material-icons-round" style="font-size:14px; color:var(--text-muted);">event_repeat</span></div><div class="action-box delete-box" onclick="deleteItem(this, event)"><span class="material-icons-round" style="font-size:14px; color:var(--danger-color);">delete</span></div></div>
             `;
             btnElement.parentNode.insertBefore(newItem, btnElement); let card = btnElement.closest('.day-card'); if (card) recalculateDayTime(card); saveData();
+        }
+
+        // 🌟 單一行程項目「移動到別天」：跳出天數選單，選好就搬到目標天的最後面
+        function openMoveDayMenu(btn, event) {
+            event.stopPropagation();
+            let item = btn.closest('.timeline-item');
+            if (!item) return;
+            let cards = Array.from(document.querySelectorAll('#itinerary-days-container .day-card'));
+            if (cards.length <= 1) { alert('目前只有一天行程，沒有其他天可以移動。'); return; }
+            let sourceCard = item.closest('.day-card');
+
+            let overlay = document.createElement('div');
+            overlay.className = 'move-day-overlay';
+            overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:10000; display:flex; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;';
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+            let menu = document.createElement('div');
+            menu.style.cssText = 'background:var(--glass-bg); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:20px; padding:16px; width:100%; max-width:280px; max-height:70vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.2); border:1px solid var(--glass-border);';
+
+            let title = document.createElement('div');
+            title.style.cssText = 'font-weight:800; font-size:15px; margin-bottom:10px; text-align:center; color:var(--text-color);';
+            title.textContent = '移動這個行程到哪一天？';
+            menu.appendChild(title);
+
+            cards.forEach((card) => {
+                let titleEl = card.querySelector('.section-title');
+                let label = titleEl ? titleEl.innerText.trim() : '未命名的一天';
+                let isSource = (card === sourceCard);
+                let row = document.createElement('div');
+                row.style.cssText = 'padding:12px 14px; border-radius:14px; margin-bottom:6px; font-size:14px; font-weight:700; display:flex; justify-content:space-between; align-items:center; color:var(--text-color);' + (isSource ? 'opacity:0.4;' : 'background:rgba(127,127,127,0.1); cursor:pointer;');
+                row.innerHTML = `<span>${label}</span>` + (isSource ? '<span style="font-size:11px; font-weight:600;">目前所在天</span>' : '');
+                if (!isSource) {
+                    row.onclick = () => { moveItemToDay(item, sourceCard, card); overlay.remove(); };
+                }
+                menu.appendChild(row);
+            });
+
+            let cancelBtn = document.createElement('div');
+            cancelBtn.style.cssText = 'text-align:center; padding:10px; margin-top:4px; color:var(--text-muted); font-size:13px; cursor:pointer; font-weight:700;';
+            cancelBtn.textContent = '取消';
+            cancelBtn.onclick = () => overlay.remove();
+            menu.appendChild(cancelBtn);
+
+            overlay.appendChild(menu);
+            document.body.appendChild(overlay);
+        }
+
+        // 🌟 把項目搬到目標天的最後面（時間軸不自動重排，維持你手動拖曳的順序）
+        function moveItemToDay(item, sourceCard, targetCard) {
+            let addBtn = targetCard.querySelector('.add-btn');
+            if (addBtn) targetCard.insertBefore(item, addBtn); else targetCard.appendChild(item);
+            if (sourceCard) recalculateDayTime(sourceCard);
+            recalculateDayTime(targetCard);
+            initSortable();
+            rebindEvents();
+            saveData();
         }
 
                 // 🌟 交通指南：處理日期變更
@@ -2202,7 +2280,7 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
             let startEl = wrap.querySelector('.start-time'); if (!startEl) return;
             startEl.innerText = input.value;
             let card = wrap.closest('.day-card');
-            if (card) recalculateDayTime(card, startEl);
+            if (card) adjustStartTimeKeepingDownstream(card, startEl);
             saveData();
         }
 
@@ -2712,6 +2790,35 @@ body.dark-mode .item-note { color: #d4d4d8; border-left-color: rgba(255,255,255,
                 gapMinsEl.innerText = formatSignedMins(snap.get(items[i + 1]) - (snap.get(item) + dur + travel));
             }
             recalculateDayTime(card);
+        }
+
+        // 🌟 手動修改「單一行程的開始時間」時：只反推跟前一個行程的「隔」，
+        //    後面的行程維持原本的實際時間不被推移（做法跟拖曳排序的凍結邏輯一致）
+        function adjustStartTimeKeepingDownstream(card, startEl) {
+            if (!card) return;
+            let items = Array.from(card.querySelectorAll('.timeline-item'));
+            let editedItem = startEl.closest('.timeline-item');
+            let editedIndex = items.indexOf(editedItem);
+
+            // 先記下「修改之前」全部行程的絕對時間，等等要把後面的行程復原成這個樣子
+            let snapBefore = snapshotDayStarts(card);
+
+            // 沿用原本的機制：反推上一個行程的「隔」，並正確顯示使用者剛剛輸入的時間
+            recalculateDayTime(card, startEl);
+
+            if (editedIndex > -1 && editedIndex < items.length - 1 && editedItem.querySelector('.travel-time-wrap')) {
+                let nextItem = items[editedIndex + 1];
+                let gapMinsEl = editedItem.querySelector('.gap-mins');
+                let newAbsStart = parseInt(editedItem.dataset.absStart, 10);
+                let targetNextAbs = snapBefore.get(nextItem);
+                if (gapMinsEl && !isNaN(newAbsStart) && targetNextAbs !== undefined) {
+                    let dur = parseMins((editedItem.querySelector('.duration') || {}).innerText);
+                    let travel = parseMins((editedItem.querySelector('.travel-time') || {}).innerText);
+                    gapMinsEl.innerText = formatSignedMins(targetNextAbs - (newAbsStart + dur + travel));
+                    // 用修正後的「隔」重新展開一次，後面的行程就會回到原本的實際時間
+                    recalculateDayTime(card);
+                }
+            }
         }
 
         // 2. 交通工具圖示切換
